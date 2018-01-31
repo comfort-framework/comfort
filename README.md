@@ -1,6 +1,6 @@
 # COMFORT Framwork
-[![Build Status](https://travis-ci.org/comfort-framework/comfort.svg?branch=master)](https://travis-ci.org/ftrautsch/seppelSHARK)
-[![codecov](https://codecov.io/gh/comfort-framework/comfort/branch/master/graph/badge.svg)](https://codecov.io/gh/ftrautsch/seppelSHARK)
+[![Build Status](https://travis-ci.org/comfort-framework/comfort.svg?branch=master)](https://travis-ci.org/comfort-framework/comfort)
+[![codecov](https://codecov.io/gh/comfort-framework/comfort/branch/master/graph/badge.svg)](https://codecov.io/gh/comfort-framework/comfort)
 [![BCH compliance](https://bettercodehub.com/edge/badge/comfort-framework/comfort?branch=master)](https://bettercodehub.com/)
 
 
