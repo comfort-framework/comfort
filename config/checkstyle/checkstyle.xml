@@ -10,7 +10,7 @@
     <module name="TreeWalker">
         <module name="AvoidStarImport">
             <property name="excludes" value="java.io,java.util,java.util.concurrent,com.google.common.graph,
-            org.apache.bcel.classfile,org.mongodb.morphia.annotations,de.ugoe.cs.seppelshark.data.models,
+            org.apache.bcel.classfile,org.mongodb.morphia.annotations,de.ugoe.cs.comfort.data.models,
             org.apache.bcel.generic,org.jacoco.core.data,com.github.javaparser.ast.stmt" />
         </module>
         <module name="ConstantName"/>

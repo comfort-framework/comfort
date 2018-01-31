@@ -63,7 +63,7 @@ javadoc {
 jar {
     manifest {
         attributes(
-                'Main-Class': 'de.ugoe.cs.seppelshark.Main'
+                'Main-Class': 'de.ugoe.cs.comfort.Main'
         )
     }
 }

@@ -124,10 +124,7 @@ hs_err_pid*
 /config.json
 
 # test config
-seppelshark-framework/src/test/resources/test-configurations/test-config.json
-
-# real config
-seppelshark-framework/config.json
+src/test/resources/test-configurations/test-config.json
 
 # Ignore cache folder
 .cache/

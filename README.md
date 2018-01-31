@@ -183,9 +183,9 @@ gradle shadowJar
 ```
 
 ### Use
-You can call SeppelSHARK in the following way
+You can call COMFORT in the following way
 ```bash
-java -jar build/libs/seppelshark-framework-1.0.0-all.jar "path_to_config.json"
+java -jar build/libs/comfort-1.0.0-all.jar "path_to_config.json"
 ```
 
 For an example of a config.json file, please look 

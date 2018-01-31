@@ -21,7 +21,7 @@
         </dependency>
         <dependency>
             <groupId>de.ugoe.cs</groupId>
-            <artifactId>seppelshark-jacoco-listener</artifactId>
+            <artifactId>comfort-jacoco-listener</artifactId>
             <version>1.0.0</version>
             <scope>test</scope>
         </dependency>
@@ -41,22 +41,21 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.20</version>
+                <version>2.20.1</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.surefire</groupId>
+                        <artifactId>surefire-junit47</artifactId>
+                        <version>2.20.1</version>
+                    </dependency>
+                </dependencies>
                 <configuration>
                     <properties>
                         <property>
                             <name>listener</name>
-                            <value>de.ugoe.cs.seppelshark.listener.JUnitListener</value>
+                            <value>de.ugoe.cs.comfort.listener.JUnitListener</value>
                         </property>
                     </properties>
-                    <includes>
-                        <include>**/*Test.java</include>
-                        <include>**/*TestBinary.java</include>
-                        <include>**/*TestPermutations.java</include>
-                    </includes>
-                    <excludes>
-                        <exclude>**/*AbstractTest.java</exclude>
-                    </excludes>
                 </configuration>
             </plugin>
             <plugin>
