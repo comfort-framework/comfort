@@ -1,0 +1,22 @@
+{
+  "projectName": "javaproject",
+  "projectDir": "TRAVIS_BUILD_DIR/seppelshark-framework/src/test/resources/loaderTestData/dependencygraph/",
+  "collections": [
+    {
+      "loader": {
+        "name": "DependencyGraphLoader"
+      },
+      "filters": [
+        "SameProjectFilter"
+      ],
+      "collectors": [
+        "ISTQBTestTypeCollector",
+        "IEEETestTypeCollector"
+      ]
+    }
+  ],
+  "filer": {
+    "name": "CSVFiler",
+    "metricsCSVPath": "TRAVIS_BUILD_DIR/out.csv"
+  }
+}
