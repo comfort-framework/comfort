@@ -147,6 +147,29 @@ while method-level means the output can be generated per Test**METHOD**
 | Coverage Data (Java)     | -                            | -                   | -                             | x (class-level, method-level) | x (class-level, method-level) | -                             | -                              | x (method-level)      | -                                 | -                             | x (class-level, method-level) |
 | Coverage Data (Python)   | -                            | -                   | -                             | x (class-level, method-level) | x (class-level, method-level) | -                             | -                              | -                     | -                                 | -                             | x (class-level, method-level) |
 
+
+### Extending
+
+**Loader**
+To create a loader, you need to inherit from the BaseLoader class. Afterwards, you can provide annotations 
+(e.g., @SupportsJava) to mark if your new loader supports Java or Python or both.
+
+**Filter**
+To create a filter you need to inherit from the BaseFilter class. Afterwards, you can create methods that
+take the data type that your filter can process as input. Furthermore, you can provide annotations 
+(e.g., @SupportsJava) to mark if your new filter methods supports Java or Python or both.
+
+**MetricCollector**
+To create a metriccollector you need to inherit from the BaseMetricCollector class. Afterwards, you can create 
+methods that take the data type that your metriccollector can process as input. Furthermore, you can provide annotations 
+(e.g., @SupportsJava) to mark if your new filter methods supports Java or Python or both and annotations
+to say at which level your results will be produced (e.g., @SupportsMethod to show that your results will be
+on a method-level).
+
+**Filer**
+To create a new filer you need to implement the IFiler interface.
+
+
 ### Test
 You can test the project by calling
 ```bash
