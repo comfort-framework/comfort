@@ -25,6 +25,7 @@ public class FilerConfiguration extends BaseConfiguration {
     private String metricsCSVPath;
     private String mutationCSVPath;
     private String fileName;
+    private Database database = new Database();
 
     public FilerConfiguration() {
 
@@ -58,6 +59,14 @@ public class FilerConfiguration extends BaseConfiguration {
         return mutationCSVPath;
     }
 
+    public void setDatabase(Database database) {
+        this.database = database;
+    }
+
+    public Database getDatabase() {
+        return this.database;
+    }
+
 
     @Override
     public String toString() {
@@ -66,6 +75,7 @@ public class FilerConfiguration extends BaseConfiguration {
                 .add("metricsCSVPath", metricsCSVPath)
                 .add("mutationCSVPath", mutationCSVPath)
                 .add("fileName", fileName)
+                .add("database", database)
                 .toString();
     }
 }

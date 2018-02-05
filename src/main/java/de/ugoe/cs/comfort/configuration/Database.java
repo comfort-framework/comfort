@@ -28,6 +28,7 @@ public class Database {
     private String username = null;
     private String password = null;
     private String authenticationDatabase = null;
+    private Boolean ssl = false;
 
     public Database() {}
 
@@ -77,6 +78,14 @@ public class Database {
 
     public void setAuthenticationDatabase(String authenticationDatabase) {
         this.authenticationDatabase = authenticationDatabase;
+    }
+
+    public Boolean getSSL() {
+        return ssl;
+    }
+
+    public void setSSL(Boolean sslEnabled) {
+        ssl = sslEnabled;
     }
 
     public String toString() {

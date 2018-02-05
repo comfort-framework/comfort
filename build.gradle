@@ -25,6 +25,7 @@ buildscript {
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
 
@@ -49,6 +50,8 @@ dependencies {
     compile group: 'org.jacoco', name: 'org.jacoco.agent', version: jacocoVersion
     compile group: 'org.jacoco', name: 'org.jacoco.report', version: jacocoVersion
     compile group: 'com.github.javaparser', name:'javaparser-core', version: '3.5.7'
+    compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '4.10.0.201712302008-r'
+    compile group: 'de.ugoe.cs', name: 'jSHARK', version: '1.0-SNAPSHOT'
 }
 
 shadowJar {

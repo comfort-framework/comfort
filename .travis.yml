@@ -17,13 +17,16 @@ addons:
 before_install:
   - cd $TRAVIS_BUILD_DIR
 
-before_script:
-  - chmod +x gradlew
+  # Install jshark for smartshark filer and changesetloader
+  - git clone https://github.com/smartshark/jSHARK $TRAVIS_BUILD_DIR/jSHARK
+  - ./gradlew install -b $TRAVIS_BUILD_DIR/jSHARK/build.gradle
 
   # Install newest pitest version
   - git clone https://github.com/hcoles/pitest $TRAVIS_BUILD_DIR/pitest
   - mvn -f $TRAVIS_BUILD_DIR/pitest/pom.xml install
 
+before_script:
+  - chmod +x gradlew
 
   # Copying test-config and set them for travis build
   - cp -f $TRAVIS_BUILD_DIR/src/test/resources/test-configurations/test-config-base.json  $TRAVIS_BUILD_DIR/src/test/resources/test-configurations/test-config.json

@@ -17,6 +17,7 @@
 package de.ugoe.cs.comfort.filer.models;
 
 import com.google.common.base.MoreObjects;
+import org.mongodb.morphia.annotations.Property;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -24,10 +25,20 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * @author Fabian Trautsch
  */
 public class Mutation {
+
+    @Property("m_type")
     private String mType;
+
     private String location;
+
+    @Property("l_num")
     private Integer lineNumber;
+
     private String result;
+
+    public Mutation() {
+
+    }
 
     public Mutation(String location, String mType, Integer lineNumber, String result) {
         this.location = location;

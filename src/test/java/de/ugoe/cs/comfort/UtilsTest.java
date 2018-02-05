@@ -33,30 +33,6 @@ import static org.junit.Assert.fail;
 public class UtilsTest extends BaseTest{
 
     @Test
-    public void createMongoDBStringWithoutAuthentication() {
-        String expected = "mongodb://localhost:27017";
-        assertEquals("Wrong mongodb connection string", expected, Utils.createMongoDBConnectionString(null, null, "localhost", 27017, null));
-    }
-
-    @Test
-    public void createMongoDBStringWithAuthenticationButNoAuthenticationDatabase() {
-        String expected = "mongodb://admin:password@127.234.21.55:3473";
-        assertEquals("Wrong mongodb connection string", expected, Utils.createMongoDBConnectionString("admin", "password", "127.234.21.55", 3473, null));
-    }
-
-    @Test
-    public void createMongoDBStringWithoutAuthenticationButWithAuthenticationDatabase() {
-        String expected = "mongodb://127.234.21.55:3473";
-        assertEquals("Wrong mongodb connection string", expected, Utils.createMongoDBConnectionString(null, null, "127.234.21.55", 3473, "smartshark"));
-    }
-
-    @Test
-    public void createMongoDBStringWitAuthenticationAndWithAuthenticationDatabase() {
-        String expected = "mongodb://admin:password@127.234.21.55:3473/?authSource=smartshark";
-        assertEquals("Wrong mongodb connection string", expected, Utils.createMongoDBConnectionString("admin", "password", "127.234.21.55", 3473, "smartshark"));
-    }
-
-    @Test
     public void getPathForFullyQualifiedClassNameTest() {
         String fqn = "org.foo.Bar";
         Path expectedPath = Paths.get("/root/src/main/java/org/foo/Bar.java");

@@ -75,8 +75,8 @@ public class CSVFilerTest extends BaseTest{
 
         String expectedContent =
                 "id,path,istqb_call\n" +
-                "de.foo.bar.ModelTest,/de/foo/bar/ModelTest.java,UNIT\n" +
-                "de.foo.bar.ModelTest1,/de/foo/bar/ModelTest1.java,INTEGRATION";
+                "de.foo.bar.ModelTest,src/de/foo/bar/ModelTest.java,UNIT\n" +
+                "de.foo.bar.ModelTest1,src/de/foo/bar/ModelTest1.java,INTEGRATION";
 
         testResultsAgainstExpectedOutput(resultSet, expectedContent, metricsCSVPath);
     }
@@ -102,17 +102,17 @@ public class CSVFilerTest extends BaseTest{
 
         String expectedContent =
                 "id,path,location,m_type,line_number,result\n" +
-                "de.foo.bar.ModelTest,/de/foo/bar/ModelTest.java,de.foo.bar.Model.addBatch,org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator,10,NO_COVERAGE\n" +
-                "de.foo.bar.ModelTest,/de/foo/bar/ModelTest.java,de.foo.bar.Model.addBatch,org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator,11,SURVIVED\n" +
-                "de.foo.bar.ModelTest1,/de/foo/bar/ModelTest1.java,de.foo.bar.Model.addBatch,org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator,10,NO_COVERAGE\n" +
-                "de.foo.bar.ModelTest1,/de/foo/bar/ModelTest1.java,de.foo.bar.Model.addBatch,org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator,30,KILLED";
+                "de.foo.bar.ModelTest,src/de/foo/bar/ModelTest.java,de.foo.bar.Model.addBatch,org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator,10,NO_COVERAGE\n" +
+                "de.foo.bar.ModelTest,src/de/foo/bar/ModelTest.java,de.foo.bar.Model.addBatch,org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator,11,SURVIVED\n" +
+                "de.foo.bar.ModelTest1,src/de/foo/bar/ModelTest1.java,de.foo.bar.Model.addBatch,org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator,10,NO_COVERAGE\n" +
+                "de.foo.bar.ModelTest1,src/de/foo/bar/ModelTest1.java,de.foo.bar.Model.addBatch,org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator,30,KILLED";
 
         testResultsAgainstExpectedOutput(resultSet, expectedContent, mutationCSVPath);
 
         expectedContent =
                 "id,path,mut_killMut,mut_genMut,mut_scoreMut\n" +
-                "de.foo.bar.ModelTest,/de/foo/bar/ModelTest.java,100,1402,2\n" +
-                "de.foo.bar.ModelTest1,/de/foo/bar/ModelTest1.java,2,123,2";
+                "de.foo.bar.ModelTest,src/de/foo/bar/ModelTest.java,100,1402,2\n" +
+                "de.foo.bar.ModelTest1,src/de/foo/bar/ModelTest1.java,2,123,2";
 
         testResultsAgainstExpectedOutput(resultSet, expectedContent, metricsCSVPath);
 

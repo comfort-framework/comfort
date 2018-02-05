@@ -24,7 +24,6 @@ import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
-import de.ugoe.cs.comfort.Utils;
 import de.ugoe.cs.comfort.annotations.SupportsJava;
 import de.ugoe.cs.comfort.annotations.SupportsPython;
 import de.ugoe.cs.comfort.configuration.Database;
@@ -32,11 +31,11 @@ import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
 import de.ugoe.cs.comfort.configuration.LoaderConfiguration;
 import de.ugoe.cs.comfort.data.ChangeSet;
 import de.ugoe.cs.comfort.data.ProjectFiles;
-import de.ugoe.cs.comfort.database.models.File;
-import de.ugoe.cs.comfort.database.models.FileAction;
 import de.ugoe.cs.comfort.database.models.FileAggregation;
-import de.ugoe.cs.comfort.database.models.VCSSystem;
 import de.ugoe.cs.comfort.exception.LoaderException;
+import de.ugoe.cs.smartshark.model.File;
+import de.ugoe.cs.smartshark.model.FileAction;
+import de.ugoe.cs.smartshark.model.VCSSystem;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -66,26 +65,24 @@ public class ChangeSetLoader extends BaseLoader {
         MorphiaLoggerFactory.registerLogger(Log4JLoggerImplFactory.class);
 
         Database databaseConfiguration = loaderConf.getDatabase();
-        System.out.println(databaseConfiguration);
 
         // Map models
+        morphia.mapPackage("de.ugoe.cs.smartshark.model");
         morphia.mapPackage("de.ugoe.cs.comfort.database.models");
 
-        // Create database connection string
-        String mongoDBConnectionString = Utils.createMongoDBConnectionString(
+        logger.debug("Connecting to database...");
+        // Create database connection
+        MongoClientURI uri = new MongoClientURI(de.ugoe.cs.smartshark.Utils.createMongoDBURI(
                 databaseConfiguration.getUsername(),
                 databaseConfiguration.getPassword(),
                 databaseConfiguration.getHostname(),
-                databaseConfiguration.getPort(),
-                databaseConfiguration.getAuthenticationDatabase()
-        );
-
-        // Create database connection
-        logger.debug("Connecting to database...");
-        MongoClientURI connectionString = new MongoClientURI(mongoDBConnectionString);
-        MongoClient mongoClient = new MongoClient(connectionString);
+                String.valueOf(databaseConfiguration.getPort()),
+                databaseConfiguration.getAuthenticationDatabase(),
+                databaseConfiguration.getSSL()));
+        MongoClient mongoClient = new MongoClient(uri);
         final Datastore datastore = morphia.createDatastore(mongoClient, databaseConfiguration.getDatabase());
         datastore.ensureIndexes();
+
 
 
 

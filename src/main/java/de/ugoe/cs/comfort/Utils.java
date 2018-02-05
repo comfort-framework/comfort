@@ -37,29 +37,6 @@ import org.apache.logging.log4j.Logger;
 public class Utils {
     private static final Logger LOGGER = LogManager.getLogger(Utils.class.getName());
 
-
-    public static String createMongoDBConnectionString(String user, String password, String hostname,
-                                                       int port, String authenticationDatabase) {
-        String uri = "mongodb://";
-
-        if(Utils.isAuthenticationEnabled(user, password)) {
-            uri += user + ":" + password + "@" + hostname + ":" + port;
-
-            if(authenticationDatabase != null && !authenticationDatabase.isEmpty()) {
-                uri += "/?authSource=" + authenticationDatabase;
-            }
-        } else {
-            uri += hostname + ":" + port;
-        }
-        return uri;
-    }
-
-
-
-    private static boolean isAuthenticationEnabled(String user, String password) {
-        return user != null && !user.isEmpty() && password != null && !password.isEmpty();
-    }
-
     public static Boolean isTestBasedOnName(String nameOfFile) {
         String lowerCaseName = nameOfFile.toLowerCase();
         return lowerCaseName.contains("test");

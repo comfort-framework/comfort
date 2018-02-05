@@ -217,8 +217,8 @@ public class BaseTest {
 
 
     // Results
-    protected Result res1 = new Result("de.foo.bar.ModelTest", Paths.get("/de/foo/bar/ModelTest.java"));
-    protected Result res2 = new Result("de.foo.bar.ModelTest1", Paths.get("/de/foo/bar/ModelTest1.java"));
+    protected Result res1 = new Result("de.foo.bar.ModelTest", Paths.get("src/de/foo/bar/ModelTest.java"));
+    protected Result res2 = new Result("de.foo.bar.ModelTest1", Paths.get("src/de/foo/bar/ModelTest1.java"));
 
     protected Set<Mutation> mutationResultsRes1 = new HashSet<Mutation>(){{
         add(new Mutation(
