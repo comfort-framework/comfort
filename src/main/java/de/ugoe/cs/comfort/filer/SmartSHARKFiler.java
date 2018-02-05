@@ -81,7 +81,7 @@ public class SmartSHARKFiler implements IFiler {
                             file -> {
                                 files.put(Paths.get(file.getPath()), file.getId());
                             }
-            );
+                );
 
             // Go through all results -> create a test state and store it
             for(Result result: results.getResults()) {
@@ -93,7 +93,6 @@ public class SmartSHARKFiler implements IFiler {
 
         } catch (IOException e) {
             logger.catching(e);
-            System.exit(1);
         }
     }
 

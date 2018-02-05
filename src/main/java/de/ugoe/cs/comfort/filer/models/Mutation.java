@@ -17,9 +17,10 @@
 package de.ugoe.cs.comfort.filer.models;
 
 import com.google.common.base.MoreObjects;
-import org.mongodb.morphia.annotations.Property;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.mongodb.morphia.annotations.Property;
+
 
 /**
  * @author Fabian Trautsch
