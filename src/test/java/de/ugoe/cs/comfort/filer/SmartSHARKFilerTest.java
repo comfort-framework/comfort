@@ -17,47 +17,41 @@
 package de.ugoe.cs.comfort.filer;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.powermock.api.mockito.PowerMockito.spy;
+import static org.powermock.api.mockito.PowerMockito.verifyPrivate;
+import static org.powermock.api.mockito.PowerMockito.when;
 
-import com.github.danielfelgar.morphia.Log4JLoggerImplFactory;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
-import de.ugoe.cs.comfort.BaseTest;
 import de.ugoe.cs.comfort.DatabaseTest;
 import de.ugoe.cs.comfort.collection.metriccollector.TestType;
-import de.ugoe.cs.comfort.configuration.Database;
 import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
 import de.ugoe.cs.comfort.database.models.TestState;
-import de.ugoe.cs.comfort.filer.models.Mutation;
 import de.ugoe.cs.comfort.filer.models.Result;
 import de.ugoe.cs.comfort.filer.models.ResultSet;
 import de.ugoe.cs.smartshark.model.Commit;
-import de.ugoe.cs.smartshark.model.FileAction;
 import de.ugoe.cs.smartshark.model.VCSSystem;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.apache.commons.io.FileUtils;
 import org.bson.types.ObjectId;
+import org.eclipse.jgit.lib.Constants;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.lib.StoredConfig;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mongodb.morphia.Datastore;
-import org.mongodb.morphia.Morphia;
-import org.mongodb.morphia.logging.MorphiaLoggerFactory;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Fabian Trautsch
  */
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(SmartSHARKFiler.class)
 public class SmartSHARKFilerTest extends DatabaseTest {
     private GeneralConfiguration configuration = new GeneralConfiguration();
 
@@ -73,7 +67,7 @@ public class SmartSHARKFilerTest extends DatabaseTest {
     public void createFilerConfiguration() {
         configuration.getFilerConfiguration().setDatabase(getDatabaseConfiguration());
 
-        configuration.setProjectDir(getPathToResource("filerTestData/SmartSHARKFilerData/HikariCP_64d91e8ea35799bae2739d8392b5705627d7758a"));
+        configuration.setProjectDir(getPathToResource("filerTestData/SmartSHARKFilerData"));
         configuration.setLanguage("java");
 
         resultSet = new ResultSet();
@@ -90,7 +84,7 @@ public class SmartSHARKFilerTest extends DatabaseTest {
 
         // Generate vcsSystem
         final VCSSystem vcsSystem = new VCSSystem();
-        vcsSystem.setUrl("https://github.com/brettwooldridge/HikariCP");
+        vcsSystem.setUrl("git@github.com:comfort-framework/comfort.git");
         vcsSystem.setProjectId(projectId);
         vcsSystem.setRepositoryType("git");
         vcsSystem.setLastUpdated(new Date());
@@ -98,7 +92,7 @@ public class SmartSHARKFilerTest extends DatabaseTest {
 
         commit = new Commit();
         commit.setVcSystemId(vcsSystem.getId());
-        commit.setRevisionHash("64d91e8ea35799bae2739d8392b5705627d7758a");
+        commit.setRevisionHash("13a2f32a6c91a472d186348d7dfbdf8b9e92f16f");
         datastore.save(commit);
 
         // Create files of the repository
@@ -119,8 +113,23 @@ public class SmartSHARKFilerTest extends DatabaseTest {
         mongoClient.dropDatabase(DB_NAME);
     }
 
+    private SmartSHARKFiler getMockedSmartSHARKFiler() throws Exception {
+        // Mock Repository and the config so that the right values are eturned
+        Repository repositoryMock = mock(Repository.class);
+        StoredConfig storedConfigMock = mock(StoredConfig.class);
+        when(storedConfigMock.getString("remote", "origin", "url")).thenReturn("git@github.com:comfort-framework/comfort.git");
+        when(repositoryMock.getConfig()).thenReturn(storedConfigMock);
+        org.eclipse.jgit.lib.ObjectId objectId = org.eclipse.jgit.lib.ObjectId.fromString("13a2f32a6c91a472d186348d7dfbdf8b9e92f16f");
+        when(repositoryMock.resolve(Constants.HEAD)).thenReturn(objectId);
+
+        SmartSHARKFiler smartSHARKFiler = spy(new SmartSHARKFiler());
+        when(smartSHARKFiler, "getRepository", configuration.getProjectDir()).thenReturn(repositoryMock);
+
+        return smartSHARKFiler;
+    }
+
     @Test
-    public void storeResultsOnlyMetricsTest() {
+    public void storeResultsOnlyMetricsTest() throws Exception {
         // Create test data
         res1.addMetric("istqb_call", TestType.UNIT.name());
         res2.addMetric("istqb_call", TestType.INTEGRATION.name());
@@ -129,8 +138,11 @@ public class SmartSHARKFilerTest extends DatabaseTest {
 
         resultSet.addResults(resultsToStore);
 
-        SmartSHARKFiler smartSHARKFiler = new SmartSHARKFiler();
+        SmartSHARKFiler smartSHARKFiler = getMockedSmartSHARKFiler();
         smartSHARKFiler.storeResults(configuration, resultSet);
+
+        // Verify that getRepository is called
+        verifyPrivate(smartSHARKFiler).invoke("getRepository", configuration.getProjectDir());
 
         // Check stored results
         List<TestState> testStates = datastore.createQuery(TestState.class).order("name").asList();
@@ -162,7 +174,7 @@ public class SmartSHARKFilerTest extends DatabaseTest {
     }
 
     @Test
-    public void storeMutationDataTest() {
+    public void storeMutationDataTest() throws Exception {
         // Create test data
         res1.addMutationResults(mutationResultsRes1);
         res1.addMetric("mut_genMut", "1402");
@@ -180,8 +192,11 @@ public class SmartSHARKFilerTest extends DatabaseTest {
 
         resultSet.addResults(resultsToStore);
 
-        SmartSHARKFiler smartSHARKFiler = new SmartSHARKFiler();
+        SmartSHARKFiler smartSHARKFiler = getMockedSmartSHARKFiler();
         smartSHARKFiler.storeResults(configuration, resultSet);
+
+        // Verify that getRepository is called
+        verifyPrivate(smartSHARKFiler).invoke("getRepository", configuration.getProjectDir());
 
         // Check stored results
         List<TestState> testStates = datastore.createQuery(TestState.class).order("name").asList();

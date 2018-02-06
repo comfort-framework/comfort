@@ -56,16 +56,15 @@ public class SmartSHARKFiler implements IFiler {
 
 
         try {
-            Repository repo = new RepositoryBuilder()
-                    .readEnvironment()
-                    .findGitDir(configuration.getProjectDir().toFile())
-                    .build();
+            Repository repo = getRepository(configuration.getProjectDir());
 
             // Get VCS System
             String vcsSystemUrl = repo.getConfig().getString("remote", "origin", "url");
             ObjectId vcsSystemId = datastore.createQuery(VCSSystem.class)
                     .field("url").equal(vcsSystemUrl).get().getId();
 
+            System.out.println(vcsSystemUrl);
+            System.out.println(repo.resolve(Constants.HEAD).getName());
 
             // Get commit id via jgit
             ObjectId commitId = datastore.createQuery(Commit.class)
@@ -94,6 +93,13 @@ public class SmartSHARKFiler implements IFiler {
         } catch (IOException e) {
             logger.catching(e);
         }
+    }
+
+    private Repository getRepository(Path projectDir) throws IOException {
+        return new RepositoryBuilder()
+                .readEnvironment()
+                .findGitDir(projectDir.toFile())
+                .build();
     }
 
     private Datastore connectToDatabase(Database databaseConfiguration) {
