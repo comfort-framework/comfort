@@ -31,7 +31,7 @@
             <plugin>
                 <groupId>org.pitest</groupId>
                 <artifactId>pitest-maven</artifactId>
-                <version>1.3.2-SNAPSHOT</version>
+                <version>1.3.2</version>
                 <configuration>
                     <targetClasses>
                         <param>Module1*</param>

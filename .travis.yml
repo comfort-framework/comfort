@@ -21,10 +21,6 @@ before_install:
   - git clone https://github.com/smartshark/jSHARK $TRAVIS_BUILD_DIR/jSHARK
   - ./gradlew install -b $TRAVIS_BUILD_DIR/jSHARK/build.gradle
 
-  # Install newest pitest version
-  - git clone https://github.com/hcoles/pitest $TRAVIS_BUILD_DIR/pitest
-  - mvn -DskipTests -f $TRAVIS_BUILD_DIR/pitest/pom.xml install
-
 before_script:
   - chmod +x gradlew
 
@@ -34,7 +30,7 @@ before_script:
   - cat $TRAVIS_BUILD_DIR/src/test/resources/test-configurations/test-config.json
 
 script:
-  - ./gradlew check --stacktrace
+  - ./gradlew check
   - ./gradlew jacocoTestReport
 
 after_success:
