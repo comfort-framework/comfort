@@ -34,7 +34,7 @@ before_script:
   - cat $TRAVIS_BUILD_DIR/src/test/resources/test-configurations/test-config.json
 
 script:
-  - ./gradlew check --stacktrace --debug
+  - ./gradlew check --stacktrace
   - ./gradlew jacocoTestReport
 
 after_success:
