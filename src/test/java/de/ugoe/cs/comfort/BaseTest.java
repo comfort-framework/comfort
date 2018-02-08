@@ -225,12 +225,14 @@ public class BaseTest {
                 "de.foo.bar.Model.addBatch",
                 "org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator",
                 10,
-                "NO_COVERAGE"));
+                "NO_COVERAGE",
+                null));
         add(new Mutation(
                 "de.foo.bar.Model.addBatch",
                 "org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator",
                 11,
-                "SURVIVED"));
+                "SURVIVED",
+                "INTERFACE"));
     }};
 
     protected Set<Mutation> mutationResultsRes2 = new HashSet<Mutation>(){{
@@ -238,12 +240,14 @@ public class BaseTest {
                 "de.foo.bar.Model.addBatch",
                 "org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator",
                 10,
-                "NO_COVERAGE"));
+                "NO_COVERAGE",
+                null));
         add(new Mutation(
                 "de.foo.bar.Model.addBatch",
                 "org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator",
                 30,
-                "KILLED"));
+                "KILLED",
+                "INTERFACE"));
     }};
 
 

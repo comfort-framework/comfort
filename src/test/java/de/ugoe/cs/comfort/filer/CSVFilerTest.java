@@ -102,10 +102,10 @@ public class CSVFilerTest extends BaseTest{
 
         String expectedContent =
                 "id,path,location,m_type,line_number,result\n" +
-                "de.foo.bar.ModelTest,src/de/foo/bar/ModelTest.java,de.foo.bar.Model.addBatch,org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator,10,NO_COVERAGE\n" +
-                "de.foo.bar.ModelTest,src/de/foo/bar/ModelTest.java,de.foo.bar.Model.addBatch,org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator,11,SURVIVED\n" +
-                "de.foo.bar.ModelTest1,src/de/foo/bar/ModelTest1.java,de.foo.bar.Model.addBatch,org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator,10,NO_COVERAGE\n" +
-                "de.foo.bar.ModelTest1,src/de/foo/bar/ModelTest1.java,de.foo.bar.Model.addBatch,org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator,30,KILLED";
+                "de.foo.bar.ModelTest,src/de/foo/bar/ModelTest.java,de.foo.bar.Model.addBatch,org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator,10,NO_COVERAGE,\n" +
+                "de.foo.bar.ModelTest,src/de/foo/bar/ModelTest.java,de.foo.bar.Model.addBatch,org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator,11,SURVIVED,INTERFACE\n" +
+                "de.foo.bar.ModelTest1,src/de/foo/bar/ModelTest1.java,de.foo.bar.Model.addBatch,org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator,10,NO_COVERAGE,\n" +
+                "de.foo.bar.ModelTest1,src/de/foo/bar/ModelTest1.java,de.foo.bar.Model.addBatch,org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator,30,KILLED,INTERFACE";
 
         testResultsAgainstExpectedOutput(resultSet, expectedContent, mutationCSVPath);
 

@@ -30,7 +30,9 @@ import de.ugoe.cs.smartshark.model.VCSSystem;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,8 +41,11 @@ import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.RepositoryBuilder;
 import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.FindAndModifyOptions;
 import org.mongodb.morphia.Morphia;
 import org.mongodb.morphia.logging.MorphiaLoggerFactory;
+import org.mongodb.morphia.query.Query;
+import org.mongodb.morphia.query.UpdateOperations;
 
 /**
  * @author Fabian Trautsch
@@ -48,11 +53,12 @@ import org.mongodb.morphia.logging.MorphiaLoggerFactory;
 public class SmartSHARKFiler implements IFiler {
     private final Morphia morphia = new Morphia();
     private Logger logger = LogManager.getLogger(this.getClass().getName());
+    private Datastore datastore;
 
     @Override
     public void storeResults(GeneralConfiguration configuration, ResultSet results) {
         // Connect to database
-        Datastore datastore = connectToDatabase(configuration.getFilerConfiguration().getDatabase());
+        datastore = connectToDatabase(configuration.getFilerConfiguration().getDatabase());
 
 
         try {
@@ -60,11 +66,13 @@ public class SmartSHARKFiler implements IFiler {
 
             // Get VCS System
             String vcsSystemUrl = repo.getConfig().getString("remote", "origin", "url");
+            List<String> possibleVCSSystemValues = new ArrayList<String>(){{
+                    add(vcsSystemUrl);
+                    add(vcsSystemUrl+"/");
+                }
+            };
             ObjectId vcsSystemId = datastore.createQuery(VCSSystem.class)
-                    .field("url").equal(vcsSystemUrl).get().getId();
-
-            System.out.println(vcsSystemUrl);
-            System.out.println(repo.resolve(Constants.HEAD).getName());
+                    .field("url").in(possibleVCSSystemValues).get().getId();
 
             // Get commit id via jgit
             ObjectId commitId = datastore.createQuery(Commit.class)
@@ -87,12 +95,24 @@ public class SmartSHARKFiler implements IFiler {
                 ObjectId fileId = files.get(result.getPathToFile());
 
                 TestState testState = new TestState(result, fileId, commitId);
-                datastore.save(testState);
+                storeTestState(testState);
             }
 
         } catch (IOException e) {
             logger.catching(e);
         }
+    }
+
+    private void storeTestState(TestState testState) {
+        Query<TestState> query = datastore.find(TestState.class)
+                .field("name").equal(testState.getName())
+                .field("commit_id").equal(testState.getCommitId());
+
+        UpdateOperations<TestState> updateOperations = datastore.createUpdateOperations(TestState.class)
+                .set("file_id", testState.getFileId())
+                .set("metrics", testState.getMetrics())
+                .set("mutations", testState.getMutations());
+        datastore.findAndModify(query, updateOperations, new FindAndModifyOptions().returnNew(false).upsert(true));
     }
 
     private Repository getRepository(Path projectDir) throws IOException {

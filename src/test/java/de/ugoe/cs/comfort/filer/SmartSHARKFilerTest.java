@@ -110,7 +110,7 @@ public class SmartSHARKFilerTest extends DatabaseTest {
 
     @After
     public void tearDownDatabase() {
-        mongoClient.dropDatabase(DB_NAME);
+        //mongoClient.dropDatabase(DB_NAME);
     }
 
     private SmartSHARKFiler getMockedSmartSHARKFiler() throws Exception {

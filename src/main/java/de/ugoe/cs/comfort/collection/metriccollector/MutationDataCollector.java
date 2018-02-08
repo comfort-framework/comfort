@@ -18,10 +18,12 @@ package de.ugoe.cs.comfort.collection.metriccollector;
 
 import de.ugoe.cs.comfort.annotations.SupportsJava;
 import de.ugoe.cs.comfort.annotations.SupportsMethod;
+import de.ugoe.cs.comfort.collection.metriccollector.mutation.MutationChangeClassifier;
 import de.ugoe.cs.comfort.collection.metriccollector.mutation.MutationExecutionResult;
 import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
 import de.ugoe.cs.comfort.data.CoverageData;
 import de.ugoe.cs.comfort.data.models.IUnit;
+import de.ugoe.cs.comfort.exception.MutationResultException;
 import de.ugoe.cs.comfort.filer.models.Mutation;
 import de.ugoe.cs.comfort.filer.models.Result;
 import java.io.BufferedReader;
@@ -91,7 +93,7 @@ public class MutationDataCollector extends BaseMetricCollector {
                 results.add(result);
             } catch (IOException e) {
                 // If not successful, print error but it is not necessary to cancel here
-                logger.warn("Error {} for executing mutation testing for test {}", e.getMessage(),
+                logger.warn("Error \"{}\" for executing mutation testing for test {}", e.getMessage(),
                         entry.getKey().getFQN());
             }
         }
@@ -109,7 +111,24 @@ public class MutationDataCollector extends BaseMetricCollector {
         while ((line = br.readLine()) != null) {
             String[] cols = line.split(",");
             logger.debug("Result Line: {}", line);
-            mutationResults.add(new Mutation(cols[1]+"."+cols[3], cols[2], Integer.parseInt(cols[4]), cols[5]));
+            String location = cols[1]+"."+cols[3];
+            String mutationOperator = cols[2];
+            int lineNumber =  Integer.parseInt(cols[4]);
+            String result = cols[5];
+
+            // Try to get a change clasification for the mutation
+            // But we catch the exceptions here, as this kind of data is not crucial
+            String changeClassification = null;
+            try {
+                if (!result.equals("NO_COVERAGE") && lineNumber != 0) {
+                    changeClassification = MutationChangeClassifier.getChangeClassification(
+                            generalConf.getProjectDir(), cols[0], mutationOperator, lineNumber
+                    );
+                }
+            } catch (MutationResultException e) {
+                logger.catching(e);
+            }
+            mutationResults.add(new Mutation(location, mutationOperator, lineNumber, result, changeClassification));
         }
         br.close();
 

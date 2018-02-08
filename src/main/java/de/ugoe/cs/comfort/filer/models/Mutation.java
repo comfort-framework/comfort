@@ -37,15 +37,18 @@ public class Mutation {
 
     private String result;
 
+    private String classification;
+
     public Mutation() {
 
     }
 
-    public Mutation(String location, String mType, Integer lineNumber, String result) {
+    public Mutation(String location, String mType, Integer lineNumber, String result, String changeClassification) {
         this.location = location;
         this.mType = mType;
         this.lineNumber = lineNumber;
         this.result = result;
+        this.classification = changeClassification;
     }
 
     public String getMType() {
@@ -80,6 +83,14 @@ public class Mutation {
         this.result = result;
     }
 
+    public String getClassification() {
+        return classification;
+    }
+
+    public void setClassification(String classification) {
+        this.classification = classification;
+    }
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
@@ -87,6 +98,7 @@ public class Mutation {
                 .add("mType", mType)
                 .add("lineNumber", lineNumber)
                 .add("result", result)
+                .add("classification", classification)
                 .toString();
     }
 
@@ -106,6 +118,7 @@ public class Mutation {
                 .append(mType, otherNode.mType)
                 .append(lineNumber, otherNode.lineNumber)
                 .append(result, otherNode.result)
+                .append(classification, otherNode.classification)
                 .isEquals();
     }
 
@@ -116,6 +129,7 @@ public class Mutation {
                 .append(mType)
                 .append(lineNumber)
                 .append(result)
+                .append(classification)
                 .toHashCode();
     }
 }

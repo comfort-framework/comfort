@@ -83,7 +83,11 @@ public class CSVFiler implements IFiler{
             csvRow.append(mutationResult.getLocation()).append(",");
             csvRow.append(mutationResult.getMType()).append(",");
             csvRow.append(mutationResult.getLineNumber()).append(",");
-            csvRow.append(mutationResult.getResult());
+            csvRow.append(mutationResult.getResult()).append(",");
+
+            if(mutationResult.getClassification() != null) {
+                csvRow.append(mutationResult.getClassification());
+            }
             csvRow.append(System.getProperty("line.separator"));
 
             csvRows.add(csvRow.toString().substring(0, csvRow.toString().length()
