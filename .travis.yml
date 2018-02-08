@@ -21,6 +21,10 @@ before_install:
   - git clone https://github.com/smartshark/jSHARK $TRAVIS_BUILD_DIR/jSHARK
   - ./gradlew install -b $TRAVIS_BUILD_DIR/jSHARK/build.gradle
 
+  # Install change distiller
+  - git clone https://github.com/ftrautsch/tools-changedistiller $TRAVIS_BUILD_DIR/changedistiller
+  - mvn install -f $TRAVIS_BUILD_DIR/changedistiller/pom.xml
+
   # Install bugifxclassifier for mutationdatacollector
   - git clone https://github.com/ftrautsch/BugFixClassifier $TRAVIS_BUILD_DIR/BugFixClassifier
   - ./gradlew install -b $TRAVIS_BUILD_DIR/BugFixClassifier/build.gradle
