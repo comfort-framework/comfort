@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DirectnessCollector.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">comfort</a> &gt; <a href="index.source.html" class="el_package">de.ugoe.cs.comfort.collection.metriccollector</a> &gt; <span class="el_source">DirectnessCollector.java</span></div><h1>DirectnessCollector.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2017 University of Goettingen, Germany
+ * 
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.ugoe.cs.comfort.collection.metriccollector;
+
+import de.ugoe.cs.comfort.Utils;
+import de.ugoe.cs.comfort.annotations.SupportsClass;
+import de.ugoe.cs.comfort.annotations.SupportsJava;
+import de.ugoe.cs.comfort.annotations.SupportsMethod;
+import de.ugoe.cs.comfort.annotations.SupportsPython;
+import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
+import de.ugoe.cs.comfort.data.graphs.CallGraph;
+import de.ugoe.cs.comfort.data.graphs.DependencyGraph;
+import de.ugoe.cs.comfort.data.models.IUnit;
+import de.ugoe.cs.comfort.filer.models.Result;
+import java.text.DecimalFormat;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+/**
+ * @author Fabian Trautsch
+ */
+public class DirectnessCollector extends BaseMetricCollector {
+    public DirectnessCollector(GeneralConfiguration configuration) {
+<span class="fc" id="L40">        super(configuration);</span>
+<span class="fc" id="L41">    }</span>
+
+    @SupportsJava
+    @SupportsPython
+    @SupportsMethod
+    public Set&lt;Result&gt; createDirectnessMetricForJavaOnMethodLevel(CallGraph callGraph) {
+<span class="fc" id="L47">        Map&lt;IUnit, Set&lt;String&gt;&gt; numDirectConnections = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L48">        Set&lt;String&gt; units = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L49">        callGraph.getProductionNodes().forEach(x -&gt; units.add(x.getFQNOfUnit()));</span>
+
+<span class="fc bfc" id="L51" title="All 2 branches covered.">        for(IUnit node: callGraph.getTestNodes()) {</span>
+<span class="fc" id="L52">            Set&lt;String&gt; adjacentUnits = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L53">            callGraph.adjacentNodes(node).forEach(x -&gt; {</span>
+<span class="pc bpc" id="L54" title="1 of 2 branches missed.">                if(!Utils.isTestBasedOnFQN(x.getFQN())) {</span>
+<span class="fc" id="L55">                    adjacentUnits.add(x.getFQNOfUnit());</span>
+                }
+<span class="fc" id="L57">            });</span>
+<span class="fc" id="L58">            numDirectConnections.put(node, adjacentUnits);</span>
+<span class="fc" id="L59">        }</span>
+<span class="fc" id="L60">        return getResults(numDirectConnections, units.size());</span>
+    }
+
+    @SupportsJava
+    @SupportsPython
+    @SupportsClass
+    public Set&lt;Result&gt; createDirectnessMetricForJavaOnClassLevel(CallGraph callGraph) {
+        // As we are only working on class level, we are using the dependencygraph here
+<span class="fc" id="L68">        DependencyGraph depGraph = callGraph.getDependencyGraphRepresentation();</span>
+
+<span class="fc" id="L70">        Map&lt;IUnit, Set&lt;String&gt;&gt; numDirectConnections = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L71">        Set&lt;String&gt; units = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L72">        callGraph.getProductionNodes().forEach(x -&gt; units.add(x.getFQNOfUnit()));</span>
+
+<span class="fc bfc" id="L74" title="All 2 branches covered.">        for(IUnit node: depGraph.getTestNodes()) {</span>
+<span class="fc" id="L75">            Set&lt;String&gt; adjacentUnits = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L76">            depGraph.adjacentNodes(node).forEach(x -&gt; {</span>
+<span class="pc bpc" id="L77" title="1 of 2 branches missed.">                if(!Utils.isTestBasedOnFQN(x.getFQN())) {</span>
+<span class="fc" id="L78">                    adjacentUnits.add(x.getFQNOfUnit());</span>
+                }
+<span class="fc" id="L80">            });</span>
+<span class="fc" id="L81">            Set&lt;String&gt; connectionsToClass = numDirectConnections.getOrDefault(node, new HashSet&lt;&gt;());</span>
+<span class="fc" id="L82">            connectionsToClass.addAll(adjacentUnits);</span>
+<span class="fc" id="L83">            numDirectConnections.put(node, connectionsToClass);</span>
+<span class="fc" id="L84">        }</span>
+<span class="fc" id="L85">        return getResults(numDirectConnections, units.size());</span>
+    }
+
+    private Set&lt;Result&gt; getResults(Map&lt;IUnit, Set&lt;String&gt;&gt; numDirectConnectionsPerTest, Integer numAllUnits) {
+<span class="fc" id="L89">        logger.debug(&quot;Got the following connections: {}&quot;, numDirectConnectionsPerTest);</span>
+
+<span class="fc" id="L91">        Set&lt;Result&gt; results = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L92">        DecimalFormat decimalFormat = new DecimalFormat(&quot;#0.0000&quot;);</span>
+<span class="fc bfc" id="L93" title="All 2 branches covered.">        for(Map.Entry&lt;IUnit, Set&lt;String&gt;&gt; entry: numDirectConnectionsPerTest.entrySet()) {</span>
+<span class="fc" id="L94">            double percentDirectlyCovered = ((double) entry.getValue().size()*100) / (double) numAllUnits;</span>
+<span class="fc" id="L95">            results.add(new Result(entry.getKey().getFQN(), entry.getKey().getFilePath(),</span>
+<span class="fc" id="L96">                    &quot;call_dire&quot;, decimalFormat.format(percentDirectlyCovered)));</span>
+<span class="fc" id="L97">        }</span>
+
+<span class="fc" id="L99">        return results;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

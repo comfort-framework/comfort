@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LoaderConfiguration.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">comfort</a> &gt; <a href="index.source.html" class="el_package">de.ugoe.cs.comfort.configuration</a> &gt; <span class="el_source">LoaderConfiguration.java</span></div><h1>LoaderConfiguration.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2017 University of Goettingen, Germany
+ * 
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.ugoe.cs.comfort.configuration;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+/**
+ * @author Fabian Trautsch
+ */
+public class LoaderConfiguration extends BaseConfiguration {
+    private String vcsSystemUrl;
+<span class="fc" id="L29">    private Database database = new Database();</span>
+<span class="fc" id="L30">    private String coverageLocation = null;</span>
+<span class="fc" id="L31">    private String callGraphLocation = null;</span>
+
+    public LoaderConfiguration(@JsonProperty(&quot;name&quot;) String name) {
+<span class="fc" id="L34">        super(name);</span>
+<span class="fc" id="L35">    }</span>
+
+
+    public Path getCallGraphLocation() {
+<span class="fc" id="L39">        return Paths.get(callGraphLocation);</span>
+    }
+
+    public void setCallGraphLocation(String callGraphLocation) {
+<span class="fc" id="L43">        this.callGraphLocation = callGraphLocation;</span>
+<span class="fc" id="L44">    }</span>
+
+    public Path getCoverageLocation() {
+<span class="fc" id="L47">        return Paths.get(coverageLocation);</span>
+    }
+
+    public void setCoverageLocation(String coverageLocation) {
+<span class="fc" id="L51">        this.coverageLocation = coverageLocation;</span>
+<span class="fc" id="L52">    }</span>
+
+    public String getVcsSystemUrl() {
+<span class="fc" id="L55">        return vcsSystemUrl;</span>
+    }
+
+    public void setVcsSystemUrl(String vcsSystemUrl) {
+<span class="fc" id="L59">        this.vcsSystemUrl = vcsSystemUrl;</span>
+<span class="fc" id="L60">    }</span>
+
+    public void setDatabase(Database database) {
+<span class="fc" id="L63">        this.database = database;</span>
+<span class="fc" id="L64">    }</span>
+
+    public Database getDatabase() {
+<span class="fc" id="L67">        return this.database;</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="nc" id="L72">        return MoreObjects.toStringHelper(this)</span>
+<span class="nc" id="L73">                .add(&quot;Name&quot;, this.name)</span>
+<span class="nc" id="L74">                .add(&quot;database&quot;, database)</span>
+<span class="nc" id="L75">                .add(&quot;vcsSystemUrl&quot;, vcsSystemUrl)</span>
+<span class="nc" id="L76">                .add(&quot;coverageLocation&quot;, coverageLocation)</span>
+<span class="nc" id="L77">                .add(&quot;callGraphLocation&quot;, callGraphLocation)</span>
+<span class="nc" id="L78">                .toString();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

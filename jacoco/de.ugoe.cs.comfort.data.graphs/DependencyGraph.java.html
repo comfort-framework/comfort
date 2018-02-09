@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DependencyGraph.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">comfort</a> &gt; <a href="index.source.html" class="el_package">de.ugoe.cs.comfort.data.graphs</a> &gt; <span class="el_source">DependencyGraph.java</span></div><h1>DependencyGraph.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2017 University of Goettingen, Germany
+ * 
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.ugoe.cs.comfort.data.graphs;
+
+import com.google.common.base.MoreObjects;
+import com.google.common.graph.ElementOrder;
+import com.google.common.graph.EndpointPair;
+import com.google.common.graph.GraphBuilder;
+import com.google.common.graph.MutableGraph;
+import de.ugoe.cs.comfort.Utils;
+import de.ugoe.cs.comfort.data.DataSet;
+import de.ugoe.cs.comfort.data.models.IUnit;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import javax.annotation.ParametersAreNonnullByDefault;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+
+
+
+/**
+ * @author Fabian Trautsch
+ */
+public class DependencyGraph extends DataSet implements MutableGraph&lt;IUnit&gt;, IGraph {
+    private final MutableGraph&lt;IUnit&gt; graph;
+
+<span class="fc" id="L46">    public DependencyGraph() {</span>
+<span class="fc" id="L47">        graph = GraphBuilder.directed().allowsSelfLoops(true).build();</span>
+<span class="fc" id="L48">    }</span>
+
+    public DependencyGraph getCopyOfGraph() {
+<span class="fc" id="L51">        DependencyGraph clonedGraph = new DependencyGraph();</span>
+<span class="fc" id="L52">        edges().forEach(</span>
+<span class="fc" id="L53">                edge -&gt; clonedGraph.putEdge(edge.source(), edge.target())</span>
+        );
+<span class="fc" id="L55">        return clonedGraph;</span>
+    }
+
+    @Override
+    @ParametersAreNonnullByDefault
+    public boolean addNode(IUnit node) {
+<span class="nc" id="L61">        return graph.addNode(node);</span>
+    }
+
+    @Override
+    @ParametersAreNonnullByDefault
+    public boolean putEdge(IUnit nodeU, IUnit nodeV) {
+<span class="fc" id="L67">        return graph.putEdge(nodeU, nodeV);</span>
+    }
+
+    @Override
+    @ParametersAreNonnullByDefault
+    public boolean removeNode(IUnit node) {
+<span class="fc" id="L73">        return graph.removeNode(node);</span>
+    }
+
+    @Override
+    @ParametersAreNonnullByDefault
+    public boolean removeEdge(IUnit nodeU, IUnit nodeV) {
+<span class="fc" id="L79">        return graph.removeEdge(nodeU, nodeV);</span>
+    }
+
+    @Override
+    public Set&lt;IUnit&gt; nodes() {
+<span class="fc" id="L84">        return graph.nodes();</span>
+    }
+
+    @Override
+    public Set&lt;EndpointPair&lt;IUnit&gt;&gt; edges() {
+<span class="fc" id="L89">        return graph.edges();</span>
+    }
+
+    @Override
+    public boolean isDirected() {
+<span class="fc" id="L94">        return graph.isDirected();</span>
+    }
+
+    @Override
+    public boolean allowsSelfLoops() {
+<span class="nc" id="L99">        return graph.allowsSelfLoops();</span>
+    }
+
+    @Override
+    public ElementOrder&lt;IUnit&gt; nodeOrder() {
+<span class="nc" id="L104">        return graph.nodeOrder();</span>
+    }
+
+    @Override
+    @ParametersAreNonnullByDefault
+    public Set&lt;IUnit&gt; adjacentNodes(IUnit node) {
+<span class="fc" id="L110">        return graph.adjacentNodes(node);</span>
+    }
+
+    @Override
+    @ParametersAreNonnullByDefault
+    public Set&lt;IUnit&gt; predecessors(IUnit node) {
+<span class="nc" id="L116">        return graph.predecessors(node);</span>
+    }
+
+    @Override
+    @ParametersAreNonnullByDefault
+    public Set&lt;IUnit&gt; successors(IUnit node) {
+<span class="fc" id="L122">        return graph.successors(node);</span>
+    }
+
+    @Override
+    @ParametersAreNonnullByDefault
+    public int degree(IUnit node) {
+<span class="nc" id="L128">        return graph.degree(node);</span>
+    }
+
+    @Override
+    @ParametersAreNonnullByDefault
+    public int inDegree(IUnit node) {
+<span class="nc" id="L134">        return graph.inDegree(node);</span>
+    }
+
+    @Override
+    @ParametersAreNonnullByDefault
+    public int outDegree(IUnit node) {
+<span class="nc" id="L140">        return graph.outDegree(node);</span>
+    }
+
+    @Override
+    @ParametersAreNonnullByDefault
+    public boolean hasEdgeConnecting(IUnit nodeU, IUnit nodeV) {
+<span class="nc" id="L146">        return graph.hasEdgeConnecting(nodeU, nodeV);</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="nc" id="L151">        return new HashCodeBuilder(17, 31)</span>
+<span class="nc" id="L152">                .append(graph)</span>
+<span class="nc" id="L153">                .toHashCode();</span>
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+<span class="pc bpc" id="L158" title="1 of 2 branches missed.">        if(obj == this) {</span>
+<span class="nc" id="L159">            return true;</span>
+        }
+
+<span class="pc bpc" id="L162" title="1 of 2 branches missed.">        if (!(obj instanceof DependencyGraph)) {</span>
+<span class="nc" id="L163">            return false;</span>
+        }
+<span class="fc" id="L165">        DependencyGraph other = (DependencyGraph) obj;</span>
+
+<span class="pc bpc" id="L167" title="1 of 2 branches missed.">        return isDirected() == other.isDirected()</span>
+<span class="pc bpc" id="L168" title="1 of 2 branches missed.">                &amp;&amp; nodes().equals(other.nodes())</span>
+<span class="pc bpc" id="L169" title="1 of 2 branches missed.">                &amp;&amp; edges().equals(other.edges());</span>
+    }
+
+    public Set&lt;IUnit&gt; getTestNodes() {
+<span class="fc" id="L173">        Set&lt;IUnit&gt; testNodes = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L174" title="All 2 branches covered.">        for(IUnit node: this.nodes()) {</span>
+<span class="fc bfc" id="L175" title="All 2 branches covered.">            if(Utils.isTestBasedOnFQN(node.getFQNOfUnit())) {</span>
+<span class="fc" id="L176">                testNodes.add(node);</span>
+            }
+<span class="fc" id="L178">        }</span>
+<span class="fc" id="L179">        return testNodes;</span>
+    }
+
+    public void cleanGraphOfNodesThatAreSingle() {
+        // Go through all nodes and check if they have any connections left. If not -&gt; put them in a list to remove
+<span class="fc" id="L184">        Set&lt;IUnit&gt; nodesToRemove = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L185">        this.nodes().forEach(node -&gt; {</span>
+<span class="fc bfc" id="L186" title="All 2 branches covered.">            if(this.adjacentNodes(node).size() == 0) {</span>
+<span class="fc" id="L187">                nodesToRemove.add(node);</span>
+            }
+<span class="fc" id="L189">        });</span>
+
+<span class="fc" id="L191">        nodesToRemove.forEach(this::removeNode);</span>
+<span class="fc" id="L192">    }</span>
+
+
+    public void printToFileInDotFormat(Path outputPath) throws IOException {
+<span class="nc" id="L196">        List&lt;String&gt; lines = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L197">        lines.add(&quot;digraph graph {&quot;);</span>
+<span class="nc bnc" id="L198" title="All 2 branches missed.">        for(EndpointPair&lt;IUnit&gt; edge: graph.edges()) {</span>
+<span class="nc" id="L199">            lines.add(&quot;\&quot;&quot; + edge.source() + &quot;\&quot; -&gt; \&quot;&quot; + edge.target() + &quot;\&quot;;&quot;);</span>
+<span class="nc" id="L200">        }</span>
+<span class="nc" id="L201">        lines.add(&quot;}&quot;);</span>
+<span class="nc" id="L202">        Files.write(outputPath, lines);</span>
+<span class="nc" id="L203">    }</span>
+
+    @Override
+    public String toString() {
+<span class="nc" id="L207">        return MoreObjects.toStringHelper(this)</span>
+<span class="nc" id="L208">                .add(&quot;Edges&quot;, edges())</span>
+<span class="nc" id="L209">                .add(&quot;Nodes&quot;, nodes())</span>
+<span class="nc" id="L210">                .toString();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

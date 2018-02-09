@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DependencyCollector.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">comfort</a> &gt; <a href="index.source.html" class="el_package">de.ugoe.cs.comfort.collection.metriccollector</a> &gt; <span class="el_source">DependencyCollector.java</span></div><h1>DependencyCollector.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2017 University of Goettingen, Germany
+ * 
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.ugoe.cs.comfort.collection.metriccollector;
+
+import de.ugoe.cs.comfort.annotations.SupportsClass;
+import de.ugoe.cs.comfort.annotations.SupportsJava;
+import de.ugoe.cs.comfort.annotations.SupportsMethod;
+import de.ugoe.cs.comfort.annotations.SupportsPython;
+import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
+import de.ugoe.cs.comfort.data.graphs.CallGraph;
+import de.ugoe.cs.comfort.data.graphs.DependencyGraph;
+import de.ugoe.cs.comfort.data.models.IUnit;
+import de.ugoe.cs.comfort.filer.models.Result;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+/**
+ * @author Fabian Trautsch
+ */
+public class DependencyCollector extends BaseMetricCollector {
+    public DependencyCollector(GeneralConfiguration configuration) {
+<span class="fc" id="L37">        super(configuration);</span>
+<span class="fc" id="L38">    }</span>
+
+    @SupportsJava
+    @SupportsPython
+    @SupportsMethod
+    public Set&lt;Result&gt; getNumberOfDependentUnitsForMethod(CallGraph callGraph) {
+<span class="fc" id="L44">        Map&lt;IUnit, Set&lt;IUnit&gt;&gt; callerCalleePairs = TestTypeDetectionUtils</span>
+<span class="fc" id="L45">                .getCallPairsOnClassLevel(callGraph);</span>
+<span class="fc" id="L46">        return generateResults(callerCalleePairs);</span>
+    }
+
+    @SupportsJava
+    @SupportsPython
+    @SupportsClass
+    public Set&lt;Result&gt; getNumberOfDependentUnitsForClass(DependencyGraph dependencyGraph) {
+<span class="fc" id="L53">        Map&lt;IUnit, Set&lt;IUnit&gt;&gt; callerCalleePairs = TestTypeDetectionUtils</span>
+<span class="fc" id="L54">                .getCallPairsOnClassLevel(dependencyGraph);</span>
+<span class="fc" id="L55">        return generateResults(callerCalleePairs);</span>
+    }
+
+    private Set&lt;Result&gt; generateResults(Map&lt;IUnit, Set&lt;IUnit&gt;&gt; callerCalleePairs) {
+<span class="fc" id="L59">        Set&lt;Result&gt; results = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L60" title="All 2 branches covered.">        for(Map.Entry&lt;IUnit, Set&lt;IUnit&gt;&gt; entry: callerCalleePairs.entrySet()) {</span>
+<span class="fc" id="L61">            Set&lt;String&gt; units = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L62">            entry.getValue().forEach(unit -&gt; {</span>
+<span class="fc bfc" id="L63" title="All 2 branches covered.">                if(!unit.isTestBasedOnFQNofUnit()) {</span>
+<span class="fc" id="L64">                    units.add(unit.getFQNOfUnit());</span>
+                }
+<span class="fc" id="L66">            });</span>
+<span class="fc" id="L67">            logger.debug(&quot;Dependency of {} is: {}&quot;, entry.getKey(), entry.getValue().size());</span>
+<span class="fc" id="L68">            results.add(new Result(entry.getKey().getFQN(), entry.getKey().getFilePath(),</span>
+<span class="fc" id="L69">                    &quot;call_dep&quot;, String.valueOf(units.size())));</span>
+<span class="fc" id="L70">        }</span>
+<span class="fc" id="L71">        return results;</span>
+    }
+
+
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>IEEETestTypeCollector.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">comfort</a> &gt; <a href="index.source.html" class="el_package">de.ugoe.cs.comfort.collection.metriccollector</a> &gt; <span class="el_source">IEEETestTypeCollector.java</span></div><h1>IEEETestTypeCollector.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2017 University of Goettingen, Germany
+ * 
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.ugoe.cs.comfort.collection.metriccollector;
+
+import de.ugoe.cs.comfort.annotations.SupportsClass;
+import de.ugoe.cs.comfort.annotations.SupportsJava;
+import de.ugoe.cs.comfort.annotations.SupportsMethod;
+import de.ugoe.cs.comfort.annotations.SupportsPython;
+import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
+import de.ugoe.cs.comfort.data.CoverageData;
+import de.ugoe.cs.comfort.data.graphs.CallGraph;
+import de.ugoe.cs.comfort.data.graphs.DependencyGraph;
+import de.ugoe.cs.comfort.data.graphs.IGraph;
+import de.ugoe.cs.comfort.data.models.IUnit;
+import de.ugoe.cs.comfort.filer.models.Result;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+/**
+ * @author Fabian Trautsch
+ */
+public class IEEETestTypeCollector extends BaseMetricCollector {
+
+    public IEEETestTypeCollector(GeneralConfiguration configuration) {
+<span class="fc" id="L41">        super(configuration);</span>
+<span class="fc" id="L42">    }</span>
+
+    @SupportsClass
+    @SupportsJava
+    @SupportsPython
+    public Set&lt;Result&gt; createResultsJavaPythonClassLevelCallGraph(CallGraph callGraph) {
+<span class="fc" id="L48">        return classifyUsingGraph(callGraph.getDependencyGraphRepresentation(), &quot;call_ieee&quot;);</span>
+    }
+
+
+
+    @SupportsMethod
+    @SupportsJava
+    @SupportsPython
+    public Set&lt;Result&gt; createResultsJavaPythonMethodLevelCallGraph(CallGraph graph) {
+<span class="fc" id="L57">        return classifyUsingGraph(graph, &quot;call_ieee_met&quot;);</span>
+    }
+
+
+    @SupportsJava
+    @SupportsPython
+    @SupportsClass
+    public Set&lt;Result&gt; createResultsJavaPythonDepGraph(DependencyGraph dependencyGraph) {
+<span class="fc" id="L65">        return classifyUsingGraph(dependencyGraph, &quot;dep_ieee&quot;);</span>
+    }
+
+
+    @SupportsJava
+    @SupportsPython
+    @SupportsClass
+    public Set&lt;Result&gt; createResultsJavaPythonCoverageClass(CoverageData dataSet) {
+<span class="fc" id="L73">        Map&lt;IUnit, Integer&gt; unitAndAmountOfPackagesTested =</span>
+<span class="fc" id="L74">                getUniqueTestedPackages(dataSet.getCoverageDataClassLevel());</span>
+
+        // Merge results from different methods on class level
+<span class="fc" id="L77">        return TestTypeDetectionUtils.generateResults(generalConf, unitAndAmountOfPackagesTested,</span>
+<span class="fc" id="L78">                generalConf.getMethodLevel(), &quot;cov_ieee&quot;);</span>
+    }
+
+
+    @SupportsJava
+    @SupportsPython
+    @SupportsMethod
+    public Set&lt;Result&gt; createResultsJavaPythonCoverageMethod(CoverageData dataSet) {
+<span class="fc" id="L86">        Map&lt;IUnit, Integer&gt; unitAndAmountOfPackagesTested = getUniqueTestedPackages(dataSet.getCoverageData());</span>
+
+        // Merge results from different methods on class level
+<span class="fc" id="L89">        return TestTypeDetectionUtils.generateResults(generalConf, unitAndAmountOfPackagesTested,</span>
+<span class="fc" id="L90">                generalConf.getMethodLevel(), &quot;cov_ieee_met&quot;);</span>
+    }
+
+
+
+
+    private Set&lt;Result&gt; classifyUsingGraph(IGraph graph, String metricName) {
+<span class="fc" id="L97">        Map&lt;IUnit, Set&lt;IUnit&gt;&gt; callerCalleePairs =</span>
+<span class="fc" id="L98">                TestTypeDetectionUtils.getCallPairsOnClassLevel(graph);</span>
+<span class="fc" id="L99">        Map&lt;IUnit, Integer&gt; testAndAmountOfPackagesTested = getUniqueTestedPackages(callerCalleePairs);</span>
+
+<span class="fc" id="L101">        return TestTypeDetectionUtils.generateResults(generalConf, testAndAmountOfPackagesTested,</span>
+<span class="fc" id="L102">                generalConf.getMethodLevel(), metricName);</span>
+    }
+
+
+    private Map&lt;IUnit, Integer&gt; getUniqueTestedPackages(Map&lt;IUnit, Set&lt;IUnit&gt;&gt; callerCalleePairs) {
+<span class="fc" id="L107">        Map&lt;IUnit, Integer&gt; testAndAmountOfPackagesTested = new HashMap&lt;&gt;();</span>
+
+<span class="fc bfc" id="L109" title="All 2 branches covered.">        for (Map.Entry&lt;IUnit, Set&lt;IUnit&gt;&gt; entry : callerCalleePairs.entrySet()) {</span>
+<span class="fc" id="L110">            Set&lt;String&gt; packages = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L111">            entry.getValue().forEach(iUnit -&gt; packages.add(iUnit.getPackage()));</span>
+<span class="fc" id="L112">            testAndAmountOfPackagesTested.put(entry.getKey(), packages.size());</span>
+<span class="fc" id="L113">        }</span>
+
+<span class="fc" id="L115">        return testAndAmountOfPackagesTested;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

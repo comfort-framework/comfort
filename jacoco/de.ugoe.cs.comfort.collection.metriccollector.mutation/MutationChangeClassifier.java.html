@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MutationChangeClassifier.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">comfort</a> &gt; <a href="index.source.html" class="el_package">de.ugoe.cs.comfort.collection.metriccollector.mutation</a> &gt; <span class="el_source">MutationChangeClassifier.java</span></div><h1>MutationChangeClassifier.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2017 University of Goettingen, Germany
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.ugoe.cs.comfort.collection.metriccollector.mutation;
+
+import de.ugoe.cs.BugFixClassifier;
+import de.ugoe.cs.comfort.Utils;
+import de.ugoe.cs.comfort.collection.metriccollector.mutation.operators.BaseOperator;
+import de.ugoe.cs.comfort.collection.metriccollector.mutation.operators.ConditionalsBoundaryOperator;
+import de.ugoe.cs.comfort.collection.metriccollector.mutation.operators.IncrementsOperator;
+import de.ugoe.cs.comfort.collection.metriccollector.mutation.operators.InvertNegativesOperator;
+import de.ugoe.cs.comfort.collection.metriccollector.mutation.operators.MathOperator;
+import de.ugoe.cs.comfort.collection.metriccollector.mutation.operators.NegateConditionalsOperator;
+import de.ugoe.cs.comfort.collection.metriccollector.mutation.operators.RemoveIncrementsOperator;
+import de.ugoe.cs.comfort.exception.MutationResultException;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.Set;
+import org.apache.commons.io.FileUtils;
+
+/**
+ * @author Fabian Trautsch
+ */
+<span class="nc" id="L42">public class MutationChangeClassifier {</span>
+    private static Path findFileBasedOnName(Path projectDir, String name) throws IOException {
+<span class="fc" id="L44">        Set&lt;Path&gt; foundFiles = Utils.getAllFilesFromProjectForRegex(projectDir, name + &quot;$&quot;);</span>
+<span class="pc bpc" id="L45" title="1 of 2 branches missed.">        if(foundFiles.size() &gt; 1) {</span>
+<span class="nc" id="L46">            throw new IOException(&quot;More than one file with name &quot;+name+&quot; found in project directory!&quot;);</span>
+        } else {
+<span class="fc" id="L48">            return foundFiles.iterator().next();</span>
+        }
+    }
+
+    public static String getChangeClassification(Path projectDir, String fileName,
+                                                 String mutationOperator, int lineNumber)
+            throws MutationResultException {
+        try {
+            // Get  filename
+<span class="fc" id="L57">            Path file = findFileBasedOnName(projectDir, fileName);</span>
+
+            // Copy files
+<span class="fc" id="L60">            Path changedFile = File.createTempFile(&quot;comfort-&quot;, &quot;-suffix&quot;).toPath();</span>
+<span class="fc" id="L61">            FileUtils.copyFile(file.toFile(), changedFile.toFile());</span>
+
+            // Change File based on mutationOperator on LineNumber
+<span class="fc" id="L64">            BaseOperator operator = null;</span>
+<span class="pc bpc" id="L65" title="73 of 94 branches missed.">            switch (mutationOperator) {</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.ArgumentPropagationMutator&quot;:
+<span class="nc" id="L67">                    return &quot;INTERFACE&quot;;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.BooleanFalseReturnValsMutator&quot;:
+<span class="nc" id="L69">                    return &quot;LOGIC/CONTROL&quot;;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.BooleanTrueReturnValsMutator&quot;:
+<span class="nc" id="L71">                    return &quot;LOGIC/CONTROL&quot;;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.ConditionalsBoundaryMutator&quot;:
+<span class="fc" id="L73">                    operator = new ConditionalsBoundaryOperator(changedFile, lineNumber);</span>
+<span class="fc" id="L74">                    break;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.ConstructorCallMutator&quot;:
+<span class="nc" id="L76">                    return &quot;INTERFACE&quot;;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.EmptyObjectReturnValsMutator&quot;:
+<span class="nc" id="L78">                    return &quot;INTERFACE&quot;;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.IncrementsMutator&quot;:
+<span class="fc" id="L80">                    operator = new IncrementsOperator(changedFile, lineNumber);</span>
+<span class="fc" id="L81">                    break;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.InlineConstantMutator&quot;:
+<span class="nc" id="L83">                    return &quot;DATA&quot;;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.InvertNegsMutator&quot;:
+<span class="fc" id="L85">                    operator = new InvertNegativesOperator(changedFile, lineNumber);</span>
+<span class="fc" id="L86">                    break;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.MathMutator&quot;:
+<span class="fc" id="L88">                    operator = new MathOperator(changedFile, lineNumber);</span>
+<span class="fc" id="L89">                    break;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.NegateConditionalsMutator&quot;:
+<span class="fc" id="L91">                    operator = new NegateConditionalsOperator(changedFile, lineNumber);</span>
+<span class="fc" id="L92">                    break;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.NonVoidMethodCallMutator&quot;:
+<span class="nc" id="L94">                    return &quot;INTERFACE&quot;;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.NullReturnValsMutator&quot;:
+<span class="nc" id="L96">                    return &quot;LOGIC/CONTROL&quot;;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.PrimitiveReturnsMutator&quot;:
+<span class="nc" id="L98">                    return &quot;LOGIC/CONTROL&quot;;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator&quot;:
+<span class="nc" id="L100">                    return &quot;LOGIC/CONTROL&quot;;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.ReturnValsMutator&quot;:
+<span class="fc" id="L102">                    return &quot;LOGIC/CONTROL&quot;;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator&quot;:
+<span class="nc" id="L104">                    return &quot;INTERFACE&quot;;</span>
+
+                    // Experimental Mutators
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.experimental.MemberVariableMutator&quot;:
+<span class="nc" id="L108">                    return &quot;COMPUTATION&quot;;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.experimental.NakedReceiverMutator&quot;:
+<span class="nc" id="L110">                    return &quot;INTERFACE&quot;;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.experimental.RemoveIncrementsMutator&quot;:
+<span class="fc" id="L112">                    operator = new RemoveIncrementsOperator(changedFile, lineNumber);</span>
+<span class="fc" id="L113">                    break;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.experimental.RemoveSwitchMutator&quot;:
+<span class="nc" id="L115">                    return &quot;LOGIC/CONTROL&quot;;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.experimental.ReturnValuesMutator&quot;:
+<span class="nc" id="L117">                    return &quot;LOGIC/CONTROL&quot;;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.experimental.SwitchMutator&quot;:
+<span class="nc" id="L119">                    operator = new RemoveIncrementsOperator(changedFile, lineNumber);</span>
+<span class="nc" id="L120">                    break;</span>
+                default:
+<span class="nc" id="L122">                    throw new MutationResultException(&quot;Unsupported mutationoperator '&quot;+mutationOperator+&quot;'&quot;);</span>
+
+            }
+            // Change file based on operator. E.g., RemoveIncrementsOperator removes &quot;--&quot; or &quot;++&quot; from line.
+<span class="fc" id="L126">            operator.changeFile();</span>
+
+            // Call bugfixclassifier to get results
+<span class="fc" id="L129">            Map&lt;String, Integer&gt; results = BugFixClassifier.getBugClassifications(file, changedFile);</span>
+
+<span class="fc" id="L131">            Files.delete(changedFile);</span>
+
+            // If no results were found, there was some kind of error...
+<span class="pc bpc" id="L134" title="1 of 2 branches missed.">            if(results.size() == 0) {</span>
+<span class="nc" id="L135">                throw new MutationResultException(&quot;No results calculated!&quot;);</span>
+            }
+
+            // Get the result with the highest count
+<span class="fc" id="L139">            return Collections.max(results.entrySet(), Comparator.comparingInt(Map.Entry::getValue)).getKey();</span>
+
+<span class="nc" id="L141">        } catch (IOException e) {</span>
+<span class="nc" id="L142">            throw new MutationResultException(e.getMessage());</span>
+        }
+
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

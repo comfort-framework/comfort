@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CodeCoverStrategy.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">comfort</a> &gt; <a href="index.source.html" class="el_package">de.ugoe.cs.comfort.collection.metriccollector</a> &gt; <span class="el_source">CodeCoverStrategy.java</span></div><h1>CodeCoverStrategy.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2017 University of Goettingen, Germany
+ * 
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.ugoe.cs.comfort.collection.metriccollector;
+
+import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
+
+/**
+ * @author Fabian Trautsch
+ */
+public class CodeCoverStrategy extends BaseMetricCollector {
+
+    public CodeCoverStrategy(GeneralConfiguration configuration) {
+<span class="nc" id="L27">        super(configuration);</span>
+<span class="nc" id="L28">    }</span>
+}
+    /*
+public class CodeCoverStrategy implements IMetricCollector {
+
+    @Override
+    public Set&lt;Result&gt; classify(GeneralConfiguration configuration, CallGraph callGraph) {
+        // Get all test granularities
+        Map&lt;String, Integer&gt; testGranularities = DetectionUtils.getTestGranularitiesForTestsOnMethodLevel(callGraph);
+
+        try {
+            storeGranularitiesInCSV(configuration, testGranularities);
+        } catch (IOException e) {
+            throw new MetricCollectorException(&quot;Could not write granularities in csv file!&quot; +e);
+        }
+
+        return new HashSet&lt;&gt;();
+    }
+
+    @Override
+    public Set&lt;Result&gt; classify(GeneralConfiguration configuration, DependencyGraph dependencyGraph) {
+        Map&lt;String, Set&lt;String&gt;&gt; callerCalleePaitsOnClassLevel = DetectionUtils
+        .getCallPairsOnClassLevel(dependencyGraph);
+        Map&lt;String, Integer&gt; testGranularities =
+                callerCalleePaitsOnClassLevel.entrySet().stream().collect(Collectors
+                .toMap(Map.Entry::getKey, entry -&gt; entry.getValue().size()));
+
+        try {
+            storeGranularitiesInCSV(configuration, testGranularities);
+        } catch (IOException e) {
+            throw new MetricCollectorException(&quot;Could not write granularities in csv file!&quot; +e);
+        }
+        return new HashSet&lt;&gt;();
+    }
+
+    private void storeGranularitiesInCSV(GeneralConfiguration configuration, Map&lt;String, Integer&gt; testGranularities)
+    throws IOException{
+        // Get storage path
+        String storagePath = configuration.getConfigurationDetectionStrategy().getConfigurationOptions().getCsvPath();
+
+        // Check if stuff should be stored
+        if(storagePath == null || storagePath.isEmpty()) {
+            return;
+        }
+
+        // Get the tests per granularity, e.g., for the granularity 1 there are 5 tests, for 2 there are 2 tests, etc.
+        Map&lt;Integer, Long&gt; testsPerGranularity =
+                testGranularities.values().stream().collect(Collectors.groupingBy(e -&gt; e, Collectors.counting()));
+
+        // Sort the testsPerGranularity by key (Granularity 0 -&gt; 1 test, 1-&gt; 3 tests, etc.)
+        Map&lt;Integer, Long&gt; sortedTestsPerGranularity = testsPerGranularity.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+                        (oldValue, newValue) -&gt; oldValue, LinkedHashMap::new));
+
+        // Create csv string from the whole sorted map
+        String csvString = sortedTestsPerGranularity.entrySet().stream()
+                .map(entry -&gt; entry.getKey()+&quot;,&quot;+entry.getValue())
+                .collect(Collectors.joining(System.getProperty(&quot;line.separator&quot;)));
+
+        // Create filename basted on projectname and current date
+        String fileName = String.format(
+                &quot;%s_testGranularities_%s.csv&quot;,
+                configuration.getProjectName(),
+                new SimpleDateFormat(&quot;ddMMyyyy_HHmm&quot;).format(new Date()));
+
+        // Write the file to the storage path
+        Files.write(Paths.get(storagePath, fileName), csvString.getBytes(UTF_8));
+
+    }
+
+    @Override
+    public Set&lt;Result&gt; classify(GeneralConfiguration configuration, CoverageData dataSet) {
+        Map&lt;String, Integer&gt; testGranularities =
+                dataSet.getCoverageData().stream().collect(Collectors
+                .toMap(ITestMethod::getUniqueIdentifier, entry -&gt; entry.getTestedMethods().size()));
+        System.out.println(testGranularities);
+
+        try {
+            storeGranularitiesInCSV(configuration, testGranularities);
+        } catch (IOException e) {
+            throw new MetricCollectorException(&quot;Could not write granularities in csv file!&quot; +e);
+        }
+
+        return null;
+    }
+
+    @Override
+    public Set&lt;Result&gt; classify(GeneralConfiguration configuration, ChangeSet dataSet) {
+        throw new MetricCollectorException(&quot;Not implemented!&quot;);
+    }
+
+    @Override
+    public Set&lt;Result&gt; classify(GeneralConfiguration configuration, ProjectFiles dataSet) {
+        throw new MetricCollectorException(&quot;Not implemented!&quot;);
+    }
+
+}
+   */
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

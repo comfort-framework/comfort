@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ClassVisitor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">comfort</a> &gt; <a href="index.source.html" class="el_package">de.ugoe.cs.comfort.collection.loader.callgraph</a> &gt; <span class="el_source">ClassVisitor.java</span></div><h1>ClassVisitor.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2011 - Georgios Gousios &lt;gousiosg@gmail.com&gt;
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are
+ * met:
+ *
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *
+ *     * Redistributions in binary form must reproduce the above
+ *       copyright notice, this list of conditions and the following
+ *       disclaimer in the documentation and/or other materials provided
+ *       with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+package de.ugoe.cs.comfort.collection.loader.callgraph;
+
+import de.ugoe.cs.comfort.FileNameUtils;
+import de.ugoe.cs.comfort.data.graphs.CallGraph;
+import org.apache.bcel.classfile.*;
+import org.apache.bcel.generic.ConstantPoolGen;
+import org.apache.bcel.generic.MethodGen;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+/**
+ * The simplest of class visitors, invokes the method visitor class for each
+ * method found. Based on: http://www.spinellis.gr/sw/ckjm/
+ */
+public class ClassVisitor extends EmptyVisitor {
+
+    private JavaClass clazz;
+    private ConstantPoolGen constants;
+    private CallGraph callGraph;
+    private FileNameUtils fileNameUtils;
+<span class="fc" id="L49">    private static final Logger LOGGER = LogManager.getLogger(ClassVisitor.class.getName());</span>
+
+<span class="fc" id="L51">    public ClassVisitor(JavaClass jc, CallGraph callGraph, FileNameUtils fileNameUtils) {</span>
+<span class="fc" id="L52">        clazz = jc;</span>
+<span class="fc" id="L53">        constants = new ConstantPoolGen(clazz.getConstantPool());</span>
+<span class="fc" id="L54">        this.callGraph = callGraph;</span>
+<span class="fc" id="L55">        this.fileNameUtils = fileNameUtils;</span>
+<span class="fc" id="L56">    }</span>
+
+    public void visitJavaClass(JavaClass jc) {
+<span class="fc" id="L59">        jc.getConstantPool().accept(this);</span>
+<span class="fc" id="L60">        Method[] methods = jc.getMethods();</span>
+<span class="fc bfc" id="L61" title="All 2 branches covered.">        for (Method method : methods) {</span>
+<span class="fc" id="L62">            method.accept(this);</span>
+        }
+<span class="fc" id="L64">    }</span>
+
+    public void visitConstantPool(ConstantPool constantPool) {
+<span class="fc bfc" id="L67" title="All 2 branches covered.">        for (int i = 0; i &lt; constantPool.getLength(); i++) {</span>
+<span class="fc" id="L68">            Constant constant = constantPool.getConstant(i);</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">            if (constant == null) {</span>
+<span class="fc" id="L70">                continue;</span>
+            }
+<span class="fc bfc" id="L72" title="All 2 branches covered.">            if (constant.getTag() == 7) {</span>
+<span class="fc" id="L73">                String referencedClass =</span>
+<span class="fc" id="L74">                        constantPool.constantToString(constant);</span>
+<span class="fc" id="L75">                LOGGER.debug(&quot;Class {} references Class {}&quot;, clazz.getClassName(), referencedClass);</span>
+            }
+        }
+<span class="fc" id="L78">    }</span>
+
+    public void visitMethod(Method method) {
+<span class="fc" id="L81">        MethodGen mg = new MethodGen(method, clazz.getClassName(), constants);</span>
+<span class="fc" id="L82">        MethodVisitor visitor = new MethodVisitor(mg, clazz, callGraph, fileNameUtils);</span>
+<span class="fc" id="L83">        visitor.start();</span>
+<span class="fc" id="L84">    }</span>
+
+    public void start() {
+<span class="fc" id="L87">        visitJavaClass(clazz);</span>
+<span class="fc" id="L88">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

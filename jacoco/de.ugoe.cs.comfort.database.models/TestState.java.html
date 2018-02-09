@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TestState.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">comfort</a> &gt; <a href="index.source.html" class="el_package">de.ugoe.cs.comfort.database.models</a> &gt; <span class="el_source">TestState.java</span></div><h1>TestState.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2017 University of Goettingen, Germany
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.ugoe.cs.comfort.database.models;
+
+import com.google.common.base.MoreObjects;
+import de.ugoe.cs.comfort.filer.models.Mutation;
+import de.ugoe.cs.comfort.filer.models.Result;
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.bson.types.ObjectId;
+import org.mongodb.morphia.annotations.Embedded;
+import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Id;
+import org.mongodb.morphia.annotations.Property;
+
+/**
+ * @author Fabian Trautsch
+ */
+@Entity(value = &quot;test_state&quot;, noClassnameStored = true)
+public class TestState {
+    @Id
+    @Property(&quot;_id&quot;)
+    private ObjectId id;
+
+    private String name;
+
+    @Property(&quot;file_id&quot;)
+    private ObjectId fileId;
+
+    @Property(&quot;commit_id&quot;)
+    private ObjectId commitId;
+
+
+<span class="fc" id="L53">    private Map&lt;String, String&gt; metrics = new HashMap&lt;&gt;();</span>
+
+<span class="fc" id="L55">    @Embedded</span>
+    private Set&lt;Mutation&gt; mutations = null;
+
+<span class="fc" id="L58">    public TestState() {}</span>
+
+<span class="fc" id="L60">    public TestState(Result result, ObjectId fileId, ObjectId commitId) {</span>
+<span class="fc" id="L61">        name = result.getId();</span>
+<span class="fc" id="L62">        this.fileId = fileId;</span>
+<span class="fc" id="L63">        this.commitId = commitId;</span>
+<span class="fc" id="L64">        metrics = result.getMetrics();</span>
+<span class="fc" id="L65">        mutations = result.getMutationResults();</span>
+<span class="fc" id="L66">    }</span>
+
+    public ObjectId getId() {
+<span class="fc" id="L69">        return id;</span>
+    }
+
+    public void setId(ObjectId id) {
+<span class="fc" id="L73">        this.id = id;</span>
+<span class="fc" id="L74">    }</span>
+
+    public String getName() {
+<span class="fc" id="L77">        return name;</span>
+    }
+
+    public void setName(String name) {
+<span class="fc" id="L81">        this.name = name;</span>
+<span class="fc" id="L82">    }</span>
+
+    public ObjectId getFileId() {
+<span class="fc" id="L85">        return fileId;</span>
+    }
+
+    public void setFileId(ObjectId fileId) {
+<span class="fc" id="L89">        this.fileId = fileId;</span>
+<span class="fc" id="L90">    }</span>
+
+    public ObjectId getCommitId() {
+<span class="fc" id="L93">        return commitId;</span>
+    }
+
+    public void setCommitId(ObjectId commitId) {
+<span class="fc" id="L97">        this.commitId = commitId;</span>
+<span class="fc" id="L98">    }</span>
+
+    public Map&lt;String, String&gt; getMetrics() {
+<span class="fc" id="L101">        return metrics;</span>
+    }
+
+    public void setMetrics(Map&lt;String, String&gt; metrics) {
+<span class="fc" id="L105">        this.metrics = metrics;</span>
+<span class="fc" id="L106">    }</span>
+
+    public Set&lt;Mutation&gt; getMutations() {
+<span class="fc" id="L109">        return mutations;</span>
+    }
+
+    public void setMutations(Set&lt;Mutation&gt; mutations) {
+<span class="fc" id="L113">        this.mutations = mutations;</span>
+<span class="fc" id="L114">    }</span>
+
+    @Override
+    public boolean equals(Object obj) {
+<span class="pc bpc" id="L118" title="1 of 2 branches missed.">        if(!(obj instanceof TestState)) {</span>
+<span class="nc" id="L119">            return false;</span>
+        }
+
+<span class="pc bpc" id="L122" title="1 of 2 branches missed.">        if(obj == this) {</span>
+<span class="nc" id="L123">            return true;</span>
+        }
+
+<span class="fc" id="L126">        TestState otherNode = (TestState) obj;</span>
+<span class="fc" id="L127">        return new EqualsBuilder()</span>
+<span class="fc" id="L128">                .append(id, otherNode.id)</span>
+<span class="fc" id="L129">                .append(name, otherNode.name)</span>
+<span class="fc" id="L130">                .append(fileId, otherNode.fileId)</span>
+<span class="fc" id="L131">                .append(commitId, otherNode.commitId)</span>
+<span class="fc" id="L132">                .append(metrics, otherNode.metrics)</span>
+<span class="fc" id="L133">                .append(mutations, otherNode.mutations)</span>
+<span class="fc" id="L134">                .isEquals();</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="nc" id="L139">        return new HashCodeBuilder(17, 31)</span>
+<span class="nc" id="L140">                .append(id)</span>
+<span class="nc" id="L141">                .append(name)</span>
+<span class="nc" id="L142">                .append(fileId)</span>
+<span class="nc" id="L143">                .append(commitId)</span>
+<span class="nc" id="L144">                .append(metrics)</span>
+<span class="nc" id="L145">                .append(mutations)</span>
+<span class="nc" id="L146">                .toHashCode();</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="nc" id="L151">        return MoreObjects.toStringHelper(this)</span>
+<span class="nc" id="L152">                .add(&quot;id&quot;, id)</span>
+<span class="nc" id="L153">                .add(&quot;name&quot;, name)</span>
+<span class="nc" id="L154">                .add(&quot;fileId&quot;, fileId)</span>
+<span class="nc" id="L155">                .add(&quot;commitId&quot;, commitId)</span>
+<span class="nc" id="L156">                .add(&quot;metrics&quot;, metrics)</span>
+<span class="nc" id="L157">                .add(&quot;mutations&quot;, mutations)</span>
+<span class="nc" id="L158">                .toString();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

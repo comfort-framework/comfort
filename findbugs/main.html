@@ -1,0 +1,243 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>FindBugs Report</title>
+<style type="text/css">
+		.tablerow0 {
+			background: #EEEEEE;
+		}
+
+		.tablerow1 {
+			background: white;
+		}
+
+		.detailrow0 {
+			background: #EEEEEE;
+		}
+
+		.detailrow1 {
+			background: white;
+		}
+
+		.tableheader {
+			background: #b9b9fe;
+			font-size: larger;
+		}
+
+		.tablerow0:hover, .tablerow1:hover {
+			background: #aaffaa;
+		}
+
+		.priority-1 {
+		    color: red;
+		    font-weight: bold;
+		}
+		.priority-2 {
+		    color: orange;
+		    font-weight: bold;
+		}
+		.priority-3 {
+		    color: green;
+		    font-weight: bold;
+		}
+		.priority-4 {
+		    color: blue;
+		    font-weight: bold;
+		}
+		</style>
+<script type="text/javascript">
+			function toggleRow(elid) {
+				if (document.getElementById) {
+					element = document.getElementById(elid);
+					if (element) {
+						if (element.style.display == 'none') {
+							element.style.display = 'block';
+							//window.status = 'Toggle on!';
+						} else {
+							element.style.display = 'none';
+							//window.status = 'Toggle off!';
+						}
+					}
+				}
+			}
+		</script>
+</head>
+<body>
+<h1>
+<a href="http://findbugs.sourceforge.net">FindBugs</a> Report</h1>
+<h2>Project Information</h2>
+<p>Project: 
+		</p>
+<p>FindBugs version: 3.0.1</p>
+<p>Code analyzed:</p>
+<ul>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/configuration/FilerConfiguration.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/configuration/BaseConfiguration.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/configuration/Database.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/configuration/LoaderConfiguration.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/configuration/GeneralConfiguration.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/configuration/CollectionConfiguration.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/Utils.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/FileNameUtils.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/Main.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/database/models/FileAggregation.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/database/models/TestState.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/exception/MutationResultException.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/exception/FilterException.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/exception/LoaderException.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/exception/MetricCollectorException.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/data/ProjectFiles.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/data/DataSet.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/data/ChangeSet.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/data/ClassFiles.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/data/models/IUnit.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/data/models/JavaClass.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/data/models/PythonModule.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/data/models/PythonMethod.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/data/models/JavaMethod.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/data/models/PythonCoverageLoaderTestMethod.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/data/models/IMethod.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/data/models/PythonCoveragerloaderTestedMethod.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/data/CoverageData.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/data/graphs/IGraph.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/data/graphs/CallEdge.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/data/graphs/CallGraph.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/data/graphs/CallType.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/data/graphs/DependencyGraph.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/filter/BaseFilter.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/filter/MergeInnerClassToMainClassFilter.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/filter/DeletePythonPackagesFilter.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/filter/TransformCallGraphToDependencyGraphFilter.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/filter/SameProjectFilter.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/filter/DirectConnectionToTestFilter.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/metriccollector/NumAssertionCollector.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/metriccollector/IEEETestTypeCollector.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/metriccollector/MaximumCallGraphDepthCollector.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/metriccollector/MutationDataCollector$PITExecutionOutputParser.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/metriccollector/TestCoverageCollector.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/metriccollector/MutationDataCollector.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/metriccollector/ISTQBTestTypeCollector.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/metriccollector/DirectnessCollector.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/metriccollector/mutation/MutationChangeClassifier.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/metriccollector/mutation/MutationExecutionResult.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/metriccollector/mutation/operators/InvertNegativesOperator.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/metriccollector/mutation/operators/MathOperator.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/metriccollector/mutation/operators/IncrementsOperator.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/metriccollector/mutation/operators/RemoveIncrementsOperator.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/metriccollector/mutation/operators/ConditionalsBoundaryOperator.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/metriccollector/mutation/operators/NegateConditionalsOperator.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/metriccollector/mutation/operators/BaseOperator.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/metriccollector/DijkstraAlgorithm.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/metriccollector/LOCAndMcCabeCollector.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/metriccollector/CoEvolutionTestTypeCollector.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/metriccollector/TestTypeDetectionUtils.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/metriccollector/parsing/ASTMethodVisitor$1.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/metriccollector/parsing/ASTMethodNode.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/metriccollector/parsing/ASTMethodVisitor.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/metriccollector/parsing/ASTClassVisitor.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/metriccollector/parsing/MetricMethodVisitor.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/metriccollector/parsing/MetricClassVisitor.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/metriccollector/parsing/ASTClassNode.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/metriccollector/DependencyCollector.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/metriccollector/NamingConventionTestTypeCollector.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/metriccollector/LOCAndMcCabeCollector$LOCAndMcCabeOutputParser.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/metriccollector/BaseMetricCollector.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/metriccollector/MaximumCallGraphDepthCollector$LongestPathCalculator.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/metriccollector/TestType.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/metriccollector/CodeCoverStrategy.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/BaseModel.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/loader/CallGraphLoader.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/loader/DependencyGraphLoader.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/loader/TestCoverageLoader.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/loader/ProjectFilesLoader.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/loader/callgraph/ClassVisitor.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/loader/callgraph/MethodVisitor.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/loader/ClassFilesLoader.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/loader/testcoverage/JacocoReportReader.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/loader/testcoverage/ExecutionDataVisitor.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/loader/DependencyGraphLoader$DependencyExtractOutputParser.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/loader/BaseLoader.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/collection/loader/ChangeSetLoader.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/filer/SmartSHARKFiler$1.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/filer/models/Result.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/filer/models/Mutation.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/filer/models/ResultSet.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/filer/CSVFiler.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/filer/IFiler.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/filer/SmartSHARKFiler.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/annotations/SupportsClass.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/annotations/SupportsMethod.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/annotations/SupportsJava.class</li>
+<li>/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/build/classes/main/de/ugoe/cs/comfort/annotations/SupportsPython.class</li>
+</ul>
+<p>
+<br/>
+<br/>
+</p>
+<h2>Metrics</h2>
+<p>3869 lines of code analyzed,
+	in 98 classes, 
+	in 19 packages.</p>
+<table width="500" cellpadding="5" cellspacing="2">
+<tr class="tableheader">
+<th align="left">Metric</th>
+<th align="right">Total</th>
+<th align="right">Density*</th>
+</tr>
+<tr class="tablerow0">
+<td>High Priority Warnings</td>
+<td align="right"/>
+<td align="right">0.00</td>
+</tr>
+<tr class="tablerow1">
+<td>Medium Priority Warnings</td>
+<td align="right"/>
+<td align="right">0.00</td>
+</tr>
+<tr class="$totalClass">
+<td>
+<b>Total Warnings</b>
+</td>
+<td align="right">
+<b>0</b>
+</td>
+<td align="right">
+<b>0.00</b>
+</td>
+</tr>
+</table>
+<p>
+<i>(* Defects per Thousand lines of non-commenting source statements)</i>
+</p>
+<p>
+<br/>
+<br/>
+</p>
+<h2>Contents</h2>
+<ul>
+<li>
+<a href="#Details">Details</a>
+</li>
+</ul>
+<h1>Summary</h1>
+<table width="500" cellpadding="5" cellspacing="2">
+<tr class="tableheader">
+<th align="left">Warning Type</th>
+<th align="right">Number</th>
+</tr>
+<tr class="tablerow0">
+<td>
+<b>Total</b>
+</td>
+<td align="right">
+<b>0</b>
+</td>
+</tr>
+</table>
+<h1>Warnings</h1>
+<p>Click on a warning row to see full context information.</p>
+<h1>
+<a name="Details">Details</a>
+</h1>
+</body>
+</html>
