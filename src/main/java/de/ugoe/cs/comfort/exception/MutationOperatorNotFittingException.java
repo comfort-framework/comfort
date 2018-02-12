@@ -14,27 +14,13 @@
  * limitations under the License.
  */
 
-package de.ugoe.cs.comfort.collection.metriccollector.mutation.operators;
-
-import de.ugoe.cs.comfort.exception.MutationOperatorNotFittingException;
-import java.io.IOException;
+package de.ugoe.cs.comfort.exception;
 
 /**
  * @author Fabian Trautsch
  */
-public class InvertNegativesOperator extends BaseOperator {
-    public InvertNegativesOperator() {
-    }
-
-    @Override
-    public void changeFile() throws IOException, MutationOperatorNotFittingException {
-        String newLine;
-        if (line.contains("-")) {
-            newLine = getChangedNewLineForPattern("-", "");
-        } else {
-            throw new MutationOperatorNotFittingException("Line does not contain - !");
-        }
-
-        storeChangedLine(newLine);
+public class MutationOperatorNotFittingException extends Exception {
+    public MutationOperatorNotFittingException(String message) {
+        super(message);
     }
 }

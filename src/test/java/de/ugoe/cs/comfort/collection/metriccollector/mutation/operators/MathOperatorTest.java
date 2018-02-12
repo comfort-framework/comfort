@@ -17,14 +17,13 @@
 package de.ugoe.cs.comfort.collection.metriccollector.mutation.operators;
 
 import de.ugoe.cs.comfort.collection.metriccollector.mutation.MutationOperatorBaseTest;
+import de.ugoe.cs.comfort.exception.MutationOperatorNotFittingException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,14 +44,15 @@ public class MathOperatorTest extends MutationOperatorBaseTest {
     }
 
     @Test
-    public void plusInLoopTest() throws IOException {
-        MathOperator operator = new MathOperator(clazz, 3);
+    public void plusInLoopTest() throws IOException, MutationOperatorNotFittingException {
+        MathOperator operator = new MathOperator();
+        operator.initialize(clazz, 3);
         operator.changeFile();
         assertNewLineOnLineNumber(clazz, "for(int j=0; j<number+1; j--) {", 3);
     }
 
     @Test
-    public void assignmentTest() throws IOException {
+    public void assignmentTest() throws IOException, MutationOperatorNotFittingException {
         List<String> expectedValues = new ArrayList<String>() {{
             add("-");
             add("+");
@@ -69,7 +69,8 @@ public class MathOperatorTest extends MutationOperatorBaseTest {
 
         int i = 7;
         for(String expectedValue: expectedValues) {
-            MathOperator operator = new MathOperator(clazz, i);
+            MathOperator operator = new MathOperator();
+            operator.initialize(clazz, i);
             operator.changeFile();
             assertNewLineOnLineNumber(clazz, "i = i"+expectedValue+"1;", i);
             i++;
@@ -77,8 +78,9 @@ public class MathOperatorTest extends MutationOperatorBaseTest {
     }
 
     @Test
-    public void negativeTestCaseBooleanOperatorTest() throws IOException {
-        MathOperator operator = new MathOperator(clazz, 20);
+    public void negativeTestCaseBooleanOperatorTest() throws IOException, MutationOperatorNotFittingException {
+        MathOperator operator = new MathOperator();
+        operator.initialize(clazz, 20);
         operator.changeFile();
         assertNewLineOnLineNumber(clazz, "i = i&&1;", 20);
     }

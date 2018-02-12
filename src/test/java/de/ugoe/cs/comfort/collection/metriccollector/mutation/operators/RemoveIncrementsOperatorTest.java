@@ -17,12 +17,11 @@
 package de.ugoe.cs.comfort.collection.metriccollector.mutation.operators;
 
 import de.ugoe.cs.comfort.collection.metriccollector.mutation.MutationOperatorBaseTest;
+import de.ugoe.cs.comfort.exception.MutationOperatorNotFittingException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,9 +42,10 @@ public class RemoveIncrementsOperatorTest extends MutationOperatorBaseTest {
     }
 
     @Test
-    public void assignmentTest() throws IOException {
+    public void assignmentTest() throws IOException, MutationOperatorNotFittingException {
         for(int i=7; i<=10; i++) {
-            RemoveIncrementsOperator operator = new RemoveIncrementsOperator(clazz, i);
+            RemoveIncrementsOperator operator = new RemoveIncrementsOperator();
+            operator.initialize(clazz, i);
             operator.changeFile();
             assertNewLineOnLineNumber(clazz, "i = i;", i);
         }
@@ -53,8 +53,9 @@ public class RemoveIncrementsOperatorTest extends MutationOperatorBaseTest {
 
 
     @Test
-    public void incrementInForLoopTest() throws IOException {
-        RemoveIncrementsOperator operator = new RemoveIncrementsOperator(clazz, 3);
+    public void incrementInForLoopTest() throws IOException, MutationOperatorNotFittingException {
+        RemoveIncrementsOperator operator = new RemoveIncrementsOperator();
+        operator.initialize(clazz, 3);
         operator.changeFile();
         assertNewLineOnLineNumber(clazz, "for(int j=k; j==number+1; j++) {", 3);
     }

@@ -17,6 +17,7 @@
 package de.ugoe.cs.comfort.collection.metriccollector.mutation;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.fail;
 
 import de.ugoe.cs.comfort.BaseTest;
@@ -28,253 +29,140 @@ import org.junit.Test;
  * @author Fabian Trautsch
  */
 public class MutationChangeClassifierTest extends BaseTest {
+    private static final int  DC_START = 3;
+    private static final int  DC_END = 19;
 
-    @Test
-    public void conditionalsBoundaryMutatorTest() {
+    private static final int  LC_START = 3;
+    private static final int  LC_END = 7;
+
+    private static final int  CC_START = 3;
+    private static final int  CC_END = 31;
+
+    private void runningTestsOnDataChanges(String expectedValue, boolean shouldBeEqual) {
         try {
-            String classification = MutationChangeClassifier.getChangeClassification(
-                    Paths.get(getPathToResource("mutationOperatorsTestData")),
-                    "ConditionalsBoundaryOperatorData.java",
-                    "org.pitest.mutationtest.engine.gregor.mutators.ConditionalsBoundaryMutator",
-                    3
-            );
-            assertEquals("Classification not correct!", "LOGIC/CONTROL", classification);
+            for(int i=DC_START; i<=DC_END; i++) {
+                String classification = MutationChangeClassifier.getChangeClassification(
+                        Paths.get(getPathToResource("mutationChangeClassifierData")),
+                        "DataChanges.java",
+                        "org.pitest.mutationtest.engine.gregor.mutators.ConditionalsBoundaryMutator",
+                        i
+                );
+
+                if(shouldBeEqual) {
+                    assertEquals("Classification not correct!", expectedValue, classification);
+                } else {
+                    assertNotEquals("Classification not correct!", expectedValue, classification);
+                }
+            }
         } catch (MutationResultException e) {
             fail("Unexpected exception: "+e.getMessage());
         }
     }
 
-    @Test
-    public void returnConditionalsBoundaryMutatorTest() {
+    private void runningTestsOnLogicControlChanges(String expectedValue, boolean shouldBeEqual) {
         try {
-            String classification = MutationChangeClassifier.getChangeClassification(
-                    Paths.get(getPathToResource("mutationOperatorsTestData")),
-                    "ConditionalsBoundaryOperatorData.java",
-                    "org.pitest.mutationtest.engine.gregor.mutators.ConditionalsBoundaryMutator",
-                    19
-            );
-            assertEquals("Classification not correct!", "LOGIC/CONTROL", classification);
+            for(int i=LC_START; i<=LC_END; i++) {
+                String classification = MutationChangeClassifier.getChangeClassification(
+                        Paths.get(getPathToResource("mutationChangeClassifierData")),
+                        "LogicControlChanges.java",
+                        "org.pitest.mutationtest.engine.gregor.mutators.ConditionalsBoundaryMutator",
+                        i
+                );
+
+                if(shouldBeEqual) {
+                    assertEquals("Classification not correct!", expectedValue, classification);
+                } else {
+                    assertNotEquals("Classification not correct!", expectedValue, classification);
+                }
+            }
         } catch (MutationResultException e) {
             fail("Unexpected exception: "+e.getMessage());
         }
     }
 
-    @Test
-    public void incrementMutatorInLoopTest() {
+    private void runningTestsOnComputationChanges(String expectedValue, boolean shouldBeEqual) {
         try {
-            String classification = MutationChangeClassifier.getChangeClassification(
-                    Paths.get(getPathToResource("mutationOperatorsTestData")),
-                    "IncrementsOperatorData.java",
-                    "org.pitest.mutationtest.engine.gregor.mutators.IncrementsMutator",
-                    6
-            );
-            assertEquals("Classification not correct!", "LOGIC/CONTROL", classification);
+            for(int i=CC_START; i<=CC_END; i++) {
+                String classification = MutationChangeClassifier.getChangeClassification(
+                        Paths.get(getPathToResource("mutationChangeClassifierData")),
+                        "ComputationChanges.java",
+                        "org.pitest.mutationtest.engine.gregor.mutators.ConditionalsBoundaryMutator",
+                        i
+                );
+
+                if(shouldBeEqual) {
+                    assertEquals("Classification not correct!", expectedValue, classification);
+                } else {
+                    assertNotEquals("Classification not correct!", expectedValue, classification);
+                }
+            }
         } catch (MutationResultException e) {
             fail("Unexpected exception: "+e.getMessage());
         }
     }
 
+
     @Test
-    public void incrementMutatorOutsideLoopTest() {
-        try {
-            String classification = MutationChangeClassifier.getChangeClassification(
-                    Paths.get(getPathToResource("mutationOperatorsTestData")),
-                    "IncrementsOperatorData.java",
-                    "org.pitest.mutationtest.engine.gregor.mutators.IncrementsMutator",
-                    4
-            );
-            assertEquals("Classification not correct!", "COMPUTATION", classification);
-        } catch (MutationResultException e) {
-            fail("Unexpected exception: "+e.getMessage());
-        }
+    public void checkDataChangesTest() {
+        runningTestsOnDataChanges("DATA", true);
     }
 
     @Test
-    public void mathMutatorOutsideLoopTest() {
-        try {
-            String classification = MutationChangeClassifier.getChangeClassification(
-                    Paths.get(getPathToResource("mutationOperatorsTestData")),
-                    "MathOperatorData.java",
-                    "org.pitest.mutationtest.engine.gregor.mutators.MathMutator",
-                    7
-            );
-            assertEquals("Classification not correct!", "COMPUTATION", classification);
-        } catch (MutationResultException e) {
-            fail("Unexpected exception: "+e.getMessage());
-        }
+    public void checkDataChangesUsingLogicControlChangesTest() {
+        runningTestsOnLogicControlChanges("DATA", false);
     }
 
     @Test
-    public void mathMutatorInsideLoopTest() {
-        try {
-            String classification = MutationChangeClassifier.getChangeClassification(
-                    Paths.get(getPathToResource("mutationOperatorsTestData")),
-                    "MathOperatorData.java",
-                    "org.pitest.mutationtest.engine.gregor.mutators.MathMutator",
-                    3
-            );
-            assertEquals("Classification not correct!", "LOGIC/CONTROL", classification);
-        } catch (MutationResultException e) {
-            fail("Unexpected exception: "+e.getMessage());
-        }
+    public void checkDataChangesUsingComputationChangesTest() {
+        runningTestsOnComputationChanges("DATA", false);
     }
 
     @Test
-    public void mathMutatorInitializationTest() {
-        try {
-            String classification = MutationChangeClassifier.getChangeClassification(
-                    Paths.get(getPathToResource("mutationOperatorsTestData")),
-                    "MathOperatorData.java",
-                    "org.pitest.mutationtest.engine.gregor.mutators.MathMutator",
-                    22
-            );
-            assertEquals("Classification not correct!", "DATA", classification);
-        } catch (MutationResultException e) {
-            fail("Unexpected exception: "+e.getMessage());
-        }
+    public void checkLogicControlTest() {
+        runningTestsOnLogicControlChanges("LOGIC/CONTROL", true);
     }
 
     @Test
-    public void negateConditionalsMutatorInForLoopTest() {
+    public void checkLogicControlUsingDataChangesTest() {
+        runningTestsOnDataChanges("LOGIC/CONTROL", false);
+    }
+
+    @Test
+    public void checkLogicControlUsingComputationChangesTest() {
+        runningTestsOnComputationChanges("LOGIC/CONTROL", false);
+
+    }
+
+    @Test
+    public void checkComputationTest() {
+        runningTestsOnComputationChanges("COMPUTATION", true);
+    }
+
+    @Test
+    public void checkComputationUsingDataChangesTest() {
+        runningTestsOnDataChanges("COMPUTATION", false);
+    }
+
+    @Test
+    public void checkComputationUsingLogicControlChangesTest() {
+        runningTestsOnLogicControlChanges("COMPUTATION", false);
+    }
+
+    @Test
+    public void checkTwoLinesIfTest() {
         try {
-            String classification = MutationChangeClassifier.getChangeClassification(
-                    Paths.get(getPathToResource("mutationOperatorsTestData")),
-                    "NegateConditionalsOperatorData.java",
+            String classification1 = MutationChangeClassifier.getChangeClassification(
+                    Paths.get(getPathToResource("mutationChangeClassifierData")),
+                    "SpecialCases.java",
                     "org.pitest.mutationtest.engine.gregor.mutators.NegateConditionalsMutator",
-                    3
-            );
-            assertEquals("Classification not correct!", "LOGIC/CONTROL", classification);
-        } catch (MutationResultException e) {
-            fail("Unexpected exception: "+e.getMessage());
-        }
-    }
-
-    @Test
-    public void negateConditionalsMutatorOutsideLoopTest() {
-        try {
-            String classification = MutationChangeClassifier.getChangeClassification(
-                    Paths.get(getPathToResource("mutationOperatorsTestData")),
-                    "NegateConditionalsOperatorData.java",
+                    3);
+            String classification2 = MutationChangeClassifier.getChangeClassification(
+                    Paths.get(getPathToResource("mutationChangeClassifierData")),
+                    "SpecialCases.java",
                     "org.pitest.mutationtest.engine.gregor.mutators.NegateConditionalsMutator",
-                    7
-            );
-            assertEquals("Classification not correct!", "COMPUTATION", classification);
-        } catch (MutationResultException e) {
-            fail("Unexpected exception: "+e.getMessage());
-        }
-    }
-
-    @Test
-    public void negateConditionalsMutatorInWhileLoopTest() {
-        try {
-            String classification = MutationChangeClassifier.getChangeClassification(
-                    Paths.get(getPathToResource("mutationOperatorsTestData")),
-                    "NegateConditionalsOperatorData.java",
-                    "org.pitest.mutationtest.engine.gregor.mutators.NegateConditionalsMutator",
-                    14
-            );
-            assertEquals("Classification not correct!", "LOGIC/CONTROL", classification);
-        } catch (MutationResultException e) {
-            fail("Unexpected exception: "+e.getMessage());
-        }
-    }
-
-    @Test
-    public void removeIncrementsOperatorInForLoopTest() throws MutationResultException {
-        String classification = MutationChangeClassifier.getChangeClassification(
-                Paths.get(getPathToResource("mutationOperatorsTestData")),
-                "RemoveIncrementsOperatorData.java",
-                "org.pitest.mutationtest.engine.gregor.mutators.experimental.RemoveIncrementsMutator",
-                3
-        );
-        assertEquals("Classification not correct!", "LOGIC/CONTROL", classification);
-    }
-
-    @Test
-    public void removeIncrementsOperatorInComputationTest() {
-        try {
-            String classification = MutationChangeClassifier.getChangeClassification(
-                    Paths.get(getPathToResource("mutationOperatorsTestData")),
-                    "RemoveIncrementsOperatorData.java",
-                    "org.pitest.mutationtest.engine.gregor.mutators.experimental.RemoveIncrementsMutator",
-                    7
-            );
-            assertEquals("Classification not correct!", "COMPUTATION", classification);
-        } catch (MutationResultException e) {
-            fail("Unexpected exception: "+e.getMessage());
-        }
-    }
-
-    @Test
-    public void removeIncrementsOperatorInInitializationComputationTest() {
-        try {
-            String classification = MutationChangeClassifier.getChangeClassification(
-                    Paths.get(getPathToResource("mutationOperatorsTestData")),
-                    "RemoveIncrementsOperatorData.java",
-                    "org.pitest.mutationtest.engine.gregor.mutators.experimental.RemoveIncrementsMutator",
-                    12
-            );
-            assertEquals("Classification not correct!", "DATA", classification);
-        } catch (MutationResultException e) {
-            fail("Unexpected exception: "+e.getMessage());
-        }
-    }
-
-    @Test
-    public void invertNegsInLoopTest() {
-        try {
-            String classification = MutationChangeClassifier.getChangeClassification(
-                    Paths.get(getPathToResource("mutationOperatorsTestData")),
-                    "InvertNegativesOperatorData.java",
-                    "org.pitest.mutationtest.engine.gregor.mutators.InvertNegsMutator",
-                    3
-            );
-            assertEquals("Classification not correct!", "LOGIC/CONTROL", classification);
-        } catch (MutationResultException e) {
-            fail("Unexpected exception: "+e.getMessage());
-        }
-    }
-
-    @Test
-    public void invertNegsInInitializationTest() {
-        try {
-            String classification = MutationChangeClassifier.getChangeClassification(
-                    Paths.get(getPathToResource("mutationOperatorsTestData")),
-                    "InvertNegativesOperatorData.java",
-                    "org.pitest.mutationtest.engine.gregor.mutators.InvertNegsMutator",
-                    7
-            );
-            assertEquals("Classification not correct!", "DATA", classification);
-        } catch (MutationResultException e) {
-            fail("Unexpected exception: "+e.getMessage());
-        }
-    }
-
-    @Test
-    public void invertNegsInAssignmentTest() {
-        try {
-            String classification = MutationChangeClassifier.getChangeClassification(
-                    Paths.get(getPathToResource("mutationOperatorsTestData")),
-                    "InvertNegativesOperatorData.java",
-                    "org.pitest.mutationtest.engine.gregor.mutators.InvertNegsMutator",
-                    8
-            );
-            assertEquals("Classification not correct!", "COMPUTATION", classification);
-        } catch (MutationResultException e) {
-            fail("Unexpected exception: "+e.getMessage());
-        }
-    }
-
-    @Test
-    public void invertNegsInReturnStatementTest() {
-        try {
-            String classification = MutationChangeClassifier.getChangeClassification(
-                    Paths.get(getPathToResource("mutationOperatorsTestData")),
-                    "InvertNegativesOperatorData.java",
-                    "org.pitest.mutationtest.engine.gregor.mutators.InvertNegsMutator",
-                    9
-            );
-            assertEquals("Classification not correct!", "LOGIC/CONTROL", classification);
+                    4);
+            assertEquals("Classification not correct", "LOGIC/CONTROL", classification1);
+            assertEquals("Classification not correct", "LOGIC/CONTROL", classification2);
         } catch (MutationResultException e) {
             fail("Unexpected exception: "+e.getMessage());
         }

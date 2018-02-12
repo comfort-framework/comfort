@@ -4,16 +4,21 @@ public class Class1 {
 
         }
 
+        while (i<1) {
+
+        }
+
         i = i==1;
         i = i!=1;
         i = i<=1;
         i = i>=1;
         i = i<1;
         i = i>1;
+        i = !i;
+        i = i&&j;
+        i = i||j;
 
-        while (i<1) {
-
-        }
-
+        if(i!=0
+           || i==0)
     }
 }

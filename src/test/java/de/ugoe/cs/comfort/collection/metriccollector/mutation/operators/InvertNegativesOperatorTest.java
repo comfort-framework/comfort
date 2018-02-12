@@ -17,6 +17,7 @@
 package de.ugoe.cs.comfort.collection.metriccollector.mutation.operators;
 
 import de.ugoe.cs.comfort.collection.metriccollector.mutation.MutationOperatorBaseTest;
+import de.ugoe.cs.comfort.exception.MutationOperatorNotFittingException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -41,29 +42,33 @@ public class InvertNegativesOperatorTest extends MutationOperatorBaseTest {
     }
 
     @Test
-    public void negativeInLoopTest() throws IOException {
-        InvertNegativesOperator operator = new InvertNegativesOperator(clazz, 3);
+    public void negativeInLoopTest() throws IOException, MutationOperatorNotFittingException {
+        InvertNegativesOperator operator = new InvertNegativesOperator();
+        operator.initialize(clazz, 3);
         operator.changeFile();
         assertNewLineOnLineNumber(clazz, "for(int j=k; j<number+1; j--) {", 3);
     }
 
     @Test
-    public void negativeInInitializationTest() throws IOException {
-        InvertNegativesOperator operator = new InvertNegativesOperator(clazz, 7);
+    public void negativeInInitializationTest() throws IOException, MutationOperatorNotFittingException {
+        InvertNegativesOperator operator = new InvertNegativesOperator();
+        operator.initialize(clazz, 7);
         operator.changeFile();
         assertNewLineOnLineNumber(clazz, "int j = k;", 7);
     }
 
     @Test
-    public void negativeInAssignmentTest() throws IOException {
-        InvertNegativesOperator operator = new InvertNegativesOperator(clazz, 8);
+    public void negativeInAssignmentTest() throws IOException, MutationOperatorNotFittingException {
+        InvertNegativesOperator operator = new InvertNegativesOperator();
+        operator.initialize(clazz, 8);
         operator.changeFile();
         assertNewLineOnLineNumber(clazz, "i = j;", 8);
     }
 
     @Test
-    public void negativeInReturnTest() throws IOException {
-        InvertNegativesOperator operator = new InvertNegativesOperator(clazz, 9);
+    public void negativeInReturnTest() throws IOException, MutationOperatorNotFittingException {
+        InvertNegativesOperator operator = new InvertNegativesOperator();
+        operator.initialize(clazz, 9);
         operator.changeFile();
         assertNewLineOnLineNumber(clazz, "return i;", 9);
     }

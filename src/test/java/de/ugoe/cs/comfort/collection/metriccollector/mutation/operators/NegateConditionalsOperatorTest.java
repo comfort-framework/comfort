@@ -17,6 +17,7 @@
 package de.ugoe.cs.comfort.collection.metriccollector.mutation.operators;
 
 import de.ugoe.cs.comfort.collection.metriccollector.mutation.MutationOperatorBaseTest;
+import de.ugoe.cs.comfort.exception.MutationOperatorNotFittingException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -43,37 +44,51 @@ public class NegateConditionalsOperatorTest extends MutationOperatorBaseTest {
     }
 
     @Test
-    public void assignmentTest() throws IOException {
+    public void assignmentTest() throws IOException, MutationOperatorNotFittingException {
         List<String> expectedValues = new ArrayList<String>() {{
-            add("!=");
-            add("==");
-            add(">");
-            add("<");
-            add(">=");
-            add("<=");
+            add("i!=1;");
+            add("i==1;");
+            add("i>1;");
+            add("i<1;");
+            add("i>=1;");
+            add("i<=1;");
+            add("i;");
+            add("i||j;");
+            add("i&&j;");
         }};
 
-        int i = 7;
+        int i = 11;
         for(String expectedValue: expectedValues) {
-            NegateConditionalsOperator operator = new NegateConditionalsOperator(clazz, i);
+            NegateConditionalsOperator operator = new NegateConditionalsOperator();
+            operator.initialize(clazz, i);
             operator.changeFile();
-            assertNewLineOnLineNumber(clazz, "i = i"+expectedValue+"1;", i);
+            assertNewLineOnLineNumber(clazz, "i = "+expectedValue, i);
             i++;
         }
     }
 
 
     @Test
-    public void equalsInForLoopTest() throws IOException {
-        NegateConditionalsOperator operator = new NegateConditionalsOperator(clazz, 3);
+    public void equalsInForLoopTest() throws IOException, MutationOperatorNotFittingException {
+        NegateConditionalsOperator operator = new NegateConditionalsOperator();
+        operator.initialize(clazz, 3);
         operator.changeFile();
         assertNewLineOnLineNumber(clazz, "for(int j=0; j!=number+1; j++) {", 3);
     }
 
     @Test
-    public void lessThanInWhileLoopTest() throws IOException {
-        NegateConditionalsOperator operator = new NegateConditionalsOperator(clazz, 14);
+    public void lessThanInWhileLoopTest() throws IOException, MutationOperatorNotFittingException {
+        NegateConditionalsOperator operator = new NegateConditionalsOperator();
+        operator.initialize(clazz, 7);
         operator.changeFile();
-        assertNewLineOnLineNumber(clazz, "while (i>=1) {", 14);
+        assertNewLineOnLineNumber(clazz, "while (i>=1) {", 7);
+    }
+
+    @Test
+    public void ifStatementOverTwoLinesTest() throws IOException, MutationOperatorNotFittingException {
+        NegateConditionalsOperator operator = new NegateConditionalsOperator();
+        operator.initialize(clazz, 22);
+        operator.changeFile();
+        assertNewLineOnLineNumber(clazz, "|| i!=0)", 22);
     }
 }

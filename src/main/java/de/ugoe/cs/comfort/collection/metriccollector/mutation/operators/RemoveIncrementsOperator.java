@@ -16,26 +16,25 @@
 
 package de.ugoe.cs.comfort.collection.metriccollector.mutation.operators;
 
+import de.ugoe.cs.comfort.exception.MutationOperatorNotFittingException;
 import java.io.IOException;
-import java.nio.file.Path;
 
 /**
  * @author Fabian Trautsch
  */
 public class RemoveIncrementsOperator extends BaseOperator {
-    public RemoveIncrementsOperator(Path file, int lineNumber) throws IOException {
-        super(file, lineNumber);
+    public RemoveIncrementsOperator() {
     }
 
     @Override
-    public void changeFile() throws IOException {
+    public void changeFile() throws IOException, MutationOperatorNotFittingException {
         String newLine;
         if (line.contains("--")) {
             newLine = getChangedNewLineForPattern("--", "");
         } else if (line.contains("++")) {
             newLine = getChangedNewLineForPattern("++", "");
         } else {
-            throw new IOException("Line does not contain --,++");
+            throw new MutationOperatorNotFittingException("Line does not contain --,++");
         }
 
         storeChangedLine(newLine);

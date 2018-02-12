@@ -16,21 +16,18 @@
 
 package de.ugoe.cs.comfort.collection.metriccollector.mutation.operators;
 
+import de.ugoe.cs.comfort.exception.MutationOperatorNotFittingException;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @author Fabian Trautsch
  */
 public class MathOperator extends BaseOperator {
-    public MathOperator(Path file, int lineNumber) throws IOException {
-        super(file, lineNumber);
+    public MathOperator() {
     }
 
     @Override
-    public void changeFile() throws IOException {
+    public void changeFile() throws IOException, MutationOperatorNotFittingException {
         String newLine;
 
         // PIT also sees "++" operator as something that should/can be changed via the math mutator
@@ -61,7 +58,7 @@ public class MathOperator extends BaseOperator {
         } else if (line.contains(">>")) {
             newLine = getChangedNewLineForPattern(">>", "<<");
         } else {
-            throw new IOException("Line does not contain +,-,*,/,%,&,|,^,<<,>>,>>>");
+            throw new MutationOperatorNotFittingException("Line does not contain +,-,*,/,%,&,|,^,<<,>>,>>>");
         }
 
         storeChangedLine(newLine);

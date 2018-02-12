@@ -120,11 +120,10 @@ public class MutationDataCollector extends BaseMetricCollector {
             // But we catch the exceptions here, as this kind of data is not crucial
             String changeClassification = null;
             try {
-                if (!result.equals("NO_COVERAGE") && lineNumber != 0) {
-                    changeClassification = MutationChangeClassifier.getChangeClassification(
-                            generalConf.getProjectDir(), cols[0], mutationOperator, lineNumber
-                    );
-                }
+                changeClassification = MutationChangeClassifier.getChangeClassification(
+                        generalConf.getProjectDir(), cols[0], mutationOperator, lineNumber
+                );
+                logger.debug("Got the following change classification {}", changeClassification);
             } catch (MutationResultException e) {
                 logger.catching(e);
             }
@@ -204,7 +203,7 @@ public class MutationDataCollector extends BaseMetricCollector {
         return mutationExecutionResult;
     }
 
-    private class PITExecutionOutputParser implements Callable<MutationExecutionResult> {
+    private static class PITExecutionOutputParser implements Callable<MutationExecutionResult> {
         private InputStream inputStream;
 
         Pattern receivedTestsPattern = Pattern.compile("(\\S*)(\\d*) tests received");
@@ -236,7 +235,7 @@ public class MutationDataCollector extends BaseMetricCollector {
                         Matcher executionTimeMatcher = executionTimePattern.matcher(pitOutputLine);
                         Matcher mutationScoreMatcher = mutationScorePattern.matcher(pitOutputLine);
 
-                        logger.debug(pitOutputLine);
+                        //logger.debug(pitOutputLine);
 
                         if(receivedTestsMatcher.find()) {
                             mutationExecutionResult.setNumTests(Integer.parseInt(receivedTestsMatcher.group(1)));

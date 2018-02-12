@@ -16,6 +16,7 @@
 
 package de.ugoe.cs.comfort.collection.metriccollector.mutation.operators;
 
+import de.ugoe.cs.comfort.exception.MutationOperatorNotFittingException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -34,15 +35,18 @@ public abstract class BaseOperator {
     protected Path file;
 
     protected List<String> lines;
-    protected int normalizedLineNumber;
+    private int normalizedLineNumber;
     protected String line;
 
-    public BaseOperator(Path file, int lineNumber) throws IOException {
+    BaseOperator() {
+
+    }
+
+    public void initialize(Path file, int lineNumber) throws IOException {
         this.file = file;
 
         // Read in File
         lines = Files.readAllLines(file);
-        logger.debug("Read lines: {}", lines);
 
         // Set normalized line number (because Arrays start at 0 and not 1)
         normalizedLineNumber = lineNumber-1;
@@ -52,7 +56,7 @@ public abstract class BaseOperator {
         logger.info("Reading Line: "+line);
     }
 
-    protected void storeChangedLine(String newLine) throws IOException {
+    void storeChangedLine(String newLine) throws IOException {
         logger.debug("New Line: "+newLine);
         lines.set(normalizedLineNumber, newLine);
 
@@ -60,7 +64,7 @@ public abstract class BaseOperator {
         Files.write(file, lines, Charset.forName("UTF-8"));
     }
 
-    protected String getChangedNewLineForPattern(String character, String replacement) {
+    String getChangedNewLineForPattern(String character, String replacement) {
         Pattern pat = Pattern.compile(Pattern.quote(character)+"+");
         Matcher matcher = pat.matcher(line);
 
@@ -73,5 +77,5 @@ public abstract class BaseOperator {
         return changedLine;
     }
 
-    public abstract void changeFile() throws IOException;
+    public abstract void changeFile() throws IOException, MutationOperatorNotFittingException;
 }

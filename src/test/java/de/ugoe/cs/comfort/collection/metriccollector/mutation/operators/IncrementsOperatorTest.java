@@ -17,6 +17,7 @@
 package de.ugoe.cs.comfort.collection.metriccollector.mutation.operators;
 
 import de.ugoe.cs.comfort.collection.metriccollector.mutation.MutationOperatorBaseTest;
+import de.ugoe.cs.comfort.exception.MutationOperatorNotFittingException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -41,15 +42,17 @@ public class IncrementsOperatorTest extends MutationOperatorBaseTest {
     }
 
     @Test
-    public void incrementAsCommandTest() throws IOException {
-        IncrementsOperator operator = new IncrementsOperator(clazz, 4);
+    public void incrementAsCommandTest() throws IOException, MutationOperatorNotFittingException {
+        IncrementsOperator operator = new IncrementsOperator();
+        operator.initialize(clazz, 4);
         operator.changeFile();
         assertNewLineOnLineNumber(clazz, "i--;", 4);
     }
 
     @Test
-    public void incrementInForLoopTest() throws IOException {
-        IncrementsOperator operator = new IncrementsOperator(clazz, 6);
+    public void incrementInForLoopTest() throws IOException, MutationOperatorNotFittingException {
+        IncrementsOperator operator = new IncrementsOperator();
+        operator.initialize(clazz, 6);
         operator.changeFile();
         assertNewLineOnLineNumber(clazz, "for(int j=0; j<5; j--) {", 6);
     }
@@ -57,15 +60,17 @@ public class IncrementsOperatorTest extends MutationOperatorBaseTest {
 
 
     @Test
-    public void decrementAsCommandTest() throws IOException {
-        IncrementsOperator operator = new IncrementsOperator(clazz, 11);
+    public void decrementAsCommandTest() throws IOException, MutationOperatorNotFittingException {
+        IncrementsOperator operator = new IncrementsOperator();
+        operator.initialize(clazz, 11);
         operator.changeFile();
         assertNewLineOnLineNumber(clazz, "l++;", 11);
     }
 
     @Test
-    public void decrementInForLoopTest() throws IOException {
-        IncrementsOperator operator = new IncrementsOperator(clazz, 13);
+    public void decrementInForLoopTest() throws IOException, MutationOperatorNotFittingException {
+        IncrementsOperator operator = new IncrementsOperator();
+        operator.initialize(clazz, 13);
         operator.changeFile();
         assertNewLineOnLineNumber(clazz, "for(int k=10; k>1; k++) {", 13);
     }

@@ -17,11 +17,8 @@
 package de.ugoe.cs.comfort.database.models;
 
 import com.google.common.base.MoreObjects;
-import de.ugoe.cs.comfort.filer.models.Mutation;
 import de.ugoe.cs.comfort.filer.models.Result;
-import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -52,17 +49,17 @@ public class TestState {
 
     private Map<String, String> metrics = new HashMap<>();
 
-    @Embedded
-    private Set<Mutation> mutations = null;
+    @Embedded("mutation_res")
+    private Set<MutationResult> mutationResults = null;
 
     public TestState() {}
 
-    public TestState(Result result, ObjectId fileId, ObjectId commitId) {
+    public TestState(Result result, ObjectId fileId, ObjectId commitId, Set<MutationResult> mutationResults) {
         name = result.getId();
         this.fileId = fileId;
         this.commitId = commitId;
         metrics = result.getMetrics();
-        mutations = result.getMutationResults();
+        this.mutationResults = mutationResults;
     }
 
     public ObjectId getId() {
@@ -105,12 +102,12 @@ public class TestState {
         this.metrics = metrics;
     }
 
-    public Set<Mutation> getMutations() {
-        return mutations;
+    public Set<MutationResult> getMutationResults() {
+        return mutationResults;
     }
 
-    public void setMutations(Set<Mutation> mutations) {
-        this.mutations = mutations;
+    public void setMutations(Set<MutationResult> mutationResults) {
+        this.mutationResults = mutationResults;
     }
 
     @Override
@@ -130,7 +127,7 @@ public class TestState {
                 .append(fileId, otherNode.fileId)
                 .append(commitId, otherNode.commitId)
                 .append(metrics, otherNode.metrics)
-                .append(mutations, otherNode.mutations)
+                .append(mutationResults, otherNode.mutationResults)
                 .isEquals();
     }
 
@@ -142,7 +139,7 @@ public class TestState {
                 .append(fileId)
                 .append(commitId)
                 .append(metrics)
-                .append(mutations)
+                .append(mutationResults)
                 .toHashCode();
     }
 
@@ -154,7 +151,7 @@ public class TestState {
                 .add("fileId", fileId)
                 .add("commitId", commitId)
                 .add("metrics", metrics)
-                .add("mutations", mutations)
+                .add("mutationResults", mutationResults)
                 .toString();
     }
 }

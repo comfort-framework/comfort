@@ -77,8 +77,8 @@ public class MutationDataCollectorTest extends BaseTest {
         mod1NumberTest.addMetric("mut_scoreMut", "60");
         mod1NumberTest.addMutationResults(new HashSet<Mutation>(){
             {
-                add(new Mutation("Module1.getName", "org.pitest.mutationtest.engine.gregor.mutators.MathMutator", 30, "NO_COVERAGE", null));
-                add(new Mutation("Module1.getName", "org.pitest.mutationtest.engine.gregor.mutators.ReturnValsMutator", 31, "NO_COVERAGE", null));
+                add(new Mutation("Module1.getName", "org.pitest.mutationtest.engine.gregor.mutators.MathMutator", 30, "NO_COVERAGE", "COMPUTATION"));
+                add(new Mutation("Module1.getName", "org.pitest.mutationtest.engine.gregor.mutators.ReturnValsMutator", 31, "NO_COVERAGE", "LOGIC/CONTROL"));
                 add(new Mutation("Module1.getNumber", "org.pitest.mutationtest.engine.gregor.mutators.MathMutator", 36, "KILLED", "COMPUTATION"));
                 add(new Mutation("Module1.getNumber", "org.pitest.mutationtest.engine.gregor.mutators.MathMutator", 37, "KILLED", "LOGIC/CONTROL"));
                 add(new Mutation("Module1.getNumber", "org.pitest.mutationtest.engine.gregor.mutators.ReturnValsMutator", 37, "KILLED", "LOGIC/CONTROL"));
@@ -103,8 +103,8 @@ public class MutationDataCollectorTest extends BaseTest {
         mod2NumberTest.addMetric("mut_scoreMut", "60");
         mod2NumberTest.addMutationResults(new HashSet<Mutation>(){
             {
-                add(new Mutation("Module1.getName", "org.pitest.mutationtest.engine.gregor.mutators.MathMutator", 30, "NO_COVERAGE", null));
-                add(new Mutation("Module1.getName", "org.pitest.mutationtest.engine.gregor.mutators.ReturnValsMutator", 31, "NO_COVERAGE", null));
+                add(new Mutation("Module1.getName", "org.pitest.mutationtest.engine.gregor.mutators.MathMutator", 30, "NO_COVERAGE", "COMPUTATION"));
+                add(new Mutation("Module1.getName", "org.pitest.mutationtest.engine.gregor.mutators.ReturnValsMutator", 31, "NO_COVERAGE", "LOGIC/CONTROL"));
                 add(new Mutation("Module1.getNumber", "org.pitest.mutationtest.engine.gregor.mutators.MathMutator", 36, "KILLED", "COMPUTATION"));
                 add(new Mutation("Module1.getNumber", "org.pitest.mutationtest.engine.gregor.mutators.MathMutator", 37, "KILLED", "LOGIC/CONTROL"));
                 add(new Mutation("Module1.getNumber", "org.pitest.mutationtest.engine.gregor.mutators.ReturnValsMutator", 37, "KILLED", "LOGIC/CONTROL"));

@@ -220,7 +220,7 @@ public class BaseTest {
     protected Result res1 = new Result("de.foo.bar.ModelTest", Paths.get("src/de/foo/bar/ModelTest.java"));
     protected Result res2 = new Result("de.foo.bar.ModelTest1", Paths.get("src/de/foo/bar/ModelTest1.java"));
 
-    protected Set<Mutation> mutationResultsRes1 = new HashSet<Mutation>(){{
+    protected Set<Mutation> mutations1 = new HashSet<Mutation>(){{
         add(new Mutation(
                 "de.foo.bar.Model.addBatch",
                 "org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator",
@@ -233,9 +233,15 @@ public class BaseTest {
                 11,
                 "SURVIVED",
                 "INTERFACE"));
+        add(new Mutation(
+                "de.foo.bar.Model.addBatch",
+                "org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator",
+                30,
+                "SURVIVED",
+                "INTERFACE"));
     }};
 
-    protected Set<Mutation> mutationResultsRes2 = new HashSet<Mutation>(){{
+    protected Set<Mutation> mutations2 = new HashSet<Mutation>(){{
         add(new Mutation(
                 "de.foo.bar.Model.addBatch",
                 "org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator",

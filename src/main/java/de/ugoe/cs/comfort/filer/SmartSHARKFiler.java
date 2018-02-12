@@ -21,7 +21,9 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import de.ugoe.cs.comfort.configuration.Database;
 import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
+import de.ugoe.cs.comfort.database.models.MutationResult;
 import de.ugoe.cs.comfort.database.models.TestState;
+import de.ugoe.cs.comfort.filer.models.Mutation;
 import de.ugoe.cs.comfort.filer.models.Result;
 import de.ugoe.cs.comfort.filer.models.ResultSet;
 import de.ugoe.cs.smartshark.model.Commit;
@@ -32,8 +34,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bson.types.ObjectId;
@@ -85,22 +89,51 @@ public class SmartSHARKFiler implements IFiler {
             datastore.createQuery(File.class)
                     .field("vcs_system_id").equal(vcsSystemId)
                     .asList().forEach(
-                            file -> {
-                                files.put(Paths.get(file.getPath()), file.getId());
-                            }
+                            file -> files.put(Paths.get(file.getPath()), file.getId())
                 );
 
             // Go through all results -> create a test state and store it
             for(Result result: results.getResults()) {
                 ObjectId fileId = files.get(result.getPathToFile());
 
-                TestState testState = new TestState(result, fileId, commitId);
+                // Create mutation results
+                Set<MutationResult> mutationResults = createMutationResults(result);
+
+                TestState testState = new TestState(result, fileId, commitId, mutationResults);
                 storeTestState(testState);
             }
 
         } catch (IOException e) {
             logger.catching(e);
         }
+    }
+
+    private Set<MutationResult> createMutationResults(Result result) {
+        Set<MutationResult> mutationResults = new HashSet<>();
+        for(Mutation mutation: result.getMutationResults()) {
+            ObjectId mutationId = getOrCreateMutation(mutation);
+            mutationResults.add(new MutationResult(mutationId, mutation.getResult()));
+        }
+
+        return mutationResults;
+    }
+
+    private ObjectId getOrCreateMutation(Mutation mutation) {
+        de.ugoe.cs.comfort.database.models.Mutation dbMutation;
+        dbMutation = datastore.createQuery(de.ugoe.cs.comfort.database.models.Mutation.class)
+                .field("location").equal(mutation.getLocation())
+                .field("m_type").equal(mutation.getMType())
+                .field("l_num").equal(mutation.getLineNumber())
+                .get();
+
+        if (dbMutation == null) {
+            dbMutation = new de.ugoe.cs.comfort.database.models.Mutation(
+                    mutation.getLocation(), mutation.getMType(), mutation.getLineNumber(), mutation.getClassification()
+            );
+            datastore.save(dbMutation);
+        }
+
+        return dbMutation.getId();
     }
 
     private void storeTestState(TestState testState) {
@@ -111,7 +144,7 @@ public class SmartSHARKFiler implements IFiler {
         UpdateOperations<TestState> updateOperations = datastore.createUpdateOperations(TestState.class)
                 .set("file_id", testState.getFileId())
                 .set("metrics", testState.getMetrics())
-                .set("mutations", testState.getMutations());
+                .set("mutation_res", testState.getMutationResults());
         datastore.findAndModify(query, updateOperations, new FindAndModifyOptions().returnNew(false).upsert(true));
     }
 

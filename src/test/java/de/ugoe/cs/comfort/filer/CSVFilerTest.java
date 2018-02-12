@@ -84,12 +84,12 @@ public class CSVFilerTest extends BaseTest{
     @Test
     public void storeMutationDataTest() {
         // Create test data
-        res1.addMutationResults(mutationResultsRes1);
+        res1.addMutationResults(mutations1);
         res1.addMetric("mut_genMut", "1402");
         res1.addMetric("mut_killMut", "100");
         res1.addMetric("mut_scoreMut", "2");
 
-        res2.addMutationResults(mutationResultsRes2);
+        res2.addMutationResults(mutations2);
         res2.addMetric("mut_genMut", "123");
         res2.addMetric("mut_killMut", "2");
         res2.addMetric("mut_scoreMut", "2");
@@ -104,6 +104,7 @@ public class CSVFilerTest extends BaseTest{
                 "id,path,location,m_type,line_number,result\n" +
                 "de.foo.bar.ModelTest,src/de/foo/bar/ModelTest.java,de.foo.bar.Model.addBatch,org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator,10,NO_COVERAGE,\n" +
                 "de.foo.bar.ModelTest,src/de/foo/bar/ModelTest.java,de.foo.bar.Model.addBatch,org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator,11,SURVIVED,INTERFACE\n" +
+                "de.foo.bar.ModelTest,src/de/foo/bar/ModelTest.java,de.foo.bar.Model.addBatch,org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator,30,SURVIVED,INTERFACE\n" +
                 "de.foo.bar.ModelTest1,src/de/foo/bar/ModelTest1.java,de.foo.bar.Model.addBatch,org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator,10,NO_COVERAGE,\n" +
                 "de.foo.bar.ModelTest1,src/de/foo/bar/ModelTest1.java,de.foo.bar.Model.addBatch,org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator,30,KILLED,INTERFACE";
 

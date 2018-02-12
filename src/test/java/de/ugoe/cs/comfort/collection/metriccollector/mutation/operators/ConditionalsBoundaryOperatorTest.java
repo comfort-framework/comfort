@@ -17,6 +17,7 @@
 package de.ugoe.cs.comfort.collection.metriccollector.mutation.operators;
 
 import de.ugoe.cs.comfort.collection.metriccollector.mutation.MutationOperatorBaseTest;
+import de.ugoe.cs.comfort.exception.MutationOperatorNotFittingException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -41,29 +42,33 @@ public class ConditionalsBoundaryOperatorTest extends MutationOperatorBaseTest {
     }
 
     @Test
-    public void lessThanTest() throws IOException {
-        ConditionalsBoundaryOperator operator = new ConditionalsBoundaryOperator(clazz, 3);
+    public void lessThanTest() throws IOException, MutationOperatorNotFittingException {
+        ConditionalsBoundaryOperator operator = new ConditionalsBoundaryOperator();
+        operator.initialize(clazz, 3);
         operator.changeFile();
         assertNewLineOnLineNumber(clazz, "if(number <= 5 && number<=6) {", 3);
     }
 
     @Test
-    public void lessThanEqualTest() throws IOException {
-        ConditionalsBoundaryOperator operator = new ConditionalsBoundaryOperator(clazz, 7);
+    public void lessThanEqualTest() throws IOException, MutationOperatorNotFittingException {
+        ConditionalsBoundaryOperator operator = new ConditionalsBoundaryOperator();
+        operator.initialize(clazz, 7);
         operator.changeFile();
         assertNewLineOnLineNumber(clazz, "if(number < 5) {", 7);
     }
 
     @Test
-    public void greaterThanTest() throws IOException {
-        ConditionalsBoundaryOperator operator = new ConditionalsBoundaryOperator(clazz, 11);
+    public void greaterThanTest() throws IOException, MutationOperatorNotFittingException {
+        ConditionalsBoundaryOperator operator = new ConditionalsBoundaryOperator();
+        operator.initialize(clazz, 11);
         operator.changeFile();
         assertNewLineOnLineNumber(clazz, "if(number >= 5) {", 11);
     }
 
     @Test
-    public void greaterThanEqualTest() throws IOException {
-        ConditionalsBoundaryOperator operator = new ConditionalsBoundaryOperator(clazz, 15);
+    public void greaterThanEqualTest() throws IOException, MutationOperatorNotFittingException {
+        ConditionalsBoundaryOperator operator = new ConditionalsBoundaryOperator();
+        operator.initialize(clazz, 15);
         operator.changeFile();
         assertNewLineOnLineNumber(clazz, "if(number >5) {", 15);
     }
