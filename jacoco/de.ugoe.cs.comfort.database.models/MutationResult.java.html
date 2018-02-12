@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MutationResult.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">comfort</a> &gt; <a href="index.source.html" class="el_package">de.ugoe.cs.comfort.database.models</a> &gt; <span class="el_source">MutationResult.java</span></div><h1>MutationResult.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2017 University of Goettingen, Germany
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.ugoe.cs.comfort.database.models;
+
+import com.google.common.base.MoreObjects;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.bson.types.ObjectId;
+import org.mongodb.morphia.annotations.Property;
+
+/**
+ * @author Fabian Trautsch
+ */
+public class MutationResult {
+    @Property(&quot;mutation_id&quot;)
+    private ObjectId mutationId;
+
+    private String result;
+
+<span class="fc" id="L34">    public MutationResult() { }</span>
+
+<span class="fc" id="L36">    public MutationResult(ObjectId mutationId, String result) {</span>
+<span class="fc" id="L37">        this.mutationId = mutationId;</span>
+<span class="fc" id="L38">        this.result = result;</span>
+<span class="fc" id="L39">    }</span>
+
+    public ObjectId getMutationId() {
+<span class="nc" id="L42">        return mutationId;</span>
+    }
+
+    public void setMutationId(ObjectId mutationId) {
+<span class="nc" id="L46">        this.mutationId = mutationId;</span>
+<span class="nc" id="L47">    }</span>
+
+    public String getResult() {
+<span class="nc" id="L50">        return result;</span>
+    }
+
+    public void setResult(String result) {
+<span class="nc" id="L54">        this.result = result;</span>
+<span class="nc" id="L55">    }</span>
+
+    @Override
+    public boolean equals(Object obj) {
+<span class="pc bpc" id="L59" title="1 of 2 branches missed.">        if(!(obj instanceof MutationResult)) {</span>
+<span class="nc" id="L60">            return false;</span>
+        }
+
+<span class="pc bpc" id="L63" title="1 of 2 branches missed.">        if(obj == this) {</span>
+<span class="nc" id="L64">            return true;</span>
+        }
+
+<span class="fc" id="L67">        MutationResult otherNode = (MutationResult) obj;</span>
+<span class="fc" id="L68">        return new EqualsBuilder()</span>
+<span class="fc" id="L69">                .append(mutationId, otherNode.mutationId)</span>
+<span class="fc" id="L70">                .append(result, otherNode.result)</span>
+<span class="fc" id="L71">                .isEquals();</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="fc" id="L76">        return new HashCodeBuilder(17, 31)</span>
+<span class="fc" id="L77">                .append(mutationId)</span>
+<span class="fc" id="L78">                .append(result)</span>
+<span class="fc" id="L79">                .toHashCode();</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="nc" id="L84">        return MoreObjects.toStringHelper(this)</span>
+<span class="nc" id="L85">                .add(&quot;mutation_id&quot;, mutationId)</span>
+<span class="nc" id="L86">                .add(&quot;result&quot;, result)</span>
+<span class="nc" id="L87">                .toString();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

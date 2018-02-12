@@ -16,55 +16,52 @@
 
 package de.ugoe.cs.comfort.collection.metriccollector.mutation.operators;
 
+import de.ugoe.cs.comfort.exception.MutationOperatorNotFittingException;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @author Fabian Trautsch
  */
 public class MathOperator extends BaseOperator {
-    public MathOperator(Path file, int lineNumber) throws IOException {
-<span class="fc" id="L29">        super(file, lineNumber);</span>
-<span class="fc" id="L30">    }</span>
+<span class="fc" id="L26">    public MathOperator() {</span>
+<span class="fc" id="L27">    }</span>
 
     @Override
-    public void changeFile() throws IOException {
+    public void changeFile() throws IOException, MutationOperatorNotFittingException {
         String newLine;
 
         // PIT also sees &quot;++&quot; operator as something that should/can be changed via the math mutator
-<span class="fc bfc" id="L37" title="All 2 branches covered.">        if(line.contains(&quot;++&quot;)) {</span>
-<span class="fc" id="L38">            newLine = getChangedNewLineForPattern(&quot;++&quot;, &quot;--&quot;);</span>
-<span class="pc bpc" id="L39" title="1 of 2 branches missed.">        } else if(line.contains(&quot;--&quot;)) {</span>
-<span class="nc" id="L40">            newLine = getChangedNewLineForPattern(&quot;--&quot;, &quot;++&quot;);</span>
-<span class="fc bfc" id="L41" title="All 2 branches covered.">        } else if (line.contains(&quot;+&quot;)) {</span>
-<span class="fc" id="L42">            newLine = getChangedNewLineForPattern(&quot;+&quot;, &quot;-&quot;);</span>
-<span class="fc bfc" id="L43" title="All 2 branches covered.">        } else if (line.contains(&quot;-&quot;)) {</span>
-<span class="fc" id="L44">            newLine = getChangedNewLineForPattern(&quot;-&quot;, &quot;+&quot;);</span>
-<span class="fc bfc" id="L45" title="All 2 branches covered.">        } else if (line.contains(&quot;*&quot;)) {</span>
-<span class="fc" id="L46">            newLine = getChangedNewLineForPattern(&quot;*&quot;, &quot;/&quot;);</span>
-<span class="fc bfc" id="L47" title="All 2 branches covered.">        } else if (line.contains(&quot;/&quot;)) {</span>
-<span class="fc" id="L48">            newLine = getChangedNewLineForPattern(&quot;/&quot;, &quot;*&quot;);</span>
-<span class="fc bfc" id="L49" title="All 2 branches covered.">        } else if (line.contains(&quot;%&quot;)) {</span>
-<span class="fc" id="L50">            newLine = getChangedNewLineForPattern(&quot;%&quot;, &quot;*&quot;);</span>
-<span class="fc bfc" id="L51" title="All 2 branches covered.">        } else if (line.contains(&quot;&amp;&quot;)) {</span>
-<span class="fc" id="L52">            newLine = getChangedNewLineForPattern(&quot;&amp;&quot;, &quot;|&quot;);</span>
-<span class="fc bfc" id="L53" title="All 2 branches covered.">        } else if (line.contains(&quot;|&quot;)) {</span>
-<span class="fc" id="L54">            newLine = getChangedNewLineForPattern(&quot;|&quot;, &quot;&amp;&quot;);</span>
-<span class="fc bfc" id="L55" title="All 2 branches covered.">        } else if (line.contains(&quot;^&quot;)) {</span>
-<span class="fc" id="L56">            newLine = getChangedNewLineForPattern(&quot;^&quot;, &quot;&amp;&quot;);</span>
-<span class="fc bfc" id="L57" title="All 2 branches covered.">        } else if (line.contains(&quot;&gt;&gt;&gt;&quot;)) {</span>
-<span class="fc" id="L58">            newLine = getChangedNewLineForPattern(&quot;&gt;&gt;&gt;&quot;, &quot;&lt;&lt;&quot;);</span>
-<span class="fc bfc" id="L59" title="All 2 branches covered.">        } else if (line.contains(&quot;&lt;&lt;&quot;)) {</span>
-<span class="fc" id="L60">            newLine = getChangedNewLineForPattern(&quot;&lt;&lt;&quot;, &quot;&gt;&gt;&quot;);</span>
-<span class="pc bpc" id="L61" title="1 of 2 branches missed.">        } else if (line.contains(&quot;&gt;&gt;&quot;)) {</span>
-<span class="fc" id="L62">            newLine = getChangedNewLineForPattern(&quot;&gt;&gt;&quot;, &quot;&lt;&lt;&quot;);</span>
+<span class="fc bfc" id="L34" title="All 2 branches covered.">        if(line.contains(&quot;++&quot;)) {</span>
+<span class="fc" id="L35">            newLine = getChangedNewLineForPattern(&quot;++&quot;, &quot;--&quot;);</span>
+<span class="pc bpc" id="L36" title="1 of 2 branches missed.">        } else if(line.contains(&quot;--&quot;)) {</span>
+<span class="nc" id="L37">            newLine = getChangedNewLineForPattern(&quot;--&quot;, &quot;++&quot;);</span>
+<span class="fc bfc" id="L38" title="All 2 branches covered.">        } else if (line.contains(&quot;+&quot;)) {</span>
+<span class="fc" id="L39">            newLine = getChangedNewLineForPattern(&quot;+&quot;, &quot;-&quot;);</span>
+<span class="fc bfc" id="L40" title="All 2 branches covered.">        } else if (line.contains(&quot;-&quot;)) {</span>
+<span class="fc" id="L41">            newLine = getChangedNewLineForPattern(&quot;-&quot;, &quot;+&quot;);</span>
+<span class="fc bfc" id="L42" title="All 2 branches covered.">        } else if (line.contains(&quot;*&quot;)) {</span>
+<span class="fc" id="L43">            newLine = getChangedNewLineForPattern(&quot;*&quot;, &quot;/&quot;);</span>
+<span class="fc bfc" id="L44" title="All 2 branches covered.">        } else if (line.contains(&quot;/&quot;)) {</span>
+<span class="fc" id="L45">            newLine = getChangedNewLineForPattern(&quot;/&quot;, &quot;*&quot;);</span>
+<span class="fc bfc" id="L46" title="All 2 branches covered.">        } else if (line.contains(&quot;%&quot;)) {</span>
+<span class="fc" id="L47">            newLine = getChangedNewLineForPattern(&quot;%&quot;, &quot;*&quot;);</span>
+<span class="fc bfc" id="L48" title="All 2 branches covered.">        } else if (line.contains(&quot;&amp;&quot;)) {</span>
+<span class="fc" id="L49">            newLine = getChangedNewLineForPattern(&quot;&amp;&quot;, &quot;|&quot;);</span>
+<span class="fc bfc" id="L50" title="All 2 branches covered.">        } else if (line.contains(&quot;|&quot;)) {</span>
+<span class="fc" id="L51">            newLine = getChangedNewLineForPattern(&quot;|&quot;, &quot;&amp;&quot;);</span>
+<span class="fc bfc" id="L52" title="All 2 branches covered.">        } else if (line.contains(&quot;^&quot;)) {</span>
+<span class="fc" id="L53">            newLine = getChangedNewLineForPattern(&quot;^&quot;, &quot;&amp;&quot;);</span>
+<span class="fc bfc" id="L54" title="All 2 branches covered.">        } else if (line.contains(&quot;&gt;&gt;&gt;&quot;)) {</span>
+<span class="fc" id="L55">            newLine = getChangedNewLineForPattern(&quot;&gt;&gt;&gt;&quot;, &quot;&lt;&lt;&quot;);</span>
+<span class="fc bfc" id="L56" title="All 2 branches covered.">        } else if (line.contains(&quot;&lt;&lt;&quot;)) {</span>
+<span class="fc" id="L57">            newLine = getChangedNewLineForPattern(&quot;&lt;&lt;&quot;, &quot;&gt;&gt;&quot;);</span>
+<span class="pc bpc" id="L58" title="1 of 2 branches missed.">        } else if (line.contains(&quot;&gt;&gt;&quot;)) {</span>
+<span class="fc" id="L59">            newLine = getChangedNewLineForPattern(&quot;&gt;&gt;&quot;, &quot;&lt;&lt;&quot;);</span>
         } else {
-<span class="nc" id="L64">            throw new IOException(&quot;Line does not contain +,-,*,/,%,&amp;,|,^,&lt;&lt;,&gt;&gt;,&gt;&gt;&gt;&quot;);</span>
+<span class="nc" id="L61">            throw new MutationOperatorNotFittingException(&quot;Line does not contain +,-,*,/,%,&amp;,|,^,&lt;&lt;,&gt;&gt;,&gt;&gt;&gt;&quot;);</span>
         }
 
-<span class="fc" id="L67">        storeChangedLine(newLine);</span>
-<span class="fc" id="L68">    }</span>
+<span class="fc" id="L64">        storeChangedLine(newLine);</span>
+<span class="fc" id="L65">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

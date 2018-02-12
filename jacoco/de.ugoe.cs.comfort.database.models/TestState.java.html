@@ -17,11 +17,8 @@
 package de.ugoe.cs.comfort.database.models;
 
 import com.google.common.base.MoreObjects;
-import de.ugoe.cs.comfort.filer.models.Mutation;
 import de.ugoe.cs.comfort.filer.models.Result;
-import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -50,112 +47,112 @@ public class TestState {
     private ObjectId commitId;
 
 
-<span class="fc" id="L53">    private Map&lt;String, String&gt; metrics = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L50">    private Map&lt;String, String&gt; metrics = new HashMap&lt;&gt;();</span>
 
-<span class="fc" id="L55">    @Embedded</span>
-    private Set&lt;Mutation&gt; mutations = null;
+<span class="fc" id="L52">    @Embedded(&quot;mutation_res&quot;)</span>
+    private Set&lt;MutationResult&gt; mutationResults = null;
 
-<span class="fc" id="L58">    public TestState() {}</span>
+<span class="fc" id="L55">    public TestState() {}</span>
 
-<span class="fc" id="L60">    public TestState(Result result, ObjectId fileId, ObjectId commitId) {</span>
-<span class="fc" id="L61">        name = result.getId();</span>
-<span class="fc" id="L62">        this.fileId = fileId;</span>
-<span class="fc" id="L63">        this.commitId = commitId;</span>
-<span class="fc" id="L64">        metrics = result.getMetrics();</span>
-<span class="fc" id="L65">        mutations = result.getMutationResults();</span>
-<span class="fc" id="L66">    }</span>
+<span class="fc" id="L57">    public TestState(Result result, ObjectId fileId, ObjectId commitId, Set&lt;MutationResult&gt; mutationResults) {</span>
+<span class="fc" id="L58">        name = result.getId();</span>
+<span class="fc" id="L59">        this.fileId = fileId;</span>
+<span class="fc" id="L60">        this.commitId = commitId;</span>
+<span class="fc" id="L61">        metrics = result.getMetrics();</span>
+<span class="fc" id="L62">        this.mutationResults = mutationResults;</span>
+<span class="fc" id="L63">    }</span>
 
     public ObjectId getId() {
-<span class="fc" id="L69">        return id;</span>
+<span class="fc" id="L66">        return id;</span>
     }
 
     public void setId(ObjectId id) {
-<span class="fc" id="L73">        this.id = id;</span>
-<span class="fc" id="L74">    }</span>
+<span class="fc" id="L70">        this.id = id;</span>
+<span class="fc" id="L71">    }</span>
 
     public String getName() {
-<span class="fc" id="L77">        return name;</span>
+<span class="fc" id="L74">        return name;</span>
     }
 
     public void setName(String name) {
-<span class="fc" id="L81">        this.name = name;</span>
-<span class="fc" id="L82">    }</span>
+<span class="fc" id="L78">        this.name = name;</span>
+<span class="fc" id="L79">    }</span>
 
     public ObjectId getFileId() {
-<span class="fc" id="L85">        return fileId;</span>
+<span class="fc" id="L82">        return fileId;</span>
     }
 
     public void setFileId(ObjectId fileId) {
-<span class="fc" id="L89">        this.fileId = fileId;</span>
-<span class="fc" id="L90">    }</span>
+<span class="fc" id="L86">        this.fileId = fileId;</span>
+<span class="fc" id="L87">    }</span>
 
     public ObjectId getCommitId() {
-<span class="fc" id="L93">        return commitId;</span>
+<span class="fc" id="L90">        return commitId;</span>
     }
 
     public void setCommitId(ObjectId commitId) {
-<span class="fc" id="L97">        this.commitId = commitId;</span>
-<span class="fc" id="L98">    }</span>
+<span class="fc" id="L94">        this.commitId = commitId;</span>
+<span class="fc" id="L95">    }</span>
 
     public Map&lt;String, String&gt; getMetrics() {
-<span class="fc" id="L101">        return metrics;</span>
+<span class="fc" id="L98">        return metrics;</span>
     }
 
     public void setMetrics(Map&lt;String, String&gt; metrics) {
-<span class="fc" id="L105">        this.metrics = metrics;</span>
-<span class="fc" id="L106">    }</span>
+<span class="fc" id="L102">        this.metrics = metrics;</span>
+<span class="fc" id="L103">    }</span>
 
-    public Set&lt;Mutation&gt; getMutations() {
-<span class="fc" id="L109">        return mutations;</span>
+    public Set&lt;MutationResult&gt; getMutationResults() {
+<span class="fc" id="L106">        return mutationResults;</span>
     }
 
-    public void setMutations(Set&lt;Mutation&gt; mutations) {
-<span class="fc" id="L113">        this.mutations = mutations;</span>
-<span class="fc" id="L114">    }</span>
+    public void setMutations(Set&lt;MutationResult&gt; mutationResults) {
+<span class="fc" id="L110">        this.mutationResults = mutationResults;</span>
+<span class="fc" id="L111">    }</span>
 
     @Override
     public boolean equals(Object obj) {
-<span class="pc bpc" id="L118" title="1 of 2 branches missed.">        if(!(obj instanceof TestState)) {</span>
-<span class="nc" id="L119">            return false;</span>
+<span class="pc bpc" id="L115" title="1 of 2 branches missed.">        if(!(obj instanceof TestState)) {</span>
+<span class="nc" id="L116">            return false;</span>
         }
 
-<span class="pc bpc" id="L122" title="1 of 2 branches missed.">        if(obj == this) {</span>
-<span class="nc" id="L123">            return true;</span>
+<span class="pc bpc" id="L119" title="1 of 2 branches missed.">        if(obj == this) {</span>
+<span class="nc" id="L120">            return true;</span>
         }
 
-<span class="fc" id="L126">        TestState otherNode = (TestState) obj;</span>
-<span class="fc" id="L127">        return new EqualsBuilder()</span>
-<span class="fc" id="L128">                .append(id, otherNode.id)</span>
-<span class="fc" id="L129">                .append(name, otherNode.name)</span>
-<span class="fc" id="L130">                .append(fileId, otherNode.fileId)</span>
-<span class="fc" id="L131">                .append(commitId, otherNode.commitId)</span>
-<span class="fc" id="L132">                .append(metrics, otherNode.metrics)</span>
-<span class="fc" id="L133">                .append(mutations, otherNode.mutations)</span>
-<span class="fc" id="L134">                .isEquals();</span>
+<span class="fc" id="L123">        TestState otherNode = (TestState) obj;</span>
+<span class="fc" id="L124">        return new EqualsBuilder()</span>
+<span class="fc" id="L125">                .append(id, otherNode.id)</span>
+<span class="fc" id="L126">                .append(name, otherNode.name)</span>
+<span class="fc" id="L127">                .append(fileId, otherNode.fileId)</span>
+<span class="fc" id="L128">                .append(commitId, otherNode.commitId)</span>
+<span class="fc" id="L129">                .append(metrics, otherNode.metrics)</span>
+<span class="fc" id="L130">                .append(mutationResults, otherNode.mutationResults)</span>
+<span class="fc" id="L131">                .isEquals();</span>
     }
 
     @Override
     public int hashCode() {
-<span class="nc" id="L139">        return new HashCodeBuilder(17, 31)</span>
-<span class="nc" id="L140">                .append(id)</span>
-<span class="nc" id="L141">                .append(name)</span>
-<span class="nc" id="L142">                .append(fileId)</span>
-<span class="nc" id="L143">                .append(commitId)</span>
-<span class="nc" id="L144">                .append(metrics)</span>
-<span class="nc" id="L145">                .append(mutations)</span>
-<span class="nc" id="L146">                .toHashCode();</span>
+<span class="nc" id="L136">        return new HashCodeBuilder(17, 31)</span>
+<span class="nc" id="L137">                .append(id)</span>
+<span class="nc" id="L138">                .append(name)</span>
+<span class="nc" id="L139">                .append(fileId)</span>
+<span class="nc" id="L140">                .append(commitId)</span>
+<span class="nc" id="L141">                .append(metrics)</span>
+<span class="nc" id="L142">                .append(mutationResults)</span>
+<span class="nc" id="L143">                .toHashCode();</span>
     }
 
     @Override
     public String toString() {
-<span class="nc" id="L151">        return MoreObjects.toStringHelper(this)</span>
-<span class="nc" id="L152">                .add(&quot;id&quot;, id)</span>
-<span class="nc" id="L153">                .add(&quot;name&quot;, name)</span>
-<span class="nc" id="L154">                .add(&quot;fileId&quot;, fileId)</span>
-<span class="nc" id="L155">                .add(&quot;commitId&quot;, commitId)</span>
-<span class="nc" id="L156">                .add(&quot;metrics&quot;, metrics)</span>
-<span class="nc" id="L157">                .add(&quot;mutations&quot;, mutations)</span>
-<span class="nc" id="L158">                .toString();</span>
+<span class="nc" id="L148">        return MoreObjects.toStringHelper(this)</span>
+<span class="nc" id="L149">                .add(&quot;id&quot;, id)</span>
+<span class="nc" id="L150">                .add(&quot;name&quot;, name)</span>
+<span class="nc" id="L151">                .add(&quot;fileId&quot;, fileId)</span>
+<span class="nc" id="L152">                .add(&quot;commitId&quot;, commitId)</span>
+<span class="nc" id="L153">                .add(&quot;metrics&quot;, metrics)</span>
+<span class="nc" id="L154">                .add(&quot;mutationResults&quot;, mutationResults)</span>
+<span class="nc" id="L155">                .toString();</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

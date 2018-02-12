@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Mutation.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">comfort</a> &gt; <a href="index.source.html" class="el_package">de.ugoe.cs.comfort.database.models</a> &gt; <span class="el_source">Mutation.java</span></div><h1>Mutation.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2017 University of Goettingen, Germany
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.ugoe.cs.comfort.database.models;
+
+import com.google.common.base.MoreObjects;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.bson.types.ObjectId;
+import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Id;
+import org.mongodb.morphia.annotations.Property;
+
+/**
+ * @author Fabian Trautsch
+ */
+@Entity(value = &quot;mutation&quot;, noClassnameStored = true)
+public class Mutation {
+    @Id
+    @Property(&quot;_id&quot;)
+    private ObjectId id;
+
+    @Property(&quot;m_type&quot;)
+    private String mType;
+
+    private String location;
+
+    @Property(&quot;l_num&quot;)
+    private Integer lineNumber;
+
+    private String classification;
+
+<span class="fc" id="L46">    public Mutation() {</span>
+
+<span class="fc" id="L48">    }</span>
+
+<span class="fc" id="L50">    public Mutation(String location, String mType, Integer lineNumber, String changeClassification) {</span>
+<span class="fc" id="L51">        this.location = location;</span>
+<span class="fc" id="L52">        this.mType = mType;</span>
+<span class="fc" id="L53">        this.lineNumber = lineNumber;</span>
+<span class="fc" id="L54">        this.classification = changeClassification;</span>
+<span class="fc" id="L55">    }</span>
+
+    public ObjectId getId() {
+<span class="fc" id="L58">        return id;</span>
+    }
+
+    public void setId(ObjectId id) {
+<span class="nc" id="L62">        this.id = id;</span>
+<span class="nc" id="L63">    }</span>
+
+    public String getMType() {
+<span class="nc" id="L66">        return mType;</span>
+    }
+
+    public void setMType(String type) {
+<span class="nc" id="L70">        this.mType = type;</span>
+<span class="nc" id="L71">    }</span>
+
+    public String getLocation() {
+<span class="nc" id="L74">        return location;</span>
+    }
+
+    public void setLocation(String location) {
+<span class="nc" id="L78">        this.location = location;</span>
+<span class="nc" id="L79">    }</span>
+
+    public Integer getLineNumber() {
+<span class="nc" id="L82">        return lineNumber;</span>
+    }
+
+    public void setLineNumber(Integer lineNumber) {
+<span class="nc" id="L86">        this.lineNumber = lineNumber;</span>
+<span class="nc" id="L87">    }</span>
+
+    public String getClassification() {
+<span class="nc" id="L90">        return classification;</span>
+    }
+
+    public void setClassification(String classification) {
+<span class="nc" id="L94">        this.classification = classification;</span>
+<span class="nc" id="L95">    }</span>
+
+    @Override
+    public String toString() {
+<span class="nc" id="L99">        return MoreObjects.toStringHelper(this)</span>
+<span class="nc" id="L100">                .add(&quot;location&quot;, location)</span>
+<span class="nc" id="L101">                .add(&quot;mType&quot;, mType)</span>
+<span class="nc" id="L102">                .add(&quot;lineNumber&quot;, lineNumber)</span>
+<span class="nc" id="L103">                .add(&quot;classification&quot;, classification)</span>
+<span class="nc" id="L104">                .toString();</span>
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+<span class="nc bnc" id="L109" title="All 2 branches missed.">        if(!(obj instanceof Mutation)) {</span>
+<span class="nc" id="L110">            return false;</span>
+        }
+
+<span class="nc bnc" id="L113" title="All 2 branches missed.">        if(obj == this) {</span>
+<span class="nc" id="L114">            return true;</span>
+        }
+
+<span class="nc" id="L117">        Mutation otherNode = (Mutation) obj;</span>
+<span class="nc" id="L118">        return new EqualsBuilder()</span>
+<span class="nc" id="L119">                .append(location, otherNode.location)</span>
+<span class="nc" id="L120">                .append(mType, otherNode.mType)</span>
+<span class="nc" id="L121">                .append(lineNumber, otherNode.lineNumber)</span>
+<span class="nc" id="L122">                .append(classification, otherNode.classification)</span>
+<span class="nc" id="L123">                .isEquals();</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="fc" id="L128">        return new HashCodeBuilder(17, 31)</span>
+<span class="fc" id="L129">                .append(location)</span>
+<span class="fc" id="L130">                .append(mType)</span>
+<span class="fc" id="L131">                .append(lineNumber)</span>
+<span class="fc" id="L132">                .append(classification)</span>
+<span class="fc" id="L133">                .toHashCode();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

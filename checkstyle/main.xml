@@ -1,225 +1,231 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <checkstyle version="8.7">
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/FileNameUtils.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/FileNameUtils.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/Main.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/Main.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/Utils.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/Utils.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/annotations/SupportsClass.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/annotations/SupportsClass.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/annotations/SupportsJava.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/annotations/SupportsJava.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/annotations/SupportsMethod.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/annotations/SupportsMethod.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/annotations/SupportsPython.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/annotations/SupportsPython.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/annotations/package-info.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/annotations/package-info.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/BaseModel.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/BaseModel.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/filter/BaseFilter.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/filter/BaseFilter.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/filter/DeletePythonPackagesFilter.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/filter/DeletePythonPackagesFilter.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/filter/DirectConnectionToTestFilter.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/filter/DirectConnectionToTestFilter.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/filter/MergeInnerClassToMainClassFilter.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/filter/MergeInnerClassToMainClassFilter.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/filter/SameProjectFilter.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/filter/SameProjectFilter.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/filter/TransformCallGraphToDependencyGraphFilter.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/filter/TransformCallGraphToDependencyGraphFilter.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/filter/package-info.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/filter/package-info.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/loader/BaseLoader.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/loader/BaseLoader.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/loader/CallGraphLoader.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/loader/CallGraphLoader.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/loader/ChangeSetLoader.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/loader/ChangeSetLoader.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/loader/ClassFilesLoader.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/loader/ClassFilesLoader.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/loader/DependencyGraphLoader.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/loader/DependencyGraphLoader.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/loader/ProjectFilesLoader.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/loader/ProjectFilesLoader.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/loader/TestCoverageLoader.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/loader/TestCoverageLoader.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/loader/callgraph/ClassVisitor.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/loader/callgraph/ClassVisitor.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/loader/callgraph/MethodVisitor.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/loader/callgraph/MethodVisitor.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/loader/callgraph/package-info.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/loader/callgraph/package-info.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/loader/package-info.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/loader/package-info.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/loader/testcoverage/ExecutionDataVisitor.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/loader/testcoverage/ExecutionDataVisitor.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/loader/testcoverage/JacocoReportReader.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/loader/testcoverage/JacocoReportReader.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/loader/testcoverage/package-info.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/loader/testcoverage/package-info.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/BaseMetricCollector.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/BaseMetricCollector.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/CoEvolutionTestTypeCollector.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/CoEvolutionTestTypeCollector.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/CodeCoverStrategy.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/CodeCoverStrategy.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/DependencyCollector.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/DependencyCollector.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/DijkstraAlgorithm.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/DijkstraAlgorithm.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/DirectnessCollector.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/DirectnessCollector.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/IEEETestTypeCollector.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/IEEETestTypeCollector.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/ISTQBTestTypeCollector.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/ISTQBTestTypeCollector.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/LOCAndMcCabeCollector.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/LOCAndMcCabeCollector.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/MaximumCallGraphDepthCollector.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/MaximumCallGraphDepthCollector.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/MutationDataCollector.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/MutationDataCollector.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/NamingConventionTestTypeCollector.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/NamingConventionTestTypeCollector.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/NumAssertionCollector.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/NumAssertionCollector.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/TestCoverageCollector.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/TestCoverageCollector.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/TestType.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/TestType.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/TestTypeDetectionUtils.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/TestTypeDetectionUtils.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/mutation/MutationChangeClassifier.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/mutation/MutationChangeClassifier.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/mutation/MutationExecutionResult.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/mutation/MutationExecutionResult.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/mutation/operators/BaseOperator.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/mutation/operators/BaseOperator.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/mutation/operators/ConditionalsBoundaryOperator.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/mutation/operators/ConditionalsBoundaryOperator.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/mutation/operators/IncrementsOperator.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/mutation/operators/IncrementsOperator.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/mutation/operators/InvertNegativesOperator.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/mutation/operators/InvertNegativesOperator.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/mutation/operators/MathOperator.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/mutation/operators/MathOperator.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/mutation/operators/NegateConditionalsOperator.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/mutation/operators/NegateConditionalsOperator.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/mutation/operators/RemoveIncrementsOperator.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/mutation/operators/RemoveIncrementsOperator.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/mutation/operators/package-info.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/mutation/operators/package-info.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/mutation/package-info.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/mutation/package-info.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/package-info.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/package-info.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/parsing/ASTClassNode.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/parsing/ASTClassNode.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/parsing/ASTClassVisitor.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/parsing/ASTClassVisitor.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/parsing/ASTMethodNode.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/parsing/ASTMethodNode.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/parsing/ASTMethodVisitor.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/parsing/ASTMethodVisitor.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/parsing/MetricClassVisitor.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/parsing/MetricClassVisitor.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/parsing/MetricMethodVisitor.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/parsing/MetricMethodVisitor.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/parsing/package-info.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/parsing/package-info.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/package-info.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/package-info.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/configuration/BaseConfiguration.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/configuration/BaseConfiguration.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/configuration/CollectionConfiguration.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/configuration/CollectionConfiguration.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/configuration/Database.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/configuration/Database.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/configuration/FilerConfiguration.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/configuration/FilerConfiguration.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/configuration/GeneralConfiguration.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/configuration/GeneralConfiguration.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/configuration/LoaderConfiguration.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/configuration/LoaderConfiguration.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/configuration/package-info.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/configuration/package-info.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/data/ChangeSet.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/data/ChangeSet.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/data/ClassFiles.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/data/ClassFiles.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/data/CoverageData.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/data/CoverageData.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/data/DataSet.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/data/DataSet.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/data/ProjectFiles.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/data/ProjectFiles.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/data/graphs/CallEdge.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/data/graphs/CallEdge.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/data/graphs/CallGraph.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/data/graphs/CallGraph.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/data/graphs/CallType.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/data/graphs/CallType.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/data/graphs/DependencyGraph.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/data/graphs/DependencyGraph.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/data/graphs/IGraph.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/data/graphs/IGraph.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/data/graphs/package-info.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/data/graphs/package-info.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/data/models/IMethod.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/data/models/IMethod.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/data/models/IUnit.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/data/models/IUnit.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/data/models/JavaClass.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/data/models/JavaClass.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/data/models/JavaMethod.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/data/models/JavaMethod.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/data/models/PythonCoverageLoaderTestMethod.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/data/models/PythonCoverageLoaderTestMethod.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/data/models/PythonCoveragerloaderTestedMethod.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/data/models/PythonCoveragerloaderTestedMethod.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/data/models/PythonMethod.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/data/models/PythonMethod.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/data/models/PythonModule.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/data/models/PythonModule.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/data/models/package-info.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/data/models/package-info.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/data/package-info.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/data/package-info.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/database/models/FileAggregation.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/database/models/FileAggregation.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/database/models/TestState.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/database/models/Mutation.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/database/models/package-info.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/database/models/MutationResult.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/exception/FilterException.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/database/models/TestState.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/exception/LoaderException.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/database/models/package-info.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/exception/MetricCollectorException.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/exception/FilterException.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/exception/MutationResultException.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/exception/LoaderException.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/exception/package-info.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/exception/MetricCollectorException.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/filer/CSVFiler.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/exception/MutationOperatorNotFittingException.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/filer/IFiler.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/exception/MutationResultException.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/filer/SmartSHARKFiler.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/exception/package-info.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/filer/models/Mutation.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/filer/CSVFiler.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/filer/models/Result.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/filer/IFiler.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/filer/models/ResultSet.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/filer/SmartSHARKFiler.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/filer/models/package-info.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/filer/models/Mutation.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/filer/package-info.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/filer/models/Result.java">
 </file>
-<file name="/home/ftrauts/Arbeit/phd_experiments/COMFORT-Framework/comfort/src/main/java/de/ugoe/cs/comfort/package-info.java">
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/filer/models/ResultSet.java">
+</file>
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/filer/models/package-info.java">
+</file>
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/filer/package-info.java">
+</file>
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/package-info.java">
 </file>
 </checkstyle>
