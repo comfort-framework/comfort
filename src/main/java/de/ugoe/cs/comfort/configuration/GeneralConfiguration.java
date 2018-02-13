@@ -39,6 +39,7 @@ public class GeneralConfiguration {
     private String language = "java";
     private String logLevel = "DEBUG";
     private String logFile = "/tmp/comfort.out";
+    private int nThreads = 1;
     private boolean methodLevel = false;
 
     @JsonProperty("collections")
@@ -103,6 +104,14 @@ public class GeneralConfiguration {
 
     public String getLogFile() {
         return logFile;
+    }
+
+    public int getNThreads() {
+        return nThreads;
+    }
+
+    public void setNThreads(int nThreads) {
+        this.nThreads = nThreads;
     }
 
     public IFiler getFiler() throws ClassNotFoundException, IllegalAccessException,

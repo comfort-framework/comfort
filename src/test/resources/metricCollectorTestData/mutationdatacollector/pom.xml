@@ -37,12 +37,12 @@
                         <param>Module1*</param>
                     </targetClasses>
                     <targetTests>
-                        <param>Module1Test</param>
+                        <param>Module2Test</param>
                     </targetTests>
                     <includedTestMethods>
                         getNumberTest
                     </includedTestMethods>
-                    <threads>4</threads>
+                    <threads>1</threads>
                     <outputFormats>CSV</outputFormats>
                     <timestampedReports>false</timestampedReports>
                 </configuration>

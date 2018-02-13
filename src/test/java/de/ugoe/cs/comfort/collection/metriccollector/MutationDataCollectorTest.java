@@ -46,7 +46,17 @@ public class MutationDataCollectorTest extends BaseTest {
     }
 
     @Test
-    public void collectMutationDataTest() {
+    public void collectMutationDataTestSingleThreaded() {
+        collectMutationData();
+    }
+
+    @Test
+    public void collectMutationDataMultiThreaded() {
+        javaConfig.setNThreads(4);
+        collectMutationData();
+    }
+
+    private void collectMutationData() {
         CoverageData covData = new CoverageData();
         covData.add(new JavaMethod("Module1Test", "getNameTest", new ArrayList<>(), null), null);
         covData.add(new JavaMethod("Module1Test", "getNumberTest", new ArrayList<>(), null), null);

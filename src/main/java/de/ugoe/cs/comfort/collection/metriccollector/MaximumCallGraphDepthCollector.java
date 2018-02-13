@@ -77,7 +77,7 @@ public class MaximumCallGraphDepthCollector extends BaseMetricCollector {
         Map<String, Integer> longestPathForTest = new HashMap<>();
 
         // We do concurrency here, as it is much faster for this heavy task
-        final ExecutorService executorService = Executors.newFixedThreadPool(4);
+        final ExecutorService executorService = Executors.newFixedThreadPool(generalConf.getNThreads());
         CompletionService<Map<String, Integer>> pool = new ExecutorCompletionService<>(executorService);
 
 
