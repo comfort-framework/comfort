@@ -39,7 +39,10 @@ public class GeneralConfiguration {
     private String language = "java";
     private String logLevel = "DEBUG";
     private String logFile = "/tmp/comfort.out";
+
+    @JsonProperty("nThreads")
     private int nThreads = 1;
+
     private boolean methodLevel = false;
 
     @JsonProperty("collections")

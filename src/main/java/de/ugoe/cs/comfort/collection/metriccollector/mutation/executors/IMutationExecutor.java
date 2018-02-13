@@ -17,14 +17,18 @@
 package de.ugoe.cs.comfort.collection.metriccollector.mutation.executors;
 
 import de.ugoe.cs.comfort.collection.metriccollector.mutation.MutationExecutionResult;
+import de.ugoe.cs.comfort.filer.models.Mutation;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Set;
 
 /**
  * @author Fabian Trautsch
  */
 public interface IMutationExecutor {
 
-    public MutationExecutionResult execute(Path projectRoot) throws IOException;
+    public MutationExecutionResult execute(Path projectRoot, String className, String methodName) throws IOException;
+
+    public Set<Mutation> getDetailedResults(Path projectRoot) throws IOException;
 
 }

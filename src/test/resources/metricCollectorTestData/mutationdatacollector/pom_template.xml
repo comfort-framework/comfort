@@ -42,6 +42,9 @@
                     <includedTestMethods>
                         ${pitmethod}
                     </includedTestMethods>
+                    <reportsDirectory>
+                        ${pitreport}
+                    </reportsDirectory>
                     <threads>1</threads>
                     <outputFormats>CSV</outputFormats>
                     <timestampedReports>false</timestampedReports>

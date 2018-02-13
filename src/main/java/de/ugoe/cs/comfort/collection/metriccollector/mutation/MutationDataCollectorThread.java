@@ -17,29 +17,16 @@
 package de.ugoe.cs.comfort.collection.metriccollector.mutation;
 
 import de.ugoe.cs.comfort.FileNameUtils;
+import de.ugoe.cs.comfort.collection.metriccollector.mutation.executors.IMutationExecutor;
 import de.ugoe.cs.comfort.collection.metriccollector.mutation.executors.PITExecutor;
 import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
 import de.ugoe.cs.comfort.data.models.IUnit;
-import de.ugoe.cs.comfort.exception.MutationResultException;
 import de.ugoe.cs.comfort.filer.models.Mutation;
 import de.ugoe.cs.comfort.filer.models.Result;
-import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
-import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.lookup.StrSubstitutor;
 
 /**
  * @author Fabian Trautsch
@@ -74,18 +61,18 @@ public class MutationDataCollectorThread implements Runnable {
             Result result = new Result(unit.getFQN(),
                     fileNameUtils.getPathForIdentifier(unit.getFQN(), generalConf.getMethodLevel()));
 
-            // Copy project folder
-            Path tempDir = Files.createTempDirectory("comfort-");
-            FileUtils.copyDirectory(generalConf.getProjectDir().toFile(), tempDir.toFile());
+            // Choose correct mutation executor
+            IMutationExecutor mutationExecutor = new PITExecutor();
 
-            // Create new pom with corresponding values
-            createNewPom(tempDir, className, methodName);
-
-            // Execute Pitest
-            MutationExecutionResult mutationExecutionResult = PITExecutor.getExecutor().execute(tempDir);
+            // Execute mutation executor -> do mutation testing for className.methodName
+            MutationExecutionResult mutationExecutionResult = mutationExecutor.execute(
+                    generalConf.getProjectDir(),
+                    className,
+                    methodName
+            );
 
             // If execution was successful, we will read the results
-            Set<Mutation> mutationResults = readPitestResults(tempDir);
+            Set<Mutation> mutationResults = mutationExecutor.getDetailedResults(generalConf.getProjectDir());
 
             // And add these results to this specific test
             result.addMutationResults(mutationResults);
@@ -102,55 +89,4 @@ public class MutationDataCollectorThread implements Runnable {
     }
 
 
-
-    private void createNewPom(Path projectRoot, String className, String methodName) throws IOException {
-        Path template = Paths.get(projectRoot.toString(), "pom_template.xml");
-
-        // Read tamplate
-        String content = new String(Files.readAllBytes(template), StandardCharsets.UTF_8);
-
-        // Substitute placeholder with the correct test name that should be tested
-        Map<String, String> valuesMap = new HashMap<>();
-        valuesMap.put("pitclass", className);
-        valuesMap.put("pitmethod", methodName);
-        StrSubstitutor sub = new StrSubstitutor(valuesMap);
-        String resolvedString = sub.replace(content);
-
-        // Store as pom.xml
-        Files.write(Paths.get(projectRoot.toString(), "pom.xml"), resolvedString.getBytes("UTF-8"));
-    }
-
-    private Set<Mutation> readPitestResults(Path projectRoot) throws IOException {
-        String line;
-        Set<Mutation> mutationResults = new HashSet<>();
-
-        // Read out pitest results
-        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(
-                Paths.get(projectRoot.toString(),"target", "pit-reports", "mutations.csv").toFile()),
-                StandardCharsets.UTF_8));
-        while ((line = br.readLine()) != null) {
-            String[] cols = line.split(",");
-            logger.debug("Result Line: {}", line);
-            String location = cols[1]+"."+cols[3];
-            String mutationOperator = cols[2];
-            int lineNumber =  Integer.parseInt(cols[4]);
-            String result = cols[5];
-
-            // Try to get a change clasification for the mutation
-            // But we catch the exceptions here, as this kind of data is not crucial
-            String changeClassification = null;
-            try {
-                changeClassification = MutationChangeClassifier.getChangeClassification(
-                        projectRoot, cols[0], mutationOperator, lineNumber
-                );
-                logger.debug("Got the following change classification {}", changeClassification);
-            } catch (MutationResultException e) {
-                logger.catching(e);
-            }
-            mutationResults.add(new Mutation(location, mutationOperator, lineNumber, result, changeClassification));
-        }
-        br.close();
-
-        return mutationResults;
-    }
 }

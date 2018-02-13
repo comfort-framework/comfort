@@ -43,6 +43,9 @@
                         getNumberTest
                     </includedTestMethods>
                     <threads>1</threads>
+                    <reportsDirectory>
+                        /home/ftrauts/pit-report
+                    </reportsDirectory>
                     <outputFormats>CSV</outputFormats>
                     <timestampedReports>false</timestampedReports>
                 </configuration>

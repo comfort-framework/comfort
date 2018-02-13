@@ -16,16 +16,25 @@
 
 package de.ugoe.cs.comfort.collection.metriccollector.mutation.executors;
 
+import de.ugoe.cs.comfort.collection.metriccollector.mutation.MutationChangeClassifier;
 import de.ugoe.cs.comfort.collection.metriccollector.mutation.MutationExecutionResult;
+import de.ugoe.cs.comfort.exception.MutationResultException;
+import de.ugoe.cs.comfort.filer.models.Mutation;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -36,23 +45,44 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.lookup.StrSubstitutor;
 
 /**
  * @author Fabian Trautsch
  */
 public class PITExecutor implements IMutationExecutor {
     private final Logger logger = LogManager.getLogger(this.getClass().getName());
-    private static PITExecutor instance = new PITExecutor();
 
-    public static PITExecutor getExecutor() {
-        return instance;
-    }
+    private Path pitReportFolder;
 
-    private PITExecutor() {
+    private void createNewPom(Path projectRoot, Path newPom, String className, String methodName) throws IOException {
+        Path template = Paths.get(projectRoot.toString(), "pom_template.xml");
+        pitReportFolder = Files.createTempDirectory("comfort-");
+
+        // Read template
+        String content = new String(Files.readAllBytes(template), StandardCharsets.UTF_8);
+
+        // Substitute placeholder with the correct test name that should be tested
+        Map<String, String> valuesMap = new HashMap<>();
+        valuesMap.put("pitclass", className);
+        valuesMap.put("pitmethod", methodName);
+        valuesMap.put("pitreport", pitReportFolder.toString());
+
+        StrSubstitutor sub = new StrSubstitutor(valuesMap);
+        String resolvedString = sub.replace(content);
+
+        // Store as pom.xml
+        Files.write(newPom, resolvedString.getBytes("UTF-8"));
     }
 
     @Override
-    public MutationExecutionResult execute(Path projectRoot) throws IOException {
+    public MutationExecutionResult execute(Path projectRoot, String className, String methodName) throws IOException {
+        // Create newPOMFile
+        Path newPomFile = File.createTempFile("comfort-", ".xml", projectRoot.toFile()).toPath();
+
+        // Create new pom with corresponding values
+        createNewPom(projectRoot, newPomFile, className, methodName);
+
         logger.info("Executing Pitest...");
 
         // monkeypatching for mybatis-3
@@ -60,7 +90,8 @@ public class PITExecutor implements IMutationExecutor {
             FileUtils.forceDelete(Paths.get(projectRoot.toString(), "ibderby").toFile()); //delete directory
         }
 
-        ProcessBuilder builder = new ProcessBuilder("mvn", "org.pitest:pitest-maven:mutationCoverage");
+        ProcessBuilder builder = new ProcessBuilder("mvn", "-f",
+                newPomFile.toString(), "org.pitest:pitest-maven:mutationCoverage");
         builder.redirectErrorStream(true);
         builder.directory(new File(projectRoot.toString()));
 
@@ -103,6 +134,41 @@ public class PITExecutor implements IMutationExecutor {
         logger.debug("Mutation Execution result: {}", mutationExecutionResult);
 
         return mutationExecutionResult;
+    }
+
+    @Override
+    public Set<Mutation> getDetailedResults(Path projectRoot) throws IOException {
+        String line;
+        Set<Mutation> mutationResults = new HashSet<>();
+
+        // Read out pitest results
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(
+                Paths.get(pitReportFolder.toString(), "mutations.csv").toFile()),
+                StandardCharsets.UTF_8));
+        while ((line = br.readLine()) != null) {
+            String[] cols = line.split(",");
+            logger.debug("Result Line: {}", line);
+            String location = cols[1]+"."+cols[3];
+            String mutationOperator = cols[2];
+            int lineNumber =  Integer.parseInt(cols[4]);
+            String result = cols[5];
+
+            // Try to get a change clasification for the mutation
+            // But we catch the exceptions here, as this kind of data is not crucial
+            String changeClassification = null;
+            try {
+                changeClassification = MutationChangeClassifier.getChangeClassification(
+                        projectRoot, cols[0], mutationOperator, lineNumber
+                );
+                logger.debug("Got the following change classification {}", changeClassification);
+            } catch (MutationResultException e) {
+                logger.catching(e);
+            }
+            mutationResults.add(new Mutation(location, mutationOperator, lineNumber, result, changeClassification));
+        }
+        br.close();
+
+        return mutationResults;
     }
 
     private static class PITExecutionOutputParser implements Callable<MutationExecutionResult> {
