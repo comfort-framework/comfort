@@ -94,7 +94,15 @@
 </file>
 <file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/mutation/MutationChangeClassifier.java">
 </file>
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/mutation/MutationDataCollectorThread.java">
+</file>
 <file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/mutation/MutationExecutionResult.java">
+</file>
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/mutation/executors/IMutationExecutor.java">
+</file>
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/mutation/executors/PITExecutor.java">
+</file>
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/mutation/executors/package-info.java">
 </file>
 <file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/mutation/operators/BaseOperator.java">
 </file>

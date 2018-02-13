@@ -7,6 +7,7 @@ de.ugoe.cs.comfort.collection.loader.callgraph
 de.ugoe.cs.comfort.collection.loader.testcoverage
 de.ugoe.cs.comfort.collection.metriccollector
 de.ugoe.cs.comfort.collection.metriccollector.mutation
+de.ugoe.cs.comfort.collection.metriccollector.mutation.executors
 de.ugoe.cs.comfort.collection.metriccollector.mutation.operators
 de.ugoe.cs.comfort.collection.metriccollector.parsing
 de.ugoe.cs.comfort.configuration

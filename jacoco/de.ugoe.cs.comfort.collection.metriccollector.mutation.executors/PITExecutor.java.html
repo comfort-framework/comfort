@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PITExecutor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">comfort</a> &gt; <a href="index.source.html" class="el_package">de.ugoe.cs.comfort.collection.metriccollector.mutation.executors</a> &gt; <span class="el_source">PITExecutor.java</span></div><h1>PITExecutor.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2017 University of Goettingen, Germany
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.ugoe.cs.comfort.collection.metriccollector.mutation.executors;
+
+import de.ugoe.cs.comfort.collection.metriccollector.mutation.MutationExecutionResult;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.apache.commons.io.FileUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+/**
+ * @author Fabian Trautsch
+ */
+public class PITExecutor implements IMutationExecutor {
+<span class="fc" id="L44">    private final Logger logger = LogManager.getLogger(this.getClass().getName());</span>
+<span class="fc" id="L45">    private static PITExecutor instance = new PITExecutor();</span>
+
+    public static PITExecutor getExecutor() {
+<span class="fc" id="L48">        return instance;</span>
+    }
+
+<span class="fc" id="L51">    private PITExecutor() {</span>
+<span class="fc" id="L52">    }</span>
+
+    @Override
+    public MutationExecutionResult execute(Path projectRoot) throws IOException {
+<span class="fc" id="L56">        logger.info(&quot;Executing Pitest...&quot;);</span>
+
+        // monkeypatching for mybatis-3
+<span class="pc bpc" id="L59" title="1 of 2 branches missed.">        if(Files.exists(Paths.get(projectRoot.toString(), &quot;ibderby&quot;))) {</span>
+<span class="nc" id="L60">            FileUtils.forceDelete(Paths.get(projectRoot.toString(), &quot;ibderby&quot;).toFile()); //delete directory</span>
+        }
+
+<span class="fc" id="L63">        ProcessBuilder builder = new ProcessBuilder(&quot;mvn&quot;, &quot;org.pitest:pitest-maven:mutationCoverage&quot;);</span>
+<span class="fc" id="L64">        builder.redirectErrorStream(true);</span>
+<span class="fc" id="L65">        builder.directory(new File(projectRoot.toString()));</span>
+
+        int exitCode;
+        Future&lt;MutationExecutionResult&gt; future;
+<span class="fc" id="L69">        ExecutorService executor = Executors.newSingleThreadExecutor();</span>
+        try {
+<span class="fc" id="L71">            Process piTest = builder.start();</span>
+<span class="fc" id="L72">            PITExecutionOutputParser outputParser =</span>
+<span class="fc" id="L73">                    new PITExecutionOutputParser(piTest.getInputStream());</span>
+<span class="fc" id="L74">            future = executor.submit(outputParser);</span>
+<span class="fc" id="L75">            logger.debug(&quot;Waiting to finish...&quot;);</span>
+<span class="fc" id="L76">            exitCode = piTest.waitFor();</span>
+<span class="fc" id="L77">            logger.debug(&quot;Finished!&quot;);</span>
+<span class="nc" id="L78">        } catch (IOException | InterruptedException e) {</span>
+<span class="nc" id="L79">            throw new IOException(&quot;Problem with execution!&quot;);</span>
+<span class="fc" id="L80">        }</span>
+
+        // Check if it returned successfully
+<span class="pc bpc" id="L83" title="1 of 2 branches missed.">        if (exitCode != 0) {</span>
+<span class="nc" id="L84">            throw new IOException(&quot;Error in executing loader: Program did not terminate with code 0&quot;);</span>
+        }
+
+        MutationExecutionResult mutationExecutionResult;
+        try {
+<span class="fc" id="L89">            mutationExecutionResult = future.get();</span>
+<span class="nc" id="L90">        } catch (InterruptedException | ExecutionException e) {</span>
+<span class="nc" id="L91">            throw new IOException(&quot;Error in parsing results!&quot;);</span>
+<span class="fc" id="L92">        }</span>
+<span class="fc" id="L93">        logger.info(&quot;Execution successful...&quot;);</span>
+
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">        if(mutationExecutionResult.getNumTests() != 1) {</span>
+<span class="nc" id="L96">            throw new IOException(&quot;Not only one test found by pit!&quot;);</span>
+        }
+
+<span class="pc bpc" id="L99" title="1 of 2 branches missed.">        if(mutationExecutionResult.getNumMutationUnits() &lt; 1) {</span>
+<span class="nc" id="L100">            throw new IOException(&quot;No mutation units generated!&quot;);</span>
+        }
+
+<span class="fc" id="L103">        logger.debug(&quot;Mutation Execution result: {}&quot;, mutationExecutionResult);</span>
+
+<span class="fc" id="L105">        return mutationExecutionResult;</span>
+    }
+
+    private static class PITExecutionOutputParser implements Callable&lt;MutationExecutionResult&gt; {
+        private InputStream inputStream;
+
+<span class="fc" id="L111">        Pattern receivedTestsPattern = Pattern.compile(&quot;(\\S*)(\\d*) tests received&quot;);</span>
+<span class="fc" id="L112">        Pattern mutationUnitsPattern = Pattern.compile(&quot;(\\S*)(\\d*) mutation test units&quot;);</span>
+<span class="fc" id="L113">        Pattern executionTimePattern = Pattern.compile(&quot;(\\S*) Completed in (\\d*) seconds&quot;);</span>
+<span class="fc" id="L114">        Pattern mutationScorePattern = Pattern.compile(&quot;(\\S*) Generated (\\d*) mutations Killed (\\d*) \\((\\d*)%\\)&quot;);</span>
+
+<span class="fc" id="L116">        PITExecutionOutputParser(InputStream inputStream) {</span>
+<span class="fc" id="L117">            this.inputStream = inputStream;</span>
+<span class="fc" id="L118">        }</span>
+
+        @Override
+        public MutationExecutionResult call() {
+<span class="fc" id="L122">            MutationExecutionResult mutationExecutionResult = new MutationExecutionResult();</span>
+            try{
+<span class="fc" id="L124">                parsePitExecutionOutput(mutationExecutionResult);</span>
+<span class="nc" id="L125">            } catch (UnsupportedEncodingException e) {</span>
+<span class="nc" id="L126">                e.printStackTrace();</span>
+<span class="fc" id="L127">            }</span>
+<span class="fc" id="L128">            return mutationExecutionResult;</span>
+        }
+
+        private void parsePitExecutionOutput(MutationExecutionResult mutationExecutionResult)
+                throws UnsupportedEncodingException {
+<span class="fc" id="L133">            new BufferedReader(new InputStreamReader(inputStream , &quot;UTF-8&quot;)).lines()</span>
+<span class="fc" id="L134">                    .forEach(pitOutputLine -&gt; {</span>
+<span class="fc" id="L135">                        Matcher receivedTestsMatcher = receivedTestsPattern.matcher(pitOutputLine);</span>
+<span class="fc" id="L136">                        Matcher mutationUnitsMatcher = mutationUnitsPattern.matcher(pitOutputLine);</span>
+<span class="fc" id="L137">                        Matcher executionTimeMatcher = executionTimePattern.matcher(pitOutputLine);</span>
+<span class="fc" id="L138">                        Matcher mutationScoreMatcher = mutationScorePattern.matcher(pitOutputLine);</span>
+
+                        //logger.debug(pitOutputLine);
+
+<span class="fc bfc" id="L142" title="All 2 branches covered.">                        if(receivedTestsMatcher.find()) {</span>
+<span class="fc" id="L143">                            mutationExecutionResult.setNumTests(Integer.parseInt(receivedTestsMatcher.group(1)));</span>
+                        }
+
+<span class="fc bfc" id="L146" title="All 2 branches covered.">                        if(mutationUnitsMatcher.find()) {</span>
+<span class="fc" id="L147">                            mutationExecutionResult</span>
+<span class="fc" id="L148">                                    .setNumMutationUnits(Integer.parseInt(mutationUnitsMatcher.group(1)));</span>
+                        }
+
+<span class="fc bfc" id="L151" title="All 2 branches covered.">                        if(executionTimeMatcher.find()) {</span>
+<span class="fc" id="L152">                            mutationExecutionResult.setExecutionTime(Integer.parseInt(executionTimeMatcher.group(2)));</span>
+                        }
+
+<span class="fc bfc" id="L155" title="All 2 branches covered.">                        if(mutationScoreMatcher.find()) {</span>
+<span class="fc" id="L156">                            mutationExecutionResult</span>
+<span class="fc" id="L157">                                    .setGeneratedMutations(Integer.parseInt(mutationScoreMatcher.group(2)));</span>
+<span class="fc" id="L158">                            mutationExecutionResult.setKilledMutations(Integer.parseInt(mutationScoreMatcher.group(3)));</span>
+<span class="fc" id="L159">                            mutationExecutionResult.setMutationScore(Integer.parseInt(mutationScoreMatcher.group(4)));</span>
+                        }
+<span class="fc" id="L161">                    });</span>
+<span class="fc" id="L162">        }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>
