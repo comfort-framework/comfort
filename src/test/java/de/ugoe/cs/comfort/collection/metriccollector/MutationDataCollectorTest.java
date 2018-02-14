@@ -52,7 +52,7 @@ public class MutationDataCollectorTest extends BaseTest {
 
     @Test
     public void collectMutationDataMultiThreaded() {
-        javaConfig.setNThreads(4);
+        javaConfig.setNThreads(2);
         collectMutationData();
     }
 

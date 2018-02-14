@@ -39,13 +39,13 @@ public class Utils {
 
     public static Boolean isTestBasedOnName(String nameOfFile) {
         String lowerCaseName = nameOfFile.toLowerCase();
-        return lowerCaseName.contains("test");
+        return lowerCaseName.contains("test") || lowerCaseName.contains("validate");
 
     }
 
     public static Boolean isTestBasedOnFQN(String fullyQualifiedName) {
         String lowerCaseName = fullyQualifiedName.substring(fullyQualifiedName.lastIndexOf('.') + 1).toLowerCase();
-        return lowerCaseName.contains("test");
+        return lowerCaseName.contains("test") || lowerCaseName.contains("validate");
     }
 
     public static String getPackageName(String fullyQualifiedName) {

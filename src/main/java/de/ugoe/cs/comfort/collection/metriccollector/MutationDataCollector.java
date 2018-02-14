@@ -23,9 +23,13 @@ import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
 import de.ugoe.cs.comfort.data.CoverageData;
 import de.ugoe.cs.comfort.data.models.IUnit;
 import de.ugoe.cs.comfort.filer.models.Result;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletionService;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -34,7 +38,7 @@ import java.util.concurrent.TimeUnit;
  * @author Fabian Trautsch
  */
 public class MutationDataCollector extends BaseMetricCollector {
-    private Set<Result> results = ConcurrentHashMap.newKeySet();
+    private Set<Result> results = new HashSet<>();
 
     public MutationDataCollector(GeneralConfiguration configuration) {
         super(configuration);
@@ -44,18 +48,23 @@ public class MutationDataCollector extends BaseMetricCollector {
     @SupportsJava
     public Set<Result> getMutationDataMetrics(CoverageData data) {
 
-        ExecutorService executor = Executors.newFixedThreadPool(generalConf.getNThreads());
+        final ExecutorService executor = Executors.newFixedThreadPool(generalConf.getNThreads());
+        CompletionService<Result> pool = new ExecutorCompletionService<>(executor);
+
 
         for (Map.Entry<IUnit, Set<IUnit>> entry : data.getCoverageData().entrySet()) {
-            executor.submit(new MutationDataCollectorThread(entry.getKey(), generalConf, fileNameUtils, results));
+            pool.submit(new MutationDataCollectorThread(entry.getKey(), generalConf, fileNameUtils));
         }
 
-        executor.shutdown();
-        try {
-            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            logger.catching(e);
+        for (int i=0; i<data.getCoverageData().size(); i++) {
+            try {
+                Result result = pool.take().get();
+                results.add(result);
+            } catch (InterruptedException | ExecutionException e) {
+                logger.catching(e);
+            }
         }
+        executor.shutdown();
         return results;
     }
 }

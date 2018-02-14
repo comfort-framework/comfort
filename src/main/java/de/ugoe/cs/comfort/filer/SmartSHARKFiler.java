@@ -137,15 +137,25 @@ public class SmartSHARKFiler implements IFiler {
     }
 
     private void storeTestState(TestState testState) {
-        Query<TestState> query = datastore.find(TestState.class)
+        TestState dbTestState = datastore.createQuery(TestState.class)
                 .field("name").equal(testState.getName())
-                .field("commit_id").equal(testState.getCommitId());
+                .field("commit_id").equal(testState.getCommitId())
+                .get();
 
-        UpdateOperations<TestState> updateOperations = datastore.createUpdateOperations(TestState.class)
-                .set("file_id", testState.getFileId())
-                .set("metrics", testState.getMetrics())
-                .set("mutation_res", testState.getMutationResults());
-        datastore.findAndModify(query, updateOperations, new FindAndModifyOptions().returnNew(false).upsert(true));
+        if(dbTestState == null) {
+            dbTestState = new TestState();
+            dbTestState.setName(testState.getName());
+            dbTestState.setCommitId(testState.getCommitId());
+            dbTestState.setFileId(testState.getFileId());
+        }
+
+        dbTestState.getMetrics().putAll(testState.getMetrics());
+
+        if(testState.getMutationResults().size() != 0) {
+            dbTestState.getMutationResults().addAll(testState.getMutationResults());
+        }
+
+        datastore.save(dbTestState);
     }
 
     private Repository getRepository(Path projectDir) throws IOException {

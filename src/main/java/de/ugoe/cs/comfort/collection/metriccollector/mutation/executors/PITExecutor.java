@@ -31,6 +31,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -46,6 +47,13 @@ import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.lookup.StrSubstitutor;
+import org.apache.maven.shared.invoker.DefaultInvocationRequest;
+import org.apache.maven.shared.invoker.DefaultInvoker;
+import org.apache.maven.shared.invoker.InvocationOutputHandler;
+import org.apache.maven.shared.invoker.InvocationRequest;
+import org.apache.maven.shared.invoker.InvocationResult;
+import org.apache.maven.shared.invoker.Invoker;
+import org.apache.maven.shared.invoker.MavenInvocationException;
 
 /**
  * @author Fabian Trautsch
@@ -77,63 +85,57 @@ public class PITExecutor implements IMutationExecutor {
 
     @Override
     public MutationExecutionResult execute(Path projectRoot, String className, String methodName) throws IOException {
-        // Create newPOMFile
-        Path newPomFile = File.createTempFile("comfort-", ".xml", projectRoot.toFile()).toPath();
-
-        // Create new pom with corresponding values
-        createNewPom(projectRoot, newPomFile, className, methodName);
-
-        logger.info("Executing Pitest...");
-
-        // monkeypatching for mybatis-3
-        if(Files.exists(Paths.get(projectRoot.toString(), "ibderby"))) {
-            FileUtils.forceDelete(Paths.get(projectRoot.toString(), "ibderby").toFile()); //delete directory
-        }
-
-        ProcessBuilder builder = new ProcessBuilder("mvn", "-f",
-                newPomFile.toString(), "org.pitest:pitest-maven:mutationCoverage");
-        builder.redirectErrorStream(true);
-        builder.directory(new File(projectRoot.toString()));
-
-        int exitCode;
-        Future<MutationExecutionResult> future;
-        ExecutorService executor = Executors.newSingleThreadExecutor();
         try {
-            Process piTest = builder.start();
-            PITExecutionOutputParser outputParser =
-                    new PITExecutionOutputParser(piTest.getInputStream());
-            future = executor.submit(outputParser);
-            logger.debug("Waiting to finish...");
-            exitCode = piTest.waitFor();
-            logger.debug("Finished!");
-        } catch (IOException | InterruptedException e) {
-            throw new IOException("Problem with execution!");
+            // Create newPOMFile
+            Path newPomFile = File.createTempFile("comfort-", ".xml", projectRoot.toFile()).toPath();
+
+            // Create new pom with corresponding values
+            createNewPom(projectRoot, newPomFile, className, methodName);
+
+            logger.info("Executing Pitest...");
+
+            // monkeypatching for mybatis-3
+            if (Files.exists(Paths.get(projectRoot.toString(), "ibderby"))) {
+                FileUtils.forceDelete(Paths.get(projectRoot.toString(), "ibderby").toFile()); //delete directory
+            }
+
+            // Create request -> pitest execute
+            InvocationRequest request = new DefaultInvocationRequest();
+            request.setPomFile(newPomFile.toFile());
+            request.setGoals(Collections.singletonList("org.pitest:pitest-maven:mutationCoverage"));
+
+            // Create new invoker and set attributes + outputparser
+            PITExecutionOutputParser outputParser = new PITExecutionOutputParser();
+            Invoker invoker = new DefaultInvoker();
+            invoker.setOutputHandler(outputParser);
+            invoker.setErrorHandler(outputParser);
+
+            // Invoke
+            InvocationResult result = invoker.execute(request);
+            Files.delete(newPomFile);
+
+            // Check if it returned successfully
+            if (result.getExitCode() != 0) {
+                throw new IOException("Error in executing loader: Program did not terminate with code 0");
+            }
+
+
+            MutationExecutionResult mutationExecutionResult = outputParser.getMutationExecutionResult();
+
+
+            if (mutationExecutionResult.getNumTests() != 1) {
+                throw new IOException("Not only one test found by pit!");
+            }
+
+            if (mutationExecutionResult.getNumMutationUnits() < 1) {
+                throw new IOException("No mutation units generated!");
+            }
+
+            logger.debug("Mutation Execution result: {}", mutationExecutionResult);
+            return mutationExecutionResult;
+        } catch (MavenInvocationException e) {
+            throw new IOException("Maven execution not successful!");
         }
-
-        // Check if it returned successfully
-        if (exitCode != 0) {
-            throw new IOException("Error in executing loader: Program did not terminate with code 0");
-        }
-
-        MutationExecutionResult mutationExecutionResult;
-        try {
-            mutationExecutionResult = future.get();
-        } catch (InterruptedException | ExecutionException e) {
-            throw new IOException("Error in parsing results!");
-        }
-        logger.info("Execution successful...");
-
-        if(mutationExecutionResult.getNumTests() != 1) {
-            throw new IOException("Not only one test found by pit!");
-        }
-
-        if(mutationExecutionResult.getNumMutationUnits() < 1) {
-            throw new IOException("No mutation units generated!");
-        }
-
-        logger.debug("Mutation Execution result: {}", mutationExecutionResult);
-
-        return mutationExecutionResult;
     }
 
     @Override
@@ -171,60 +173,43 @@ public class PITExecutor implements IMutationExecutor {
         return mutationResults;
     }
 
-    private static class PITExecutionOutputParser implements Callable<MutationExecutionResult> {
-        private InputStream inputStream;
+    private static class PITExecutionOutputParser implements InvocationOutputHandler {
+        MutationExecutionResult mutationExecutionResult = new MutationExecutionResult();
 
         Pattern receivedTestsPattern = Pattern.compile("(\\S*)(\\d*) tests received");
         Pattern mutationUnitsPattern = Pattern.compile("(\\S*)(\\d*) mutation test units");
         Pattern executionTimePattern = Pattern.compile("(\\S*) Completed in (\\d*) seconds");
         Pattern mutationScorePattern = Pattern.compile("(\\S*) Generated (\\d*) mutations Killed (\\d*) \\((\\d*)%\\)");
 
-        PITExecutionOutputParser(InputStream inputStream) {
-            this.inputStream = inputStream;
-        }
-
         @Override
-        public MutationExecutionResult call() {
-            MutationExecutionResult mutationExecutionResult = new MutationExecutionResult();
-            try{
-                parsePitExecutionOutput(mutationExecutionResult);
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+        public void consumeLine(String line) {
+
+            Matcher receivedTestsMatcher = receivedTestsPattern.matcher(line);
+            Matcher mutationUnitsMatcher = mutationUnitsPattern.matcher(line);
+            Matcher executionTimeMatcher = executionTimePattern.matcher(line);
+            Matcher mutationScoreMatcher = mutationScorePattern.matcher(line);
+
+            if(receivedTestsMatcher.find()) {
+                mutationExecutionResult.setNumTests(Integer.parseInt(receivedTestsMatcher.group(1)));
             }
-            return mutationExecutionResult;
+
+            if(mutationUnitsMatcher.find()) {
+                mutationExecutionResult.setNumMutationUnits(Integer.parseInt(mutationUnitsMatcher.group(1)));
+            }
+
+            if(executionTimeMatcher.find()) {
+                mutationExecutionResult.setExecutionTime(Integer.parseInt(executionTimeMatcher.group(2)));
+            }
+
+            if(mutationScoreMatcher.find()) {
+                mutationExecutionResult.setGeneratedMutations(Integer.parseInt(mutationScoreMatcher.group(2)));
+                mutationExecutionResult.setKilledMutations(Integer.parseInt(mutationScoreMatcher.group(3)));
+                mutationExecutionResult.setMutationScore(Integer.parseInt(mutationScoreMatcher.group(4)));
+            }
         }
 
-        private void parsePitExecutionOutput(MutationExecutionResult mutationExecutionResult)
-                throws UnsupportedEncodingException {
-            new BufferedReader(new InputStreamReader(inputStream , "UTF-8")).lines()
-                    .forEach(pitOutputLine -> {
-                        Matcher receivedTestsMatcher = receivedTestsPattern.matcher(pitOutputLine);
-                        Matcher mutationUnitsMatcher = mutationUnitsPattern.matcher(pitOutputLine);
-                        Matcher executionTimeMatcher = executionTimePattern.matcher(pitOutputLine);
-                        Matcher mutationScoreMatcher = mutationScorePattern.matcher(pitOutputLine);
-
-                        //logger.debug(pitOutputLine);
-
-                        if(receivedTestsMatcher.find()) {
-                            mutationExecutionResult.setNumTests(Integer.parseInt(receivedTestsMatcher.group(1)));
-                        }
-
-                        if(mutationUnitsMatcher.find()) {
-                            mutationExecutionResult
-                                    .setNumMutationUnits(Integer.parseInt(mutationUnitsMatcher.group(1)));
-                        }
-
-                        if(executionTimeMatcher.find()) {
-                            mutationExecutionResult.setExecutionTime(Integer.parseInt(executionTimeMatcher.group(2)));
-                        }
-
-                        if(mutationScoreMatcher.find()) {
-                            mutationExecutionResult
-                                    .setGeneratedMutations(Integer.parseInt(mutationScoreMatcher.group(2)));
-                            mutationExecutionResult.setKilledMutations(Integer.parseInt(mutationScoreMatcher.group(3)));
-                            mutationExecutionResult.setMutationScore(Integer.parseInt(mutationScoreMatcher.group(4)));
-                        }
-                    });
+        public MutationExecutionResult getMutationExecutionResult() {
+            return mutationExecutionResult;
         }
     }
 }

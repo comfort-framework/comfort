@@ -19,6 +19,7 @@ package de.ugoe.cs.comfort.database.models;
 import com.google.common.base.MoreObjects;
 import de.ugoe.cs.comfort.filer.models.Result;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -50,7 +51,7 @@ public class TestState {
     private Map<String, String> metrics = new HashMap<>();
 
     @Embedded("mutation_res")
-    private Set<MutationResult> mutationResults = null;
+    private Set<MutationResult> mutationResults = new HashSet<>();
 
     public TestState() {}
 

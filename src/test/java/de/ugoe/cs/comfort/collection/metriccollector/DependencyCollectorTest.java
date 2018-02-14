@@ -20,10 +20,12 @@ import static org.junit.Assert.assertEquals;
 
 import de.ugoe.cs.comfort.BaseTest;
 import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
+import de.ugoe.cs.comfort.data.CoverageData;
 import de.ugoe.cs.comfort.data.graphs.CallEdge;
 import de.ugoe.cs.comfort.data.graphs.CallGraph;
 import de.ugoe.cs.comfort.data.graphs.CallType;
 import de.ugoe.cs.comfort.data.graphs.DependencyGraph;
+import de.ugoe.cs.comfort.data.models.IUnit;
 import de.ugoe.cs.comfort.filer.models.Result;
 import java.util.HashSet;
 import java.util.Set;
@@ -111,7 +113,7 @@ public class DependencyCollectorTest extends BaseTest {
     }
 
     @Test
-    public void getMaximumDepthForJavaOnMethodLevelTest() {
+    public void getDependencyForJavaOnMethodLevelTest() {
         javaConfig.setMethodLevel(true);
         dependencyCollector = new DependencyCollector(javaConfig);
         result = dependencyCollector.getNumberOfDependentUnitsForMethod(javaCallGraph);
@@ -124,13 +126,38 @@ public class DependencyCollectorTest extends BaseTest {
     }
 
     @Test
-    public void getMaximumDepthForJavaOnClassLevelTest() {
+    public void getDependencyForJavaOnClassLevelTest() {
         dependencyCollector = new DependencyCollector(javaConfig);
         result = dependencyCollector.getNumberOfDependentUnitsForClass(javaDependencyGraph);
 
         expectedResult.add(new Result("org.foo.Test1", null, "call_dep","3"));
         expectedResult.add(new Result("org.foo.Test2", null, "call_dep","3"));
         expectedResult.add(new Result("org.foo.Test3", null, "call_dep","4"));
+
+        assertEquals(expectedResult, result);
+    }
+
+    @Test
+    public void getDependencyForJavaUsingCoverageData() {
+        javaConfig.setMethodLevel(true);
+        Set<IUnit> testedMethodsOfTest1 = new HashSet<>();
+        testedMethodsOfTest1.add(covP1C1M1);
+
+        Set<IUnit> testedMethodsOfTest2 = new HashSet<>();
+        testedMethodsOfTest2.add(covP1C1M1);
+        testedMethodsOfTest2.add(covP1C2M1);
+
+        CoverageData covData = new CoverageData();
+        covData.add(T1M1, testedMethodsOfTest1);
+        covData.add(T2M1, testedMethodsOfTest2);
+        covData.add(T1Test1, new HashSet<>());
+
+        dependencyCollector = new DependencyCollector(javaConfig);
+        result = dependencyCollector.getNumberOfDependentUnitsForCoverageData(covData);
+
+        expectedResult.add(new Result("org.foo.t1.Test1.m1", null, "cov_dep", "1"));
+        expectedResult.add(new Result("org.foo.t2.Test2.m1", null, "cov_dep", "2"));
+        expectedResult.add(new Result("org.foo.t1.Test1.test1", null, "cov_dep", "0"));
 
         assertEquals(expectedResult, result);
     }

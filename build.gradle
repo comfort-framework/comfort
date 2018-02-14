@@ -56,6 +56,7 @@ dependencies {
     compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '4.10.0.201712302008-r'
     compile group: 'de.ugoe.cs', name: 'jSHARK', version: '1.0-SNAPSHOT'
     compile group: 'de.ugoe.cs', name: 'BugFixClassifier', version: '1.0-SNAPSHOT'
+    compile group: 'org.apache.maven.shared', name: 'maven-invoker', version: '3.0.0'
 }
 
 shadowJar {

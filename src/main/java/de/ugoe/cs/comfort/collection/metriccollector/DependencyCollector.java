@@ -21,6 +21,7 @@ import de.ugoe.cs.comfort.annotations.SupportsJava;
 import de.ugoe.cs.comfort.annotations.SupportsMethod;
 import de.ugoe.cs.comfort.annotations.SupportsPython;
 import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
+import de.ugoe.cs.comfort.data.CoverageData;
 import de.ugoe.cs.comfort.data.graphs.CallGraph;
 import de.ugoe.cs.comfort.data.graphs.DependencyGraph;
 import de.ugoe.cs.comfort.data.models.IUnit;
@@ -43,7 +44,7 @@ public class DependencyCollector extends BaseMetricCollector {
     public Set<Result> getNumberOfDependentUnitsForMethod(CallGraph callGraph) {
         Map<IUnit, Set<IUnit>> callerCalleePairs = TestTypeDetectionUtils
                 .getCallPairsOnClassLevel(callGraph);
-        return generateResults(callerCalleePairs);
+        return generateResults(callerCalleePairs, "call_dep");
     }
 
     @SupportsJava
@@ -52,10 +53,17 @@ public class DependencyCollector extends BaseMetricCollector {
     public Set<Result> getNumberOfDependentUnitsForClass(DependencyGraph dependencyGraph) {
         Map<IUnit, Set<IUnit>> callerCalleePairs = TestTypeDetectionUtils
                 .getCallPairsOnClassLevel(dependencyGraph);
-        return generateResults(callerCalleePairs);
+        return generateResults(callerCalleePairs, "call_dep");
     }
 
-    private Set<Result> generateResults(Map<IUnit, Set<IUnit>> callerCalleePairs) {
+    @SupportsJava
+    @SupportsPython
+    @SupportsMethod
+    public Set<Result> getNumberOfDependentUnitsForCoverageData(CoverageData data) {
+        return generateResults(data.getCoverageData(), "cov_dep");
+    }
+
+    private Set<Result> generateResults(Map<IUnit, Set<IUnit>> callerCalleePairs, String metricName) {
         Set<Result> results = new HashSet<>();
         for(Map.Entry<IUnit, Set<IUnit>> entry: callerCalleePairs.entrySet()) {
             Set<String> units = new HashSet<>();
@@ -66,7 +74,7 @@ public class DependencyCollector extends BaseMetricCollector {
             });
             logger.debug("Dependency of {} is: {}", entry.getKey(), entry.getValue().size());
             results.add(new Result(entry.getKey().getFQN(), entry.getKey().getFilePath(),
-                    "call_dep", String.valueOf(units.size())));
+                    metricName, String.valueOf(units.size())));
         }
         return results;
     }

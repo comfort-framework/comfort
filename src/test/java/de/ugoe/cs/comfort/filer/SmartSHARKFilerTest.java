@@ -158,7 +158,6 @@ public class SmartSHARKFilerTest extends DatabaseTest {
         res1State.setMetrics(new HashMap<String, String>(){{
             put("istqb_call", TestType.UNIT.name());
         }});
-        res1State.setMutations(null);
         expectedStates.add(res1State);
 
         TestState res2State = new TestState();
@@ -169,7 +168,6 @@ public class SmartSHARKFilerTest extends DatabaseTest {
         res2State.setMetrics(new HashMap<String, String>(){{
             put("istqb_call", TestType.INTEGRATION.name());
         }});
-        res2State.setMutations(null);
         expectedStates.add(res2State);
 
         assertEquals(expectedStates, testStates);

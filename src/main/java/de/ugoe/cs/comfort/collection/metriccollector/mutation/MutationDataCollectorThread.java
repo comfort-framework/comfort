@@ -25,33 +25,30 @@ import de.ugoe.cs.comfort.filer.models.Mutation;
 import de.ugoe.cs.comfort.filer.models.Result;
 import java.io.IOException;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
  * @author Fabian Trautsch
  */
-public class MutationDataCollectorThread implements Runnable {
-    private final String threadName = Thread.currentThread().getName();
-    private final Logger logger = LogManager.getLogger(this.getClass().getName());
-
+public class MutationDataCollectorThread implements Callable<Result> {
     private IUnit unit;
     private GeneralConfiguration generalConf;
     private FileNameUtils fileNameUtils;
-    private Set<Result> results;
+    private Logger logger = LogManager.getLogger(this.getClass().getName());
+    private String threadName = Thread.currentThread().getName();
 
-
-
-    public MutationDataCollectorThread(IUnit unit, GeneralConfiguration generalConf, FileNameUtils fileNameUtils,
-                                       Set<Result> results) {
+    public MutationDataCollectorThread(IUnit unit, GeneralConfiguration generalConfiguration,
+                                       FileNameUtils fileNameUtils) {
         this.unit = unit;
-        this.generalConf = generalConf;
+        this.generalConf = generalConfiguration;
         this.fileNameUtils = fileNameUtils;
-        this.results = results;
     }
 
     @Override
-    public void run() {
+    public Result call() {
         String className = unit.getFQNOfUnit();
         String[] parts = unit.getFQN().split("\\.");
         String methodName = parts[parts.length-1];
@@ -63,6 +60,7 @@ public class MutationDataCollectorThread implements Runnable {
 
             // Choose correct mutation executor
             IMutationExecutor mutationExecutor = new PITExecutor();
+
 
             // Execute mutation executor -> do mutation testing for className.methodName
             MutationExecutionResult mutationExecutionResult = mutationExecutor.execute(
@@ -80,12 +78,14 @@ public class MutationDataCollectorThread implements Runnable {
             result.addMetric("mut_killMut", String.valueOf(mutationExecutionResult.getKilledMutations()));
             result.addMetric("mut_scoreMut", String.valueOf(mutationExecutionResult.getMutationScore()));
 
-            results.add(result);
+            return result;
         } catch (IOException e) {
             // If not successful, print error but it is not necessary to cancel here
             logger.warn("Error \"{}\" for executing mutation testing for test {}", e.getMessage(),
                     unit.getFQN());
         }
+        return null;
+
     }
 
 
