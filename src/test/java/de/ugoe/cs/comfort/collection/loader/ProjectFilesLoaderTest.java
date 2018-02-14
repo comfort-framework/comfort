@@ -96,6 +96,7 @@ public class ProjectFilesLoaderTest extends BaseTest{
             expected_code_files.add(Paths.get("src/test/java/org/foo/view/blatestbla.java"));
             expected_code_files.add(Paths.get("src/test/java/unit/fooTest.java"));
             expected_code_files.add(Paths.get("src/test/java/integration/blubTest.java"));
+            expected_code_files.add(Paths.get("src/test/java/org/foo/FooIT.java"));
 
             assertEquals("Not all/too less code files detected", expected_code_files.size(), projectFiles.getCodeFilesWithoutProjectDir().size());
             assertEquals("Code files not correctly detected", expected_code_files, projectFiles.getCodeFilesWithoutProjectDir());

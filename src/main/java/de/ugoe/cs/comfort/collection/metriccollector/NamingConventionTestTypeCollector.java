@@ -19,10 +19,17 @@ package de.ugoe.cs.comfort.collection.metriccollector;
 import com.google.common.io.Files;
 import de.ugoe.cs.comfort.annotations.SupportsClass;
 import de.ugoe.cs.comfort.annotations.SupportsJava;
+import de.ugoe.cs.comfort.annotations.SupportsMethod;
 import de.ugoe.cs.comfort.annotations.SupportsPython;
+import de.ugoe.cs.comfort.collection.loader.ProjectFilesLoader;
 import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
+import de.ugoe.cs.comfort.data.CoverageData;
 import de.ugoe.cs.comfort.data.ProjectFiles;
+import de.ugoe.cs.comfort.data.models.IUnit;
+import de.ugoe.cs.comfort.exception.LoaderException;
 import de.ugoe.cs.comfort.filer.models.Result;
+import de.ugoe.cs.smartshark.model.Project;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +37,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -57,22 +65,49 @@ public class NamingConventionTestTypeCollector extends BaseMetricCollector {
         // Create filer map
         Set<Result> result = new HashSet<>();
         for(Path testFile: projectFiles.getTestFiles()) {
-            result.add(classifyTestFile(testFile, codeFileNamesWithoutTests));
+            result.add(classifyTestFile(testFile.toString(), testFile, codeFileNamesWithoutTests, "files_nc"));
         }
 
         logger.debug("Got the following classification results: {}", result);
         return result;
     }
 
-    private Result classifyTestFile(Path testFile, List<String> codeFileNamesWithoutTests) {
-        Result result = new Result(testFile.toString(), testFile);
+    @SupportsPython
+    @SupportsJava
+    @SupportsMethod
+    public Set<Result> createResults(CoverageData coverageData) {
+        try {
+            // Create filer map
+            Set<Result> result = new HashSet<>();
+            for(Map.Entry<IUnit, Set<IUnit>> unit: coverageData.getCoverageData().entrySet()) {
+                List<String> coveredUnits = new ArrayList<>();
+                for(IUnit coveredUnit: unit.getValue()) {
+                    String[] fqnParts = coveredUnit.getFQNOfUnit().split("\\.");
+                    String className = fqnParts[fqnParts.length-1];
+                    coveredUnits.add(className.toLowerCase());
+                }
+                Path testPath = fileNameUtils.getPathForIdentifier(unit.getKey().getFQN(),
+                        generalConf.getMethodLevel());
+                result.add(classifyTestFile(unit.getKey().getFQN(), testPath, coveredUnits, "cov_nc"));
+            }
+
+            logger.debug("Got the following classification results: {}", result);
+            return result;
+        } catch (IOException e) {
+            logger.catching(e);
+            return null;
+        }
+    }
+
+    private Result classifyTestFile(String id, Path testFile, List<String> codeFileNamesWithoutTests, String metric) {
+        Result result = new Result(id, testFile);
         if(isIntegrationTest(testFile)) {
-            result.addMetric("files_nc", TestType.INTEGRATION.name());
+            result.addMetric(metric, TestType.INTEGRATION.name());
         } else if(isUnitTest(testFile, codeFileNamesWithoutTests)) {
-            result.addMetric("files_nc", TestType.UNIT.name());
+            result.addMetric(metric, TestType.UNIT.name());
         } else {
             logger.warn("Could not classify {}.", testFile);
-            result.addMetric("files_nc", TestType.UNKNOWN.name());
+            result.addMetric(metric, TestType.UNKNOWN.name());
         }
 
         return result;

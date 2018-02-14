@@ -20,7 +20,10 @@ import static org.junit.Assert.assertEquals;
 
 import de.ugoe.cs.comfort.BaseTest;
 import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
+import de.ugoe.cs.comfort.data.CoverageData;
 import de.ugoe.cs.comfort.data.ProjectFiles;
+import de.ugoe.cs.comfort.data.models.IUnit;
+import de.ugoe.cs.comfort.data.models.JavaMethod;
 import de.ugoe.cs.comfort.filer.models.Result;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -33,6 +36,8 @@ import org.junit.Test;
  * @author Fabian Trautsch
  */
 public class NamingConventionTestTypeCollectorTest extends BaseTest{
+    private final String basePath = getPathToResource("metricCollectorTestData/numassertcollector");
+
     private GeneralConfiguration configuration = new GeneralConfiguration();
 
     @Before
@@ -126,6 +131,46 @@ public class NamingConventionTestTypeCollectorTest extends BaseTest{
         Set<Result> result = nc.createResults(projectFiles);
 
         assertEquals("size do not match", expectedResult.size(), result.size());
+        assertEquals("wrong classification", expectedResult, result);
+    }
+
+    @Test
+    public void classificationWithCoverageDataJavaTest() {
+        configuration.setProjectDir(getPathToResource("loaderTestData/projectfiles/javaproject"));
+        configuration.setMethodLevel(true);
+
+
+        CoverageData covData = new CoverageData();
+        covData.add(personTestInit, new HashSet<IUnit>() {{ add(personInit);}});
+        covData.add(personTestm2, new HashSet<IUnit>() {{ add(personInit); add(entryViewInit);}});
+        covData.add(blubTestInit, new HashSet<IUnit>());
+        covData.add(testEntryViewInit, new HashSet<IUnit>() {{ add(entryViewInit); add(fooIT);}});
+        covData.add(blatestblaInit, new HashSet<>());
+        covData.add(fooIT, new HashSet<>());
+        covData.add(fooIT2, new HashSet<>());
+        covData.add(fooTestInit, new HashSet<>());
+
+        NamingConventionTestTypeCollector nc = new NamingConventionTestTypeCollector(configuration);
+        Set<Result> result = nc.createResults(covData);
+
+        Set<Result> expectedResult = new HashSet<>();
+        expectedResult.add(new Result("org.foo.models.Persontest.<init>",
+                Paths.get("src/test/java/org/foo/models/Persontest.java"), "cov_nc", TestType.UNIT.name()));
+        expectedResult.add(new Result("org.foo.models.Persontest.m2",
+                Paths.get("src/test/java/org/foo/models/Persontest.java"), "cov_nc", TestType.UNIT.name()));
+        expectedResult.add(new Result("integration.blubTest.<init>",
+                Paths.get("src/test/java/integration/blubTest.java"), "cov_nc", TestType.INTEGRATION.name()));
+        expectedResult.add(new Result("org.foo.view.TestEntryView.<init>",
+                Paths.get("src/test/java/org/foo/view/TestEntryView.java"), "cov_nc", TestType.UNIT.name()));
+        expectedResult.add(new Result("org.foo.view.blatestbla.<init>",
+                Paths.get("src/test/java/org/foo/view/blatestbla.java"), "cov_nc", TestType.UNKNOWN.name()));
+        expectedResult.add(new Result("org.foo.FooIT.<init>",
+                Paths.get("src/test/java/org/foo/FooIT.java"), "cov_nc", TestType.INTEGRATION.name()));
+        expectedResult.add(new Result("org.foo.FooIT.m2",
+                Paths.get("src/test/java/org/foo/FooIT.java"), "cov_nc", TestType.INTEGRATION.name()));
+        expectedResult.add(new Result("unit.fooTest.<init>",
+                Paths.get("src/test/java/unit/fooTest.java"), "cov_nc", TestType.UNIT.name()));
+
         assertEquals("wrong classification", expectedResult, result);
     }
 }

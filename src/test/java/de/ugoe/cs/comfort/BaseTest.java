@@ -109,10 +109,13 @@ public class BaseTest {
     protected  JavaMethod addressTestGetAddressTest = new JavaMethod("org.foo.models", "AddressTest", "getAddressTest", new ArrayList<>(), Paths.get("src/test/java/org/foo/models/AddressTest.java"));
     protected   JavaMethod addressTestGetAddressTest2 = new JavaMethod("org.foo.models", "AddressTest", "getAddressTest2", new ArrayList<>(), Paths.get("src/test/java/org/foo/models/AddressTest.java"));
     protected   JavaMethod personTestInit = new JavaMethod("org.foo.models", "Persontest", "<init>", new ArrayList<>(), Paths.get("src/test/java/org/foo/models/Persontest.java"));
+    protected   JavaMethod personTestm2 = new JavaMethod("org.foo.models", "Persontest", "m2", new ArrayList<>(), Paths.get("src/test/java/org/foo/models/Persontest.java"));
     protected   JavaMethod blatestblaInit = new JavaMethod("org.foo.view", "blatestbla", "<init>", new ArrayList<>(), Paths.get("src/test/java/org/foo/view/blatestbla.java"));
     protected   JavaMethod testEntryViewInit = new JavaMethod("org.foo.view", "TestEntryView", "<init>", new ArrayList<>(), Paths.get("src/test/java/org/foo/view/TestEntryView.java"));
     protected   JavaMethod fooTestInit = new JavaMethod("unit", "fooTest", "<init>", new ArrayList<>(), Paths.get("src/test/java/unit/fooTest.java"));
     protected   JavaMethod javaLangObjectInit = new JavaMethod("java.lang", "Object", "<init>", new ArrayList<>(), null);
+    protected   JavaMethod fooIT = new JavaMethod("org.foo", "FooIT", "<init>", new ArrayList<>(), Paths.get("src/test/java/org/foo/FooIT.java"));
+    protected   JavaMethod fooIT2 = new JavaMethod("org.foo", "FooIT", "m2", new ArrayList<>(), Paths.get("src/test/java/org/foo/FooIT.java"));
     protected   JavaMethod javaLangIntegerValueOf = new JavaMethod("java.lang", "Integer", "valueOf", new ArrayList<String>() {{
         add("int");
     }}, null);
