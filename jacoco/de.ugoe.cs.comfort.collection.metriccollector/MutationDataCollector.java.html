@@ -23,9 +23,13 @@ import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
 import de.ugoe.cs.comfort.data.CoverageData;
 import de.ugoe.cs.comfort.data.models.IUnit;
 import de.ugoe.cs.comfort.filer.models.Result;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletionService;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -34,29 +38,34 @@ import java.util.concurrent.TimeUnit;
  * @author Fabian Trautsch
  */
 public class MutationDataCollector extends BaseMetricCollector {
-<span class="fc" id="L37">    private Set&lt;Result&gt; results = ConcurrentHashMap.newKeySet();</span>
+<span class="fc" id="L41">    private Set&lt;Result&gt; results = new HashSet&lt;&gt;();</span>
 
     public MutationDataCollector(GeneralConfiguration configuration) {
-<span class="fc" id="L40">        super(configuration);</span>
-<span class="fc" id="L41">    }</span>
+<span class="fc" id="L44">        super(configuration);</span>
+<span class="fc" id="L45">    }</span>
 
     @SupportsMethod
     @SupportsJava
     public Set&lt;Result&gt; getMutationDataMetrics(CoverageData data) {
 
-<span class="fc" id="L47">        ExecutorService executor = Executors.newFixedThreadPool(generalConf.getNThreads());</span>
+<span class="fc" id="L51">        final ExecutorService executor = Executors.newFixedThreadPool(generalConf.getNThreads());</span>
+<span class="fc" id="L52">        CompletionService&lt;Result&gt; pool = new ExecutorCompletionService&lt;&gt;(executor);</span>
 
-<span class="fc bfc" id="L49" title="All 2 branches covered.">        for (Map.Entry&lt;IUnit, Set&lt;IUnit&gt;&gt; entry : data.getCoverageData().entrySet()) {</span>
-<span class="fc" id="L50">            executor.submit(new MutationDataCollectorThread(entry.getKey(), generalConf, fileNameUtils, results));</span>
-<span class="fc" id="L51">        }</span>
 
-<span class="fc" id="L53">        executor.shutdown();</span>
-        try {
-<span class="fc" id="L55">            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);</span>
-<span class="nc" id="L56">        } catch (InterruptedException e) {</span>
-<span class="nc" id="L57">            logger.catching(e);</span>
-<span class="fc" id="L58">        }</span>
-<span class="fc" id="L59">        return results;</span>
+<span class="fc bfc" id="L55" title="All 2 branches covered.">        for (Map.Entry&lt;IUnit, Set&lt;IUnit&gt;&gt; entry : data.getCoverageData().entrySet()) {</span>
+<span class="fc" id="L56">            pool.submit(new MutationDataCollectorThread(entry.getKey(), generalConf, fileNameUtils));</span>
+<span class="fc" id="L57">        }</span>
+
+<span class="fc bfc" id="L59" title="All 2 branches covered.">        for (int i=0; i&lt;data.getCoverageData().size(); i++) {</span>
+            try {
+<span class="fc" id="L61">                Result result = pool.take().get();</span>
+<span class="fc" id="L62">                results.add(result);</span>
+<span class="nc" id="L63">            } catch (InterruptedException | ExecutionException e) {</span>
+<span class="nc" id="L64">                logger.catching(e);</span>
+<span class="fc" id="L65">            }</span>
+        }
+<span class="fc" id="L67">        executor.shutdown();</span>
+<span class="fc" id="L68">        return results;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

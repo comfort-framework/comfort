@@ -39,13 +39,13 @@ import org.apache.logging.log4j.Logger;
 
     public static Boolean isTestBasedOnName(String nameOfFile) {
 <span class="fc" id="L41">        String lowerCaseName = nameOfFile.toLowerCase();</span>
-<span class="fc" id="L42">        return lowerCaseName.contains(&quot;test&quot;);</span>
+<span class="pc bpc" id="L42" title="1 of 4 branches missed.">        return lowerCaseName.contains(&quot;test&quot;) || lowerCaseName.contains(&quot;validate&quot;);</span>
 
     }
 
     public static Boolean isTestBasedOnFQN(String fullyQualifiedName) {
 <span class="fc" id="L47">        String lowerCaseName = fullyQualifiedName.substring(fullyQualifiedName.lastIndexOf('.') + 1).toLowerCase();</span>
-<span class="fc" id="L48">        return lowerCaseName.contains(&quot;test&quot;);</span>
+<span class="pc bpc" id="L48" title="1 of 4 branches missed.">        return lowerCaseName.contains(&quot;test&quot;) || lowerCaseName.contains(&quot;validate&quot;);</span>
     }
 
     public static String getPackageName(String fullyQualifiedName) {

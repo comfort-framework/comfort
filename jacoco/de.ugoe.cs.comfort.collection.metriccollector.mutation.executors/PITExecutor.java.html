@@ -31,6 +31,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -46,186 +47,170 @@ import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.lookup.StrSubstitutor;
+import org.apache.maven.shared.invoker.DefaultInvocationRequest;
+import org.apache.maven.shared.invoker.DefaultInvoker;
+import org.apache.maven.shared.invoker.InvocationOutputHandler;
+import org.apache.maven.shared.invoker.InvocationRequest;
+import org.apache.maven.shared.invoker.InvocationResult;
+import org.apache.maven.shared.invoker.Invoker;
+import org.apache.maven.shared.invoker.MavenInvocationException;
 
 /**
  * @author Fabian Trautsch
  */
-<span class="fc" id="L53">public class PITExecutor implements IMutationExecutor {</span>
-<span class="fc" id="L54">    private final Logger logger = LogManager.getLogger(this.getClass().getName());</span>
+<span class="fc" id="L61">public class PITExecutor implements IMutationExecutor {</span>
+<span class="fc" id="L62">    private final Logger logger = LogManager.getLogger(this.getClass().getName());</span>
 
     private Path pitReportFolder;
 
     private void createNewPom(Path projectRoot, Path newPom, String className, String methodName) throws IOException {
-<span class="fc" id="L59">        Path template = Paths.get(projectRoot.toString(), &quot;pom_template.xml&quot;);</span>
-<span class="fc" id="L60">        pitReportFolder = Files.createTempDirectory(&quot;comfort-&quot;);</span>
+<span class="fc" id="L67">        Path template = Paths.get(projectRoot.toString(), &quot;pom_template.xml&quot;);</span>
+<span class="fc" id="L68">        pitReportFolder = Files.createTempDirectory(&quot;comfort-&quot;);</span>
 
         // Read template
-<span class="fc" id="L63">        String content = new String(Files.readAllBytes(template), StandardCharsets.UTF_8);</span>
+<span class="fc" id="L71">        String content = new String(Files.readAllBytes(template), StandardCharsets.UTF_8);</span>
 
         // Substitute placeholder with the correct test name that should be tested
-<span class="fc" id="L66">        Map&lt;String, String&gt; valuesMap = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L67">        valuesMap.put(&quot;pitclass&quot;, className);</span>
-<span class="fc" id="L68">        valuesMap.put(&quot;pitmethod&quot;, methodName);</span>
-<span class="fc" id="L69">        valuesMap.put(&quot;pitreport&quot;, pitReportFolder.toString());</span>
+<span class="fc" id="L74">        Map&lt;String, String&gt; valuesMap = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L75">        valuesMap.put(&quot;pitclass&quot;, className);</span>
+<span class="fc" id="L76">        valuesMap.put(&quot;pitmethod&quot;, methodName);</span>
+<span class="fc" id="L77">        valuesMap.put(&quot;pitreport&quot;, pitReportFolder.toString());</span>
 
-<span class="fc" id="L71">        StrSubstitutor sub = new StrSubstitutor(valuesMap);</span>
-<span class="fc" id="L72">        String resolvedString = sub.replace(content);</span>
+<span class="fc" id="L79">        StrSubstitutor sub = new StrSubstitutor(valuesMap);</span>
+<span class="fc" id="L80">        String resolvedString = sub.replace(content);</span>
 
         // Store as pom.xml
-<span class="fc" id="L75">        Files.write(newPom, resolvedString.getBytes(&quot;UTF-8&quot;));</span>
-<span class="fc" id="L76">    }</span>
+<span class="fc" id="L83">        Files.write(newPom, resolvedString.getBytes(&quot;UTF-8&quot;));</span>
+<span class="fc" id="L84">    }</span>
 
     @Override
     public MutationExecutionResult execute(Path projectRoot, String className, String methodName) throws IOException {
-        // Create newPOMFile
-<span class="fc" id="L81">        Path newPomFile = File.createTempFile(&quot;comfort-&quot;, &quot;.xml&quot;, projectRoot.toFile()).toPath();</span>
-
-        // Create new pom with corresponding values
-<span class="fc" id="L84">        createNewPom(projectRoot, newPomFile, className, methodName);</span>
-
-<span class="fc" id="L86">        logger.info(&quot;Executing Pitest...&quot;);</span>
-
-        // monkeypatching for mybatis-3
-<span class="pc bpc" id="L89" title="1 of 2 branches missed.">        if(Files.exists(Paths.get(projectRoot.toString(), &quot;ibderby&quot;))) {</span>
-<span class="nc" id="L90">            FileUtils.forceDelete(Paths.get(projectRoot.toString(), &quot;ibderby&quot;).toFile()); //delete directory</span>
-        }
-
-<span class="fc" id="L93">        ProcessBuilder builder = new ProcessBuilder(&quot;mvn&quot;, &quot;-f&quot;,</span>
-<span class="fc" id="L94">                newPomFile.toString(), &quot;org.pitest:pitest-maven:mutationCoverage&quot;);</span>
-<span class="fc" id="L95">        builder.redirectErrorStream(true);</span>
-<span class="fc" id="L96">        builder.directory(new File(projectRoot.toString()));</span>
-
-        int exitCode;
-        Future&lt;MutationExecutionResult&gt; future;
-<span class="fc" id="L100">        ExecutorService executor = Executors.newSingleThreadExecutor();</span>
         try {
-<span class="fc" id="L102">            Process piTest = builder.start();</span>
-<span class="fc" id="L103">            PITExecutionOutputParser outputParser =</span>
-<span class="fc" id="L104">                    new PITExecutionOutputParser(piTest.getInputStream());</span>
-<span class="fc" id="L105">            future = executor.submit(outputParser);</span>
-<span class="fc" id="L106">            logger.debug(&quot;Waiting to finish...&quot;);</span>
-<span class="fc" id="L107">            exitCode = piTest.waitFor();</span>
-<span class="fc" id="L108">            logger.debug(&quot;Finished!&quot;);</span>
-<span class="nc" id="L109">        } catch (IOException | InterruptedException e) {</span>
-<span class="nc" id="L110">            throw new IOException(&quot;Problem with execution!&quot;);</span>
-<span class="fc" id="L111">        }</span>
+            // Create newPOMFile
+<span class="fc" id="L90">            Path newPomFile = File.createTempFile(&quot;comfort-&quot;, &quot;.xml&quot;, projectRoot.toFile()).toPath();</span>
 
-        // Check if it returned successfully
-<span class="pc bpc" id="L114" title="1 of 2 branches missed.">        if (exitCode != 0) {</span>
-<span class="nc" id="L115">            throw new IOException(&quot;Error in executing loader: Program did not terminate with code 0&quot;);</span>
+            // Create new pom with corresponding values
+<span class="fc" id="L93">            createNewPom(projectRoot, newPomFile, className, methodName);</span>
+
+<span class="fc" id="L95">            logger.info(&quot;Executing Pitest...&quot;);</span>
+
+            // monkeypatching for mybatis-3
+<span class="pc bpc" id="L98" title="1 of 2 branches missed.">            if (Files.exists(Paths.get(projectRoot.toString(), &quot;ibderby&quot;))) {</span>
+<span class="nc" id="L99">                FileUtils.forceDelete(Paths.get(projectRoot.toString(), &quot;ibderby&quot;).toFile()); //delete directory</span>
+            }
+
+            // Create request -&gt; pitest execute
+<span class="fc" id="L103">            InvocationRequest request = new DefaultInvocationRequest();</span>
+<span class="fc" id="L104">            request.setPomFile(newPomFile.toFile());</span>
+<span class="fc" id="L105">            request.setGoals(Collections.singletonList(&quot;org.pitest:pitest-maven:mutationCoverage&quot;));</span>
+
+            // Create new invoker and set attributes + outputparser
+<span class="fc" id="L108">            PITExecutionOutputParser outputParser = new PITExecutionOutputParser();</span>
+<span class="fc" id="L109">            Invoker invoker = new DefaultInvoker();</span>
+<span class="fc" id="L110">            invoker.setOutputHandler(outputParser);</span>
+<span class="fc" id="L111">            invoker.setErrorHandler(outputParser);</span>
+
+            // Invoke
+<span class="fc" id="L114">            InvocationResult result = invoker.execute(request);</span>
+<span class="fc" id="L115">            Files.delete(newPomFile);</span>
+
+            // Check if it returned successfully
+<span class="pc bpc" id="L118" title="1 of 2 branches missed.">            if (result.getExitCode() != 0) {</span>
+<span class="nc" id="L119">                throw new IOException(&quot;Error in executing loader: Program did not terminate with code 0&quot;);</span>
+            }
+
+
+<span class="fc" id="L123">            MutationExecutionResult mutationExecutionResult = outputParser.getMutationExecutionResult();</span>
+
+
+<span class="pc bpc" id="L126" title="1 of 2 branches missed.">            if (mutationExecutionResult.getNumTests() != 1) {</span>
+<span class="nc" id="L127">                throw new IOException(&quot;Not only one test found by pit!&quot;);</span>
+            }
+
+<span class="pc bpc" id="L130" title="1 of 2 branches missed.">            if (mutationExecutionResult.getNumMutationUnits() &lt; 1) {</span>
+<span class="nc" id="L131">                throw new IOException(&quot;No mutation units generated!&quot;);</span>
+            }
+
+<span class="fc" id="L134">            logger.debug(&quot;Mutation Execution result: {}&quot;, mutationExecutionResult);</span>
+<span class="fc" id="L135">            return mutationExecutionResult;</span>
+<span class="nc" id="L136">        } catch (MavenInvocationException e) {</span>
+<span class="nc" id="L137">            throw new IOException(&quot;Maven execution not successful!&quot;);</span>
         }
-
-        MutationExecutionResult mutationExecutionResult;
-        try {
-<span class="fc" id="L120">            mutationExecutionResult = future.get();</span>
-<span class="nc" id="L121">        } catch (InterruptedException | ExecutionException e) {</span>
-<span class="nc" id="L122">            throw new IOException(&quot;Error in parsing results!&quot;);</span>
-<span class="fc" id="L123">        }</span>
-<span class="fc" id="L124">        logger.info(&quot;Execution successful...&quot;);</span>
-
-<span class="pc bpc" id="L126" title="1 of 2 branches missed.">        if(mutationExecutionResult.getNumTests() != 1) {</span>
-<span class="nc" id="L127">            throw new IOException(&quot;Not only one test found by pit!&quot;);</span>
-        }
-
-<span class="pc bpc" id="L130" title="1 of 2 branches missed.">        if(mutationExecutionResult.getNumMutationUnits() &lt; 1) {</span>
-<span class="nc" id="L131">            throw new IOException(&quot;No mutation units generated!&quot;);</span>
-        }
-
-<span class="fc" id="L134">        logger.debug(&quot;Mutation Execution result: {}&quot;, mutationExecutionResult);</span>
-
-<span class="fc" id="L136">        return mutationExecutionResult;</span>
     }
 
     @Override
     public Set&lt;Mutation&gt; getDetailedResults(Path projectRoot) throws IOException {
         String line;
-<span class="fc" id="L142">        Set&lt;Mutation&gt; mutationResults = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L144">        Set&lt;Mutation&gt; mutationResults = new HashSet&lt;&gt;();</span>
 
         // Read out pitest results
-<span class="fc" id="L145">        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(</span>
-<span class="fc" id="L146">                Paths.get(pitReportFolder.toString(), &quot;mutations.csv&quot;).toFile()),</span>
+<span class="fc" id="L147">        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(</span>
+<span class="fc" id="L148">                Paths.get(pitReportFolder.toString(), &quot;mutations.csv&quot;).toFile()),</span>
                 StandardCharsets.UTF_8));
-<span class="fc bfc" id="L148" title="All 2 branches covered.">        while ((line = br.readLine()) != null) {</span>
-<span class="fc" id="L149">            String[] cols = line.split(&quot;,&quot;);</span>
-<span class="fc" id="L150">            logger.debug(&quot;Result Line: {}&quot;, line);</span>
-<span class="fc" id="L151">            String location = cols[1]+&quot;.&quot;+cols[3];</span>
-<span class="fc" id="L152">            String mutationOperator = cols[2];</span>
-<span class="fc" id="L153">            int lineNumber =  Integer.parseInt(cols[4]);</span>
-<span class="fc" id="L154">            String result = cols[5];</span>
+<span class="fc bfc" id="L150" title="All 2 branches covered.">        while ((line = br.readLine()) != null) {</span>
+<span class="fc" id="L151">            String[] cols = line.split(&quot;,&quot;);</span>
+<span class="fc" id="L152">            logger.debug(&quot;Result Line: {}&quot;, line);</span>
+<span class="fc" id="L153">            String location = cols[1]+&quot;.&quot;+cols[3];</span>
+<span class="fc" id="L154">            String mutationOperator = cols[2];</span>
+<span class="fc" id="L155">            int lineNumber =  Integer.parseInt(cols[4]);</span>
+<span class="fc" id="L156">            String result = cols[5];</span>
 
             // Try to get a change clasification for the mutation
             // But we catch the exceptions here, as this kind of data is not crucial
-<span class="fc" id="L158">            String changeClassification = null;</span>
+<span class="fc" id="L160">            String changeClassification = null;</span>
             try {
-<span class="fc" id="L160">                changeClassification = MutationChangeClassifier.getChangeClassification(</span>
+<span class="fc" id="L162">                changeClassification = MutationChangeClassifier.getChangeClassification(</span>
                         projectRoot, cols[0], mutationOperator, lineNumber
                 );
-<span class="fc" id="L163">                logger.debug(&quot;Got the following change classification {}&quot;, changeClassification);</span>
-<span class="nc" id="L164">            } catch (MutationResultException e) {</span>
-<span class="nc" id="L165">                logger.catching(e);</span>
-<span class="fc" id="L166">            }</span>
-<span class="fc" id="L167">            mutationResults.add(new Mutation(location, mutationOperator, lineNumber, result, changeClassification));</span>
-<span class="fc" id="L168">        }</span>
-<span class="fc" id="L169">        br.close();</span>
+<span class="fc" id="L165">                logger.debug(&quot;Got the following change classification {}&quot;, changeClassification);</span>
+<span class="nc" id="L166">            } catch (MutationResultException e) {</span>
+<span class="nc" id="L167">                logger.catching(e);</span>
+<span class="fc" id="L168">            }</span>
+<span class="fc" id="L169">            mutationResults.add(new Mutation(location, mutationOperator, lineNumber, result, changeClassification));</span>
+<span class="fc" id="L170">        }</span>
+<span class="fc" id="L171">        br.close();</span>
 
-<span class="fc" id="L171">        return mutationResults;</span>
+<span class="fc" id="L173">        return mutationResults;</span>
     }
 
-    private static class PITExecutionOutputParser implements Callable&lt;MutationExecutionResult&gt; {
-        private InputStream inputStream;
+<span class="fc" id="L176">    private static class PITExecutionOutputParser implements InvocationOutputHandler {</span>
+<span class="fc" id="L177">        MutationExecutionResult mutationExecutionResult = new MutationExecutionResult();</span>
 
-<span class="fc" id="L177">        Pattern receivedTestsPattern = Pattern.compile(&quot;(\\S*)(\\d*) tests received&quot;);</span>
-<span class="fc" id="L178">        Pattern mutationUnitsPattern = Pattern.compile(&quot;(\\S*)(\\d*) mutation test units&quot;);</span>
-<span class="fc" id="L179">        Pattern executionTimePattern = Pattern.compile(&quot;(\\S*) Completed in (\\d*) seconds&quot;);</span>
-<span class="fc" id="L180">        Pattern mutationScorePattern = Pattern.compile(&quot;(\\S*) Generated (\\d*) mutations Killed (\\d*) \\((\\d*)%\\)&quot;);</span>
-
-<span class="fc" id="L182">        PITExecutionOutputParser(InputStream inputStream) {</span>
-<span class="fc" id="L183">            this.inputStream = inputStream;</span>
-<span class="fc" id="L184">        }</span>
+<span class="fc" id="L179">        Pattern receivedTestsPattern = Pattern.compile(&quot;(\\S*)(\\d*) tests received&quot;);</span>
+<span class="fc" id="L180">        Pattern mutationUnitsPattern = Pattern.compile(&quot;(\\S*)(\\d*) mutation test units&quot;);</span>
+<span class="fc" id="L181">        Pattern executionTimePattern = Pattern.compile(&quot;(\\S*) Completed in (\\d*) seconds&quot;);</span>
+<span class="fc" id="L182">        Pattern mutationScorePattern = Pattern.compile(&quot;(\\S*) Generated (\\d*) mutations Killed (\\d*) \\((\\d*)%\\)&quot;);</span>
 
         @Override
-        public MutationExecutionResult call() {
-<span class="fc" id="L188">            MutationExecutionResult mutationExecutionResult = new MutationExecutionResult();</span>
-            try{
-<span class="fc" id="L190">                parsePitExecutionOutput(mutationExecutionResult);</span>
-<span class="nc" id="L191">            } catch (UnsupportedEncodingException e) {</span>
-<span class="nc" id="L192">                e.printStackTrace();</span>
-<span class="fc" id="L193">            }</span>
-<span class="fc" id="L194">            return mutationExecutionResult;</span>
+        public void consumeLine(String line) {
+
+<span class="fc" id="L187">            Matcher receivedTestsMatcher = receivedTestsPattern.matcher(line);</span>
+<span class="fc" id="L188">            Matcher mutationUnitsMatcher = mutationUnitsPattern.matcher(line);</span>
+<span class="fc" id="L189">            Matcher executionTimeMatcher = executionTimePattern.matcher(line);</span>
+<span class="fc" id="L190">            Matcher mutationScoreMatcher = mutationScorePattern.matcher(line);</span>
+
+<span class="fc bfc" id="L192" title="All 2 branches covered.">            if(receivedTestsMatcher.find()) {</span>
+<span class="fc" id="L193">                mutationExecutionResult.setNumTests(Integer.parseInt(receivedTestsMatcher.group(1)));</span>
+            }
+
+<span class="fc bfc" id="L196" title="All 2 branches covered.">            if(mutationUnitsMatcher.find()) {</span>
+<span class="fc" id="L197">                mutationExecutionResult.setNumMutationUnits(Integer.parseInt(mutationUnitsMatcher.group(1)));</span>
+            }
+
+<span class="fc bfc" id="L200" title="All 2 branches covered.">            if(executionTimeMatcher.find()) {</span>
+<span class="fc" id="L201">                mutationExecutionResult.setExecutionTime(Integer.parseInt(executionTimeMatcher.group(2)));</span>
+            }
+
+<span class="fc bfc" id="L204" title="All 2 branches covered.">            if(mutationScoreMatcher.find()) {</span>
+<span class="fc" id="L205">                mutationExecutionResult.setGeneratedMutations(Integer.parseInt(mutationScoreMatcher.group(2)));</span>
+<span class="fc" id="L206">                mutationExecutionResult.setKilledMutations(Integer.parseInt(mutationScoreMatcher.group(3)));</span>
+<span class="fc" id="L207">                mutationExecutionResult.setMutationScore(Integer.parseInt(mutationScoreMatcher.group(4)));</span>
+            }
+<span class="fc" id="L209">        }</span>
+
+        public MutationExecutionResult getMutationExecutionResult() {
+<span class="fc" id="L212">            return mutationExecutionResult;</span>
         }
-
-        private void parsePitExecutionOutput(MutationExecutionResult mutationExecutionResult)
-                throws UnsupportedEncodingException {
-<span class="fc" id="L199">            new BufferedReader(new InputStreamReader(inputStream , &quot;UTF-8&quot;)).lines()</span>
-<span class="fc" id="L200">                    .forEach(pitOutputLine -&gt; {</span>
-<span class="fc" id="L201">                        Matcher receivedTestsMatcher = receivedTestsPattern.matcher(pitOutputLine);</span>
-<span class="fc" id="L202">                        Matcher mutationUnitsMatcher = mutationUnitsPattern.matcher(pitOutputLine);</span>
-<span class="fc" id="L203">                        Matcher executionTimeMatcher = executionTimePattern.matcher(pitOutputLine);</span>
-<span class="fc" id="L204">                        Matcher mutationScoreMatcher = mutationScorePattern.matcher(pitOutputLine);</span>
-
-                        //logger.debug(pitOutputLine);
-
-<span class="fc bfc" id="L208" title="All 2 branches covered.">                        if(receivedTestsMatcher.find()) {</span>
-<span class="fc" id="L209">                            mutationExecutionResult.setNumTests(Integer.parseInt(receivedTestsMatcher.group(1)));</span>
-                        }
-
-<span class="fc bfc" id="L212" title="All 2 branches covered.">                        if(mutationUnitsMatcher.find()) {</span>
-<span class="fc" id="L213">                            mutationExecutionResult</span>
-<span class="fc" id="L214">                                    .setNumMutationUnits(Integer.parseInt(mutationUnitsMatcher.group(1)));</span>
-                        }
-
-<span class="fc bfc" id="L217" title="All 2 branches covered.">                        if(executionTimeMatcher.find()) {</span>
-<span class="fc" id="L218">                            mutationExecutionResult.setExecutionTime(Integer.parseInt(executionTimeMatcher.group(2)));</span>
-                        }
-
-<span class="fc bfc" id="L221" title="All 2 branches covered.">                        if(mutationScoreMatcher.find()) {</span>
-<span class="fc" id="L222">                            mutationExecutionResult</span>
-<span class="fc" id="L223">                                    .setGeneratedMutations(Integer.parseInt(mutationScoreMatcher.group(2)));</span>
-<span class="fc" id="L224">                            mutationExecutionResult.setKilledMutations(Integer.parseInt(mutationScoreMatcher.group(3)));</span>
-<span class="fc" id="L225">                            mutationExecutionResult.setMutationScore(Integer.parseInt(mutationScoreMatcher.group(4)));</span>
-                        }
-<span class="fc" id="L227">                    });</span>
-<span class="fc" id="L228">        }</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

@@ -137,47 +137,57 @@ import org.mongodb.morphia.query.UpdateOperations;
     }
 
     private void storeTestState(TestState testState) {
-<span class="nc" id="L140">        Query&lt;TestState&gt; query = datastore.find(TestState.class)</span>
+<span class="nc" id="L140">        TestState dbTestState = datastore.createQuery(TestState.class)</span>
 <span class="nc" id="L141">                .field(&quot;name&quot;).equal(testState.getName())</span>
-<span class="nc" id="L142">                .field(&quot;commit_id&quot;).equal(testState.getCommitId());</span>
+<span class="nc" id="L142">                .field(&quot;commit_id&quot;).equal(testState.getCommitId())</span>
+<span class="nc" id="L143">                .get();</span>
 
-<span class="nc" id="L144">        UpdateOperations&lt;TestState&gt; updateOperations = datastore.createUpdateOperations(TestState.class)</span>
-<span class="nc" id="L145">                .set(&quot;file_id&quot;, testState.getFileId())</span>
-<span class="nc" id="L146">                .set(&quot;metrics&quot;, testState.getMetrics())</span>
-<span class="nc" id="L147">                .set(&quot;mutation_res&quot;, testState.getMutationResults());</span>
-<span class="nc" id="L148">        datastore.findAndModify(query, updateOperations, new FindAndModifyOptions().returnNew(false).upsert(true));</span>
-<span class="nc" id="L149">    }</span>
+<span class="nc bnc" id="L145" title="All 2 branches missed.">        if(dbTestState == null) {</span>
+<span class="nc" id="L146">            dbTestState = new TestState();</span>
+<span class="nc" id="L147">            dbTestState.setName(testState.getName());</span>
+<span class="nc" id="L148">            dbTestState.setCommitId(testState.getCommitId());</span>
+<span class="nc" id="L149">            dbTestState.setFileId(testState.getFileId());</span>
+        }
+
+<span class="nc" id="L152">        dbTestState.getMetrics().putAll(testState.getMetrics());</span>
+
+<span class="nc bnc" id="L154" title="All 2 branches missed.">        if(testState.getMutationResults().size() != 0) {</span>
+<span class="nc" id="L155">            dbTestState.getMutationResults().addAll(testState.getMutationResults());</span>
+        }
+
+<span class="nc" id="L158">        datastore.save(dbTestState);</span>
+<span class="nc" id="L159">    }</span>
 
     private Repository getRepository(Path projectDir) throws IOException {
-<span class="nc" id="L152">        return new RepositoryBuilder()</span>
-<span class="nc" id="L153">                .readEnvironment()</span>
-<span class="nc" id="L154">                .findGitDir(projectDir.toFile())</span>
-<span class="nc" id="L155">                .build();</span>
+<span class="nc" id="L162">        return new RepositoryBuilder()</span>
+<span class="nc" id="L163">                .readEnvironment()</span>
+<span class="nc" id="L164">                .findGitDir(projectDir.toFile())</span>
+<span class="nc" id="L165">                .build();</span>
     }
 
     private Datastore connectToDatabase(Database databaseConfiguration) {
         // Set up log4j logging
-<span class="nc" id="L160">        MorphiaLoggerFactory.reset();</span>
-<span class="nc" id="L161">        MorphiaLoggerFactory.registerLogger(Log4JLoggerImplFactory.class);</span>
+<span class="nc" id="L170">        MorphiaLoggerFactory.reset();</span>
+<span class="nc" id="L171">        MorphiaLoggerFactory.registerLogger(Log4JLoggerImplFactory.class);</span>
 
         // Map models
-<span class="nc" id="L164">        morphia.mapPackage(&quot;de.ugoe.cs.smartshark.model&quot;);</span>
-<span class="nc" id="L165">        morphia.mapPackage(&quot;de.ugoe.cs.comfort.database.models&quot;);</span>
+<span class="nc" id="L174">        morphia.mapPackage(&quot;de.ugoe.cs.smartshark.model&quot;);</span>
+<span class="nc" id="L175">        morphia.mapPackage(&quot;de.ugoe.cs.comfort.database.models&quot;);</span>
 
-<span class="nc" id="L167">        logger.debug(&quot;Connecting to database...&quot;);</span>
+<span class="nc" id="L177">        logger.debug(&quot;Connecting to database...&quot;);</span>
         // Create database connection
-<span class="nc" id="L169">        MongoClientURI uri = new MongoClientURI(de.ugoe.cs.smartshark.Utils.createMongoDBURI(</span>
-<span class="nc" id="L170">                databaseConfiguration.getUsername(),</span>
-<span class="nc" id="L171">                databaseConfiguration.getPassword(),</span>
-<span class="nc" id="L172">                databaseConfiguration.getHostname(),</span>
-<span class="nc" id="L173">                String.valueOf(databaseConfiguration.getPort()),</span>
-<span class="nc" id="L174">                databaseConfiguration.getAuthenticationDatabase(),</span>
-<span class="nc" id="L175">                databaseConfiguration.getSSL()));</span>
-<span class="nc" id="L176">        MongoClient mongoClient = new MongoClient(uri);</span>
-<span class="nc" id="L177">        final Datastore datastore = morphia.createDatastore(mongoClient, databaseConfiguration.getDatabase());</span>
-<span class="nc" id="L178">        datastore.ensureIndexes();</span>
+<span class="nc" id="L179">        MongoClientURI uri = new MongoClientURI(de.ugoe.cs.smartshark.Utils.createMongoDBURI(</span>
+<span class="nc" id="L180">                databaseConfiguration.getUsername(),</span>
+<span class="nc" id="L181">                databaseConfiguration.getPassword(),</span>
+<span class="nc" id="L182">                databaseConfiguration.getHostname(),</span>
+<span class="nc" id="L183">                String.valueOf(databaseConfiguration.getPort()),</span>
+<span class="nc" id="L184">                databaseConfiguration.getAuthenticationDatabase(),</span>
+<span class="nc" id="L185">                databaseConfiguration.getSSL()));</span>
+<span class="nc" id="L186">        MongoClient mongoClient = new MongoClient(uri);</span>
+<span class="nc" id="L187">        final Datastore datastore = morphia.createDatastore(mongoClient, databaseConfiguration.getDatabase());</span>
+<span class="nc" id="L188">        datastore.ensureIndexes();</span>
 
-<span class="nc" id="L180">        return datastore;</span>
+<span class="nc" id="L190">        return datastore;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

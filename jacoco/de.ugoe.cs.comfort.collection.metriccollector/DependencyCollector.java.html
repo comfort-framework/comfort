@@ -21,6 +21,7 @@ import de.ugoe.cs.comfort.annotations.SupportsJava;
 import de.ugoe.cs.comfort.annotations.SupportsMethod;
 import de.ugoe.cs.comfort.annotations.SupportsPython;
 import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
+import de.ugoe.cs.comfort.data.CoverageData;
 import de.ugoe.cs.comfort.data.graphs.CallGraph;
 import de.ugoe.cs.comfort.data.graphs.DependencyGraph;
 import de.ugoe.cs.comfort.data.models.IUnit;
@@ -34,41 +35,48 @@ import java.util.Set;
  */
 public class DependencyCollector extends BaseMetricCollector {
     public DependencyCollector(GeneralConfiguration configuration) {
-<span class="fc" id="L37">        super(configuration);</span>
-<span class="fc" id="L38">    }</span>
+<span class="fc" id="L38">        super(configuration);</span>
+<span class="fc" id="L39">    }</span>
 
     @SupportsJava
     @SupportsPython
     @SupportsMethod
     public Set&lt;Result&gt; getNumberOfDependentUnitsForMethod(CallGraph callGraph) {
-<span class="fc" id="L44">        Map&lt;IUnit, Set&lt;IUnit&gt;&gt; callerCalleePairs = TestTypeDetectionUtils</span>
-<span class="fc" id="L45">                .getCallPairsOnClassLevel(callGraph);</span>
-<span class="fc" id="L46">        return generateResults(callerCalleePairs);</span>
+<span class="fc" id="L45">        Map&lt;IUnit, Set&lt;IUnit&gt;&gt; callerCalleePairs = TestTypeDetectionUtils</span>
+<span class="fc" id="L46">                .getCallPairsOnClassLevel(callGraph);</span>
+<span class="fc" id="L47">        return generateResults(callerCalleePairs, &quot;call_dep&quot;);</span>
     }
 
     @SupportsJava
     @SupportsPython
     @SupportsClass
     public Set&lt;Result&gt; getNumberOfDependentUnitsForClass(DependencyGraph dependencyGraph) {
-<span class="fc" id="L53">        Map&lt;IUnit, Set&lt;IUnit&gt;&gt; callerCalleePairs = TestTypeDetectionUtils</span>
-<span class="fc" id="L54">                .getCallPairsOnClassLevel(dependencyGraph);</span>
-<span class="fc" id="L55">        return generateResults(callerCalleePairs);</span>
+<span class="fc" id="L54">        Map&lt;IUnit, Set&lt;IUnit&gt;&gt; callerCalleePairs = TestTypeDetectionUtils</span>
+<span class="fc" id="L55">                .getCallPairsOnClassLevel(dependencyGraph);</span>
+<span class="fc" id="L56">        return generateResults(callerCalleePairs, &quot;call_dep&quot;);</span>
     }
 
-    private Set&lt;Result&gt; generateResults(Map&lt;IUnit, Set&lt;IUnit&gt;&gt; callerCalleePairs) {
-<span class="fc" id="L59">        Set&lt;Result&gt; results = new HashSet&lt;&gt;();</span>
-<span class="fc bfc" id="L60" title="All 2 branches covered.">        for(Map.Entry&lt;IUnit, Set&lt;IUnit&gt;&gt; entry: callerCalleePairs.entrySet()) {</span>
-<span class="fc" id="L61">            Set&lt;String&gt; units = new HashSet&lt;&gt;();</span>
-<span class="fc" id="L62">            entry.getValue().forEach(unit -&gt; {</span>
-<span class="fc bfc" id="L63" title="All 2 branches covered.">                if(!unit.isTestBasedOnFQNofUnit()) {</span>
-<span class="fc" id="L64">                    units.add(unit.getFQNOfUnit());</span>
+    @SupportsJava
+    @SupportsPython
+    @SupportsMethod
+    public Set&lt;Result&gt; getNumberOfDependentUnitsForCoverageData(CoverageData data) {
+<span class="fc" id="L63">        return generateResults(data.getCoverageData(), &quot;cov_dep&quot;);</span>
+    }
+
+    private Set&lt;Result&gt; generateResults(Map&lt;IUnit, Set&lt;IUnit&gt;&gt; callerCalleePairs, String metricName) {
+<span class="fc" id="L67">        Set&lt;Result&gt; results = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">        for(Map.Entry&lt;IUnit, Set&lt;IUnit&gt;&gt; entry: callerCalleePairs.entrySet()) {</span>
+<span class="fc" id="L69">            Set&lt;String&gt; units = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L70">            entry.getValue().forEach(unit -&gt; {</span>
+<span class="fc bfc" id="L71" title="All 2 branches covered.">                if(!unit.isTestBasedOnFQNofUnit()) {</span>
+<span class="fc" id="L72">                    units.add(unit.getFQNOfUnit());</span>
                 }
-<span class="fc" id="L66">            });</span>
-<span class="fc" id="L67">            logger.debug(&quot;Dependency of {} is: {}&quot;, entry.getKey(), entry.getValue().size());</span>
-<span class="fc" id="L68">            results.add(new Result(entry.getKey().getFQN(), entry.getKey().getFilePath(),</span>
-<span class="fc" id="L69">                    &quot;call_dep&quot;, String.valueOf(units.size())));</span>
-<span class="fc" id="L70">        }</span>
-<span class="fc" id="L71">        return results;</span>
+<span class="fc" id="L74">            });</span>
+<span class="fc" id="L75">            logger.debug(&quot;Dependency of {} is: {}&quot;, entry.getKey(), entry.getValue().size());</span>
+<span class="fc" id="L76">            results.add(new Result(entry.getKey().getFQN(), entry.getKey().getFilePath(),</span>
+<span class="fc" id="L77">                    metricName, String.valueOf(units.size())));</span>
+<span class="fc" id="L78">        }</span>
+<span class="fc" id="L79">        return results;</span>
     }
 
 
