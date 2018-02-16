@@ -25,7 +25,9 @@ import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
 import de.ugoe.cs.comfort.data.graphs.CallGraph;
 import de.ugoe.cs.comfort.data.graphs.DependencyGraph;
 import de.ugoe.cs.comfort.data.models.IUnit;
+import de.ugoe.cs.comfort.filer.BaseFiler;
 import de.ugoe.cs.comfort.filer.models.Result;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,14 +38,14 @@ import java.util.Set;
  * @author Fabian Trautsch
  */
 public class DirectnessCollector extends BaseMetricCollector {
-    public DirectnessCollector(GeneralConfiguration configuration) {
-        super(configuration);
+    public DirectnessCollector(GeneralConfiguration configuration, BaseFiler filer) {
+        super(configuration, filer);
     }
 
     @SupportsJava
     @SupportsPython
     @SupportsMethod
-    public Set<Result> createDirectnessMetricForJavaOnMethodLevel(CallGraph callGraph) {
+    public void createDirectnessMetricForJavaOnMethodLevel(CallGraph callGraph) throws IOException {
         Map<IUnit, Set<String>> numDirectConnections = new HashMap<>();
         Set<String> units = new HashSet<>();
         callGraph.getProductionNodes().forEach(x -> units.add(x.getFQNOfUnit()));
@@ -57,13 +59,13 @@ public class DirectnessCollector extends BaseMetricCollector {
             });
             numDirectConnections.put(node, adjacentUnits);
         }
-        return getResults(numDirectConnections, units.size());
+        filer.storeResults(getResults(numDirectConnections, units.size()));
     }
 
     @SupportsJava
     @SupportsPython
     @SupportsClass
-    public Set<Result> createDirectnessMetricForJavaOnClassLevel(CallGraph callGraph) {
+    public void createDirectnessMetricForJavaOnClassLevel(CallGraph callGraph) throws IOException {
         // As we are only working on class level, we are using the dependencygraph here
         DependencyGraph depGraph = callGraph.getDependencyGraphRepresentation();
 
@@ -82,7 +84,7 @@ public class DirectnessCollector extends BaseMetricCollector {
             connectionsToClass.addAll(adjacentUnits);
             numDirectConnections.put(node, connectionsToClass);
         }
-        return getResults(numDirectConnections, units.size());
+        filer.storeResults(getResults(numDirectConnections, units.size()));
     }
 
     private Set<Result> getResults(Map<IUnit, Set<String>> numDirectConnectionsPerTest, Integer numAllUnits) {

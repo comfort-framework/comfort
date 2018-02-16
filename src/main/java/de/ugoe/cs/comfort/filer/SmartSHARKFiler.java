@@ -20,14 +20,15 @@ import com.github.danielfelgar.morphia.Log4JLoggerImplFactory;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import de.ugoe.cs.comfort.configuration.Database;
+import de.ugoe.cs.comfort.configuration.FilerConfiguration;
 import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
-import de.ugoe.cs.comfort.database.models.MutationResult;
-import de.ugoe.cs.comfort.database.models.TestState;
 import de.ugoe.cs.comfort.filer.models.Mutation;
 import de.ugoe.cs.comfort.filer.models.Result;
 import de.ugoe.cs.comfort.filer.models.ResultSet;
 import de.ugoe.cs.smartshark.model.Commit;
 import de.ugoe.cs.smartshark.model.File;
+import de.ugoe.cs.smartshark.model.MutationResult;
+import de.ugoe.cs.smartshark.model.TestState;
 import de.ugoe.cs.smartshark.model.VCSSystem;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -38,6 +39,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.annotation.processing.Filer;
+import org.apache.bcel.Const;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bson.types.ObjectId;
@@ -45,67 +48,91 @@ import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.RepositoryBuilder;
 import org.mongodb.morphia.Datastore;
-import org.mongodb.morphia.FindAndModifyOptions;
 import org.mongodb.morphia.Morphia;
 import org.mongodb.morphia.logging.MorphiaLoggerFactory;
-import org.mongodb.morphia.query.Query;
-import org.mongodb.morphia.query.UpdateOperations;
 
 /**
  * @author Fabian Trautsch
  */
-public class SmartSHARKFiler implements IFiler {
+public class SmartSHARKFiler extends BaseFiler {
     private final Morphia morphia = new Morphia();
-    private Logger logger = LogManager.getLogger(this.getClass().getName());
     private Datastore datastore;
+    private ObjectId commitId;
+    private Map<Path, ObjectId> files = new HashMap<>();
+
+    // For testing purpose
+    public SmartSHARKFiler(GeneralConfiguration generalConfiguration, FilerConfiguration filerConfiguration,
+                           ObjectId commitId, Map<Path, ObjectId> files) {
+        super(generalConfiguration, filerConfiguration);
+
+        // Connect to database
+        datastore = connectToDatabase(filerConfiguration.getDatabase());
+        this.commitId = commitId;
+        this.files = files;
+    }
+
+    public SmartSHARKFiler(GeneralConfiguration generalConfiguration, FilerConfiguration filerConfiguration)
+            throws IOException {
+        super(generalConfiguration, filerConfiguration);
+
+        // Connect to database
+        datastore = connectToDatabase(filerConfiguration.getDatabase());
+
+        Repository repo = getRepository();
+
+        // Get VCS System
+        String vcsSystemUrl = repo.getConfig().getString("remote", "origin", "url");
+        List<String> possibleVCSSystemValues = new ArrayList<String>(){{
+                add(vcsSystemUrl);
+                add(vcsSystemUrl+"/");
+            }
+        };
+
+        ObjectId vcsSystemId = datastore.createQuery(VCSSystem.class)
+                .field("url").in(possibleVCSSystemValues).get().getId();
+
+        // Get commit id via jgit
+        commitId = datastore.createQuery(Commit.class)
+                .field("vcs_system_id").equal(vcsSystemId)
+                .field("revision_hash").equal(repo.resolve(Constants.HEAD).getName())
+                .get().getId();
+
+        // Get all files for this vcs system in a map (Map<String path, ObjectId oid>)
+        datastore.createQuery(File.class)
+                .field("vcs_system_id").equal(vcsSystemId)
+                .asList().forEach(
+                    file -> files.put(Paths.get(file.getPath()), file.getId())
+            );
+    }
+
 
     @Override
-    public void storeResults(GeneralConfiguration configuration, ResultSet results) {
-        // Connect to database
-        datastore = connectToDatabase(configuration.getFilerConfiguration().getDatabase());
+    public void storeResults(Set<Result> results) {
+        resultSet.addResults(results);
 
+        storeResultsInSmartSHARKDatabase();
+    }
 
-        try {
-            Repository repo = getRepository(configuration.getProjectDir());
+    @Override
+    public void storeResult(Result result) {
+        // Merge with other results
+        resultSet.addResult(result);
 
-            // Get VCS System
-            String vcsSystemUrl = repo.getConfig().getString("remote", "origin", "url");
-            List<String> possibleVCSSystemValues = new ArrayList<String>(){{
-                    add(vcsSystemUrl);
-                    add(vcsSystemUrl+"/");
-                }
-            };
-            ObjectId vcsSystemId = datastore.createQuery(VCSSystem.class)
-                    .field("url").in(possibleVCSSystemValues).get().getId();
+        storeResultsInSmartSHARKDatabase();
+    }
 
-            // Get commit id via jgit
-            ObjectId commitId = datastore.createQuery(Commit.class)
-                    .field("vcs_system_id").equal(vcsSystemId)
-                    .field("revision_hash").equal(repo.resolve(Constants.HEAD).getName())
-                    .get().getId();
+    public void storeResultsInSmartSHARKDatabase() {
+        // Go through all results -> create a test state and store it
+        for(Result result: resultSet.getResults()) {
+            ObjectId fileId = files.get(result.getPathToFile());
 
-            // Get all files for this vcs system in a map (Map<String path, ObjectId oid>)
-            Map<Path, ObjectId> files = new HashMap<>();
-            datastore.createQuery(File.class)
-                    .field("vcs_system_id").equal(vcsSystemId)
-                    .asList().forEach(
-                            file -> files.put(Paths.get(file.getPath()), file.getId())
-                );
+            // Create mutation results
+            Set<MutationResult> mutationResults = createMutationResults(result);
 
-            // Go through all results -> create a test state and store it
-            for(Result result: results.getResults()) {
-                ObjectId fileId = files.get(result.getPathToFile());
-
-                // Create mutation results
-                Set<MutationResult> mutationResults = createMutationResults(result);
-
-                TestState testState = new TestState(result, fileId, commitId, mutationResults);
-                storeTestState(testState);
-            }
-
-        } catch (IOException e) {
-            logger.catching(e);
+            TestState testState = new TestState(result.getId(), result.getMetrics(), fileId, commitId, mutationResults);
+            storeTestState(testState);
         }
+
     }
 
     private Set<MutationResult> createMutationResults(Result result) {
@@ -119,15 +146,15 @@ public class SmartSHARKFiler implements IFiler {
     }
 
     private ObjectId getOrCreateMutation(Mutation mutation) {
-        de.ugoe.cs.comfort.database.models.Mutation dbMutation;
-        dbMutation = datastore.createQuery(de.ugoe.cs.comfort.database.models.Mutation.class)
+        de.ugoe.cs.smartshark.model.Mutation dbMutation;
+        dbMutation = datastore.createQuery(de.ugoe.cs.smartshark.model.Mutation.class)
                 .field("location").equal(mutation.getLocation())
                 .field("m_type").equal(mutation.getMType())
                 .field("l_num").equal(mutation.getLineNumber())
                 .get();
 
         if (dbMutation == null) {
-            dbMutation = new de.ugoe.cs.comfort.database.models.Mutation(
+            dbMutation = new de.ugoe.cs.smartshark.model.Mutation(
                     mutation.getLocation(), mutation.getMType(), mutation.getLineNumber(), mutation.getClassification()
             );
             datastore.save(dbMutation);
@@ -158,10 +185,10 @@ public class SmartSHARKFiler implements IFiler {
         datastore.save(dbTestState);
     }
 
-    private Repository getRepository(Path projectDir) throws IOException {
+    private Repository getRepository() throws IOException {
         return new RepositoryBuilder()
                 .readEnvironment()
-                .findGitDir(projectDir.toFile())
+                .findGitDir(generalConf.getProjectDir().toFile())
                 .build();
     }
 
@@ -189,4 +216,5 @@ public class SmartSHARKFiler implements IFiler {
 
         return datastore;
     }
+
 }

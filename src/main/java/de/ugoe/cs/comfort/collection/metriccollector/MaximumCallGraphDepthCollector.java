@@ -26,8 +26,10 @@ import de.ugoe.cs.comfort.annotations.SupportsPython;
 import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
 import de.ugoe.cs.comfort.data.graphs.CallGraph;
 import de.ugoe.cs.comfort.data.models.IUnit;
+import de.ugoe.cs.comfort.filer.BaseFiler;
 import de.ugoe.cs.comfort.filer.models.Result;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -45,22 +47,22 @@ import java.util.concurrent.Executors;
  */
 
 public class MaximumCallGraphDepthCollector extends BaseMetricCollector {
-    public MaximumCallGraphDepthCollector(GeneralConfiguration configuration) {
-        super(configuration);
+    public MaximumCallGraphDepthCollector(GeneralConfiguration configuration, BaseFiler filer) {
+        super(configuration, filer);
     }
 
     @SupportsJava
     @SupportsPython
     @SupportsMethod
-    public Set<Result> getMaximumDepthForJavaOnMethodLevel(CallGraph callGraph) {
+    public void getMaximumDepthForJavaOnMethodLevel(CallGraph callGraph) throws IOException {
         Map<String, Integer> longestPathForTest = getLongestPathToNodes(callGraph);
-        return generateResults(longestPathForTest);
+        filer.storeResults(generateResults(longestPathForTest));
     }
 
     @SupportsJava
     @SupportsPython
     @SupportsClass
-    public Set<Result> getMaximumDepthForJavaOnClassLevel(CallGraph callGraph) {
+    public void getMaximumDepthForJavaOnClassLevel(CallGraph callGraph) throws IOException {
         Map<String, Integer> longestPathForTest = getLongestPathToNodes(callGraph);
 
         Map<String, Integer> classResults = new HashMap<>();
@@ -70,7 +72,7 @@ public class MaximumCallGraphDepthCollector extends BaseMetricCollector {
         }
         logger.debug("Generated the following results for class level {}", classResults);
 
-        return generateResults(classResults);
+        filer.storeResults(generateResults(classResults));
     }
 
     private Map<String, Integer> getLongestPathToNodes(CallGraph callGraph) {

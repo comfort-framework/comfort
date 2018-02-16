@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import de.ugoe.cs.comfort.collection.filter.BaseFilter;
 import de.ugoe.cs.comfort.collection.loader.BaseLoader;
 import de.ugoe.cs.comfort.collection.metriccollector.BaseMetricCollector;
+import de.ugoe.cs.comfort.filer.BaseFiler;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,14 +65,15 @@ public class CollectionConfiguration {
         return filters;
     }
 
-    public List<BaseMetricCollector> getMetricCollectors(GeneralConfiguration conf) throws ClassNotFoundException,
-            NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    public List<BaseMetricCollector> getMetricCollectors(GeneralConfiguration conf, BaseFiler filer)
+            throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException,
+            InstantiationException {
         List<BaseMetricCollector> collectors = new ArrayList<>();
         for(String collector : collectorConf) {
             collectors.add((BaseMetricCollector) Class
                     .forName("de.ugoe.cs.comfort.collection.metriccollector." + collector)
-                    .getConstructor(GeneralConfiguration.class)
-                    .newInstance(conf));
+                    .getConstructor(GeneralConfiguration.class, BaseFiler.class)
+                    .newInstance(conf, filer));
         }
         return collectors;
     }

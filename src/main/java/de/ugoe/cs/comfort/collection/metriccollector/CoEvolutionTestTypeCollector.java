@@ -23,7 +23,9 @@ import de.ugoe.cs.comfort.annotations.SupportsJava;
 import de.ugoe.cs.comfort.annotations.SupportsPython;
 import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
 import de.ugoe.cs.comfort.data.ChangeSet;
+import de.ugoe.cs.comfort.filer.BaseFiler;
 import de.ugoe.cs.comfort.filer.models.Result;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
@@ -35,14 +37,14 @@ public class CoEvolutionTestTypeCollector extends BaseMetricCollector {
     // TODO: Take as configuration parameter, maybe also for detecting integration tests
     private static final Integer DIFFERENCE = 1;
 
-    public CoEvolutionTestTypeCollector(GeneralConfiguration configuration) {
-        super(configuration);
+    public CoEvolutionTestTypeCollector(GeneralConfiguration configuration, BaseFiler filer) {
+        super(configuration, filer);
     }
 
     @SupportsJava
     @SupportsPython
     @SupportsClass
-    public Set<Result> createResults(ChangeSet changeSet) {
+    public void createResults(ChangeSet changeSet) throws IOException {
         // Create filer map
         Set<Result> result = new HashSet<>();
         for(Path testFile: changeSet.getTestFiles()) {
@@ -51,7 +53,7 @@ public class CoEvolutionTestTypeCollector extends BaseMetricCollector {
             result.add(classifyTestFile(testFile, sortedChangeSet));
         }
 
-        return result;
+        filer.storeResults(result);
     }
 
     private Result classifyTestFile(Path testFile, ImmutableMultiset<Path> changeSetOfTestFile) {

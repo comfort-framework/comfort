@@ -166,7 +166,7 @@ to say at which level your results will be produced (e.g., @SupportsMethod to sh
 on a method-level).
 
 **Filer**
-To create a new filer you need to implement the IFiler interface.
+To create a new filer you need to inherit from the BaseFiler class and implement the needed methods.
 
 
 ### Test

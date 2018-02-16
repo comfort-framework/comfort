@@ -26,8 +26,7 @@ import de.ugoe.cs.comfort.data.DataSet;
 import de.ugoe.cs.comfort.exception.FilterException;
 import de.ugoe.cs.comfort.exception.LoaderException;
 import de.ugoe.cs.comfort.exception.MetricCollectorException;
-import de.ugoe.cs.comfort.filer.IFiler;
-import de.ugoe.cs.comfort.filer.models.ResultSet;
+import de.ugoe.cs.comfort.filer.BaseFiler;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
@@ -62,11 +61,12 @@ public class Main {
             // SetUp Logging
             setupLogging(config);
 
-            // Create object in which all results are stored
-            ResultSet resultSet = new ResultSet();
-
             // Get collections that should be done
             List<CollectionConfiguration> collections = config.getCollections();
+
+            // Load filer
+            BaseFiler filer = config.getFiler();
+            LOGGER.info("Using filer {}...", filer.getClass().getName());
 
             // Execute each collection
             for(CollectionConfiguration collection: collections) {
@@ -86,10 +86,10 @@ public class Main {
                     }
 
                     // Then, execute the metric collection
-                    List<BaseMetricCollector> collectors = collection.getMetricCollectors(config);
+                    List<BaseMetricCollector> collectors = collection.getMetricCollectors(config, filer);
                     for (BaseMetricCollector collector : collectors) {
                         LOGGER.info("Using collector {}...", collector.getClass().getName());
-                        resultSet.addResults(collector.collectData(data));
+                        collector.collectData(data);
                         LOGGER.info("Collection successful...");
                     }
                 } catch(LoaderException | FilterException | MetricCollectorException e) {
@@ -97,11 +97,7 @@ public class Main {
                 }
             }
 
-            // Load filer
-            IFiler filer = config.getFiler();
-            LOGGER.info("Using filer {}...", filer.getClass().getName());
-            filer.storeResults(config, resultSet);
-            LOGGER.info("Storing of data successful.");
+            LOGGER.info("Execution successful.");
 
             System.exit(0);
 

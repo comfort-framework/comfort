@@ -27,6 +27,7 @@ import de.ugoe.cs.comfort.data.graphs.CallType;
 import de.ugoe.cs.comfort.data.graphs.DependencyGraph;
 import de.ugoe.cs.comfort.data.models.IUnit;
 import de.ugoe.cs.comfort.filer.models.Result;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
@@ -36,7 +37,7 @@ import org.junit.Test;
 /**
  * @author Fabian Trautsch
  */
-public class IEEETestTypeCollectorTest extends BaseTest {
+public class IEEETestTypeCollectorTest extends BaseMetricCollectorTest {
     private final String basePath = getPathToResource("metricCollectorTestData/ieeeAndistqb");
 
     private IEEETestTypeCollector ieeeTestTypeCollector;
@@ -44,7 +45,6 @@ public class IEEETestTypeCollectorTest extends BaseTest {
     private GeneralConfiguration javaConfig = new GeneralConfiguration();
     private GeneralConfiguration pythonConfig = new GeneralConfiguration();
 
-    private Set<Result> result = new HashSet<>();
     private Set<Result> expectedResult = new HashSet<>();
 
     @Before
@@ -61,12 +61,11 @@ public class IEEETestTypeCollectorTest extends BaseTest {
 
     @Before
     public void clearResults() {
-        result.clear();
         expectedResult.clear();
     }
 
     @Test
-    public void createResultsJavaClassLevelCallGraphTest() {
+    public void createResultsJavaClassLevelCallGraphTest() throws IOException {
         /*
          * Graph:
          * org.foo.t1.T1.m1 -> org.foo.bar.C2.m1
@@ -78,28 +77,28 @@ public class IEEETestTypeCollectorTest extends BaseTest {
         callGraph.addEdge(new CallEdge(CallType.INVOKE_SPECIAL, 0, T1M1, C2M1_p1));
         callGraph.addEdge(new CallEdge(CallType.INVOKE_SPECIAL, 0, T1M2, C2M1_p2));
 
-        ieeeTestTypeCollector = new IEEETestTypeCollector(javaConfig);
-        result = ieeeTestTypeCollector.createResultsJavaPythonClassLevelCallGraph(callGraph);
+        ieeeTestTypeCollector = new IEEETestTypeCollector(javaConfig, filerMock);
+        ieeeTestTypeCollector.createResultsJavaPythonClassLevelCallGraph(callGraph);
 
         expectedResult.add(new Result("org.foo.t1.Test1", null, "call_ieee",TestType.INTEGRATION.name()));
-        assertEquals("Result set is not correct!", expectedResult, result);
+        assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
     @Test
-    public void createResultsPythonClassLevelCallGraphTest() {
+    public void createResultsPythonClassLevelCallGraphTest() throws IOException {
         CallGraph callGraph = new CallGraph();
         callGraph.addEdge(new CallEdge(CallType.INVOKE_SPECIAL, 0, pyTest1Test, pyModule4Init));
         callGraph.addEdge(new CallEdge(CallType.INVOKE_SPECIAL, 0, pyTest1Test2, pyModule5Init));
 
-        ieeeTestTypeCollector = new IEEETestTypeCollector(javaConfig);
-        result = ieeeTestTypeCollector.createResultsJavaPythonClassLevelCallGraph(callGraph);
+        ieeeTestTypeCollector = new IEEETestTypeCollector(javaConfig, filerMock);
+        ieeeTestTypeCollector.createResultsJavaPythonClassLevelCallGraph(callGraph);
 
         expectedResult.add(new Result("tests.test_module1", null, "call_ieee",TestType.INTEGRATION.name()));
-        assertEquals("Result set is not correct!", expectedResult, result);
+        assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
     @Test
-    public void createResultsPythonClassLevelCallGraphWithUnitAndIntegrationTest() {
+    public void createResultsPythonClassLevelCallGraphWithUnitAndIntegrationTest() throws IOException {
         CallGraph callGraph = new CallGraph();
         callGraph.addEdge(new CallEdge(CallType.INVOKE_SPECIAL, 0, pyTest1Test, pyModule5Init));
         callGraph.addEdge(new CallEdge(CallType.INVOKE_SPECIAL, 0, pyTest1Test, pyModule4Init));
@@ -107,16 +106,16 @@ public class IEEETestTypeCollectorTest extends BaseTest {
         callGraph.addEdge(new CallEdge(CallType.INVOKE_SPECIAL, 0, pyTest2Test, pyModule2Init));
 
         pythonConfig.setMethodLevel(true);
-        ieeeTestTypeCollector = new IEEETestTypeCollector(pythonConfig);
-        result = ieeeTestTypeCollector.createResultsJavaPythonMethodLevelCallGraph(callGraph);
+        ieeeTestTypeCollector = new IEEETestTypeCollector(pythonConfig, filerMock);
+        ieeeTestTypeCollector.createResultsJavaPythonMethodLevelCallGraph(callGraph);
 
         expectedResult.add(new Result("tests.test_module1.Module1Test.test", null, "call_ieee_met",TestType.INTEGRATION.name()));
         expectedResult.add(new Result("tests.test_module2.Module2Test.test", null, "call_ieee_met",TestType.UNIT.name()));
-        assertEquals("Result set is not correct!", expectedResult, result);
+        assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
     @Test
-    public void createResultsJavaClassLevelCallGraphWithUnitAndIntegrationTest() {
+    public void createResultsJavaClassLevelCallGraphWithUnitAndIntegrationTest() throws IOException {
         /*
          * Graph:
          * org.foo.t1.T1.m1 -> org.foo.bar.C2.m1
@@ -132,106 +131,106 @@ public class IEEETestTypeCollectorTest extends BaseTest {
         callGraph.addEdge(new CallEdge(CallType.INVOKE_SPECIAL, 0, T2M1, C1M1_p1));
         callGraph.addEdge(new CallEdge(CallType.INVOKE_SPECIAL, 0, T2M2, C1M1_p2));
 
-        ieeeTestTypeCollector = new IEEETestTypeCollector(javaConfig);
-        result = ieeeTestTypeCollector.createResultsJavaPythonClassLevelCallGraph(callGraph);
+        ieeeTestTypeCollector = new IEEETestTypeCollector(javaConfig, filerMock);
+        ieeeTestTypeCollector.createResultsJavaPythonClassLevelCallGraph(callGraph);
 
         expectedResult.add(new Result("org.foo.t1.Test1", null, "call_ieee",TestType.UNIT.name()));
         expectedResult.add(new Result("org.foo.t2.Test2", null, "call_ieee",TestType.INTEGRATION.name()));
-        assertEquals("Result set is not correct!", expectedResult, result);
+        assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
     @Test
-    public void createResultsJavaClassLevelCallGraphCorrectPathTest() {
+    public void createResultsJavaClassLevelCallGraphCorrectPathTest() throws IOException {
         CallGraph callGraph = new CallGraph();
         callGraph.addEdge(new CallEdge(CallType.INVOKE_SPECIAL, 0, addressTestGetAddressTest, javaLangObjectInit));
 
-        ieeeTestTypeCollector = new IEEETestTypeCollector(javaConfig);
-        result = ieeeTestTypeCollector.createResultsJavaPythonClassLevelCallGraph(callGraph);
+        ieeeTestTypeCollector = new IEEETestTypeCollector(javaConfig, filerMock);
+        ieeeTestTypeCollector.createResultsJavaPythonClassLevelCallGraph(callGraph);
 
         expectedResult.add(new Result("org.foo.models.AddressTest",
                 Paths.get("src/test/java/org/foo/models/AddressTest.java"),
                 "call_ieee",TestType.UNIT.name()));
-        assertEquals("Result set is not correct!", expectedResult, result);
+        assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
     @Test
-    public void classifyCallGraphWithUnitAndIntegrationTestOnMethodLevelTest() {
+    public void classifyCallGraphWithUnitAndIntegrationTestOnMethodLevelTest() throws IOException {
         CallGraph callGraph = new CallGraph();
         callGraph.addEdge(new CallEdge(CallType.INVOKE_SPECIAL, 0, T1Test1, C2M1_p1));
         callGraph.addEdge(new CallEdge(CallType.INVOKE_SPECIAL, 1, T1Test1, C3M1));
         callGraph.addEdge(new CallEdge(CallType.INVOKE_SPECIAL, 0, T2Test1, C1M1_p1));
         callGraph.addEdge(new CallEdge(CallType.INVOKE_SPECIAL, 1, T2Test1, C1M1_p2));
 
-        ieeeTestTypeCollector = new IEEETestTypeCollector(javaConfig);
-        result = ieeeTestTypeCollector.createResultsJavaPythonMethodLevelCallGraph(callGraph);
+        ieeeTestTypeCollector = new IEEETestTypeCollector(javaConfig, filerMock);
+        ieeeTestTypeCollector.createResultsJavaPythonMethodLevelCallGraph(callGraph);
 
         expectedResult.add(new Result("org.foo.t1.Test1.test1", null, "call_ieee_met",TestType.UNIT.name()));
         expectedResult.add(new Result("org.foo.t2.Test2.test1", null, "call_ieee_met",TestType.INTEGRATION.name()));
-        assertEquals("Result set is not correct!", expectedResult, result);
+        assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
     @Test
-    public void classifyPythonDependencyGraphWithIntegrationTestTest() {
+    public void classifyPythonDependencyGraphWithIntegrationTestTest() throws IOException {
         DependencyGraph dependencyGraph = new DependencyGraph();
         dependencyGraph.putEdge(pyTest1, module1);
         dependencyGraph.putEdge(pyTest1, module2);
 
-        ieeeTestTypeCollector = new IEEETestTypeCollector(pythonConfig);
-        result = ieeeTestTypeCollector.createResultsJavaPythonDepGraph(dependencyGraph);
+        ieeeTestTypeCollector = new IEEETestTypeCollector(pythonConfig, filerMock);
+        ieeeTestTypeCollector.createResultsJavaPythonDepGraph(dependencyGraph);
 
         expectedResult.add(new Result("tests.test1", Paths.get("tests/test1.py"), "dep_ieee",TestType.INTEGRATION.name()));
-        assertEquals("Result set is not correct!", expectedResult, result);
+        assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
     @Test
-    public void classifyPythonDependencyGraphWithUnitAndIntegrationTest() {
+    public void classifyPythonDependencyGraphWithUnitAndIntegrationTest() throws IOException {
         DependencyGraph dependencyGraph = new DependencyGraph();
         dependencyGraph.putEdge(pyTest1, module1);
         dependencyGraph.putEdge(pyTest1, module3);
         dependencyGraph.putEdge(pyTest2, module1);
         dependencyGraph.putEdge(pyTest2, module2);
 
-        ieeeTestTypeCollector = new IEEETestTypeCollector(pythonConfig);
-        result = ieeeTestTypeCollector.createResultsJavaPythonDepGraph(dependencyGraph);
+        ieeeTestTypeCollector = new IEEETestTypeCollector(pythonConfig, filerMock);
+        ieeeTestTypeCollector.createResultsJavaPythonDepGraph(dependencyGraph);
 
         expectedResult.add(new Result("tests.test1", Paths.get("tests/test1.py"), "dep_ieee",TestType.UNIT.name()));
         expectedResult.add(new Result("tests.test2", Paths.get("tests/test2.py"),"dep_ieee",TestType.INTEGRATION.name()));
-        assertEquals("Result set is not correct!", expectedResult, result);
+        assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
     @Test
-    public void classifyDependencyGraphWithIntegrationTestTest() {
+    public void classifyDependencyGraphWithIntegrationTestTest() throws IOException {
         DependencyGraph dependencyGraph = new DependencyGraph();
         dependencyGraph.putEdge(blatestbla, entryView);
         dependencyGraph.putEdge(blatestbla, telephonebook);
 
-        ieeeTestTypeCollector = new IEEETestTypeCollector(javaConfig);
-        result = ieeeTestTypeCollector.createResultsJavaPythonDepGraph(dependencyGraph);
+        ieeeTestTypeCollector = new IEEETestTypeCollector(javaConfig, filerMock);
+        ieeeTestTypeCollector.createResultsJavaPythonDepGraph(dependencyGraph);
 
         expectedResult.add(new Result("org.foo.view.blatestbla", Paths.get("src/test/java/org/foo/view/blatestbla.java"), "dep_ieee",TestType.INTEGRATION.name()));
-        assertEquals("Result set is not correct!", expectedResult, result);
+        assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
 
 
     @Test
-    public void classifyDependencyGraphWithUnitAndIntegrationTestTest() {
+    public void classifyDependencyGraphWithUnitAndIntegrationTestTest() throws IOException {
         DependencyGraph dependencyGraph = new DependencyGraph();
         dependencyGraph.putEdge(blatestbla, C2);
         dependencyGraph.putEdge(blatestbla, C3);
         dependencyGraph.putEdge(personTest, C1);
         dependencyGraph.putEdge(personTest, address);
 
-        ieeeTestTypeCollector = new IEEETestTypeCollector(javaConfig);
-        result = ieeeTestTypeCollector.createResultsJavaPythonDepGraph(dependencyGraph);
+        ieeeTestTypeCollector = new IEEETestTypeCollector(javaConfig, filerMock);
+        ieeeTestTypeCollector.createResultsJavaPythonDepGraph(dependencyGraph);
 
         expectedResult.add(new Result("org.foo.view.blatestbla",  Paths.get("src/test/java/org/foo/view/blatestbla.java"),"dep_ieee", TestType.UNIT.name()));
         expectedResult.add(new Result("org.foo.models.Persontest", Paths.get("src/test/java/org/foo/models/Persontest.java"), "dep_ieee",TestType.INTEGRATION.name()));
-        assertEquals("Result set is not correct!", expectedResult, result);
+        assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
     @Test
-    public void classifyCodeCoverageJavaClassLevelTest() {
+    public void classifyCodeCoverageJavaClassLevelTest() throws IOException {
         Set<IUnit> testedMethodsOfTest1 = new HashSet<>();
         testedMethodsOfTest1.add(covP1C1M1);
         testedMethodsOfTest1.add(covP1C2M1);
@@ -244,16 +243,16 @@ public class IEEETestTypeCollectorTest extends BaseTest {
         covData.add(T1Test1, testedMethodsOfTest1);
         covData.add(T2Test1, testedMethodsOfTest2);
 
-        ieeeTestTypeCollector = new IEEETestTypeCollector(javaConfig);
-        result = ieeeTestTypeCollector.createResultsJavaPythonCoverageClass(covData);
+        ieeeTestTypeCollector = new IEEETestTypeCollector(javaConfig, filerMock);
+        ieeeTestTypeCollector.createResultsJavaPythonCoverageClass(covData);
 
         expectedResult.add(new Result("org.foo.t1.Test1", null, "cov_ieee",TestType.UNIT.name()));
         expectedResult.add(new Result("org.foo.t2.Test2", null , "cov_ieee",TestType.INTEGRATION.name()));
-        assertEquals("Result set is not correct!", expectedResult, result);
+        assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
     @Test
-    public void classifyCodeCoverageJavaClassLevelSameClassDifferentMethodsTest() {
+    public void classifyCodeCoverageJavaClassLevelSameClassDifferentMethodsTest() throws IOException {
         Set<IUnit> testedMethodsOfTest1 = new HashSet<>();
         testedMethodsOfTest1.add(covP1C1M1);
         testedMethodsOfTest1.add(covP1C2M1);
@@ -266,15 +265,15 @@ public class IEEETestTypeCollectorTest extends BaseTest {
         covData.add(T1Test1, testedMethodsOfTest1);
         covData.add(T1M1, testedMethodsOfTest2);
 
-        ieeeTestTypeCollector = new IEEETestTypeCollector(javaConfig);
-        result = ieeeTestTypeCollector.createResultsJavaPythonCoverageClass(covData);
+        ieeeTestTypeCollector = new IEEETestTypeCollector(javaConfig, filerMock);
+        ieeeTestTypeCollector.createResultsJavaPythonCoverageClass(covData);
 
         expectedResult.add(new Result("org.foo.t1.Test1", null, "cov_ieee",TestType.INTEGRATION.name()));
-        assertEquals("Result set is not correct!", expectedResult, result);
+        assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
     @Test
-    public void classifyCodeCoverageJavaMethodLevelTest() {
+    public void classifyCodeCoverageJavaMethodLevelTest() throws IOException {
         Set<IUnit> testedMethodsOfTest1 = new HashSet<>();
         testedMethodsOfTest1.add(covP1C1M1);
         testedMethodsOfTest1.add(covP1C2M1);
@@ -288,19 +287,19 @@ public class IEEETestTypeCollectorTest extends BaseTest {
         covData.add(T1M1, testedMethodsOfTest2);
 
         javaConfig.setMethodLevel(true);
-        ieeeTestTypeCollector = new IEEETestTypeCollector(javaConfig);
-        result = ieeeTestTypeCollector.createResultsJavaPythonCoverageMethod(covData);
+        ieeeTestTypeCollector = new IEEETestTypeCollector(javaConfig, filerMock);
+        ieeeTestTypeCollector.createResultsJavaPythonCoverageMethod(covData);
 
         expectedResult.add(new Result("org.foo.t1.Test1.test1", null, "cov_ieee_met",TestType.UNIT.name()));
         expectedResult.add(new Result("org.foo.t1.Test1.m1", null, "cov_ieee_met",TestType.INTEGRATION.name()));
-        assertEquals("Result set is not correct!", expectedResult, result);
+        assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
 
 
 
     @Test
-    public void classifyCodeCoveragePythonClassLevelTest() {
+    public void classifyCodeCoveragePythonClassLevelTest() throws IOException {
         Set<IUnit> testedMethodsOfTest1 = new HashSet<>();
         testedMethodsOfTest1.add(pyModule1Init);
         testedMethodsOfTest1.add(pyModule2Init);
@@ -312,17 +311,17 @@ public class IEEETestTypeCollectorTest extends BaseTest {
         covData.add(pyTest1Test, testedMethodsOfTest1);
         covData.add(pyTest2Test, testedMethodsOfTest2);
 
-        ieeeTestTypeCollector = new IEEETestTypeCollector(pythonConfig);
-        result = ieeeTestTypeCollector.createResultsJavaPythonCoverageClass(covData);
+        ieeeTestTypeCollector = new IEEETestTypeCollector(pythonConfig, filerMock);
+        ieeeTestTypeCollector.createResultsJavaPythonCoverageClass(covData);
 
         expectedResult.add(new Result("tests.test_module1", null, "cov_ieee", TestType.UNIT.name()));
         expectedResult.add(new Result("tests.test_module2", null, "cov_ieee", TestType.INTEGRATION.name()));
-        assertEquals("Result set is not correct!", expectedResult, result);
+        assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
 
     @Test
-    public void classifyCodeCoveragePythonMethodLevelTest() {
+    public void classifyCodeCoveragePythonMethodLevelTest() throws IOException {
         Set<IUnit> testedMethodsOfTest1 = new HashSet<>();
         testedMethodsOfTest1.add(pyModule1Init);
         testedMethodsOfTest1.add(pyModule2Init);
@@ -336,11 +335,11 @@ public class IEEETestTypeCollectorTest extends BaseTest {
         covData.add(pyTest2Test, testedMethodsOfTest2);
 
         pythonConfig.setMethodLevel(true);
-        ieeeTestTypeCollector = new IEEETestTypeCollector(pythonConfig);
-        result = ieeeTestTypeCollector.createResultsJavaPythonCoverageMethod(covData);
+        ieeeTestTypeCollector = new IEEETestTypeCollector(pythonConfig, filerMock);
+        ieeeTestTypeCollector.createResultsJavaPythonCoverageMethod(covData);
 
         expectedResult.add(new Result("tests.test_module1.Module1Test.test", null, "cov_ieee_met", TestType.UNIT.name()));
         expectedResult.add(new Result("tests.test_module2.Module2Test.test", null, "cov_ieee_met", TestType.INTEGRATION.name()));
-        assertEquals("Result set is not correct!", expectedResult, result);
+        assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 }

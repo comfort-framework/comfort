@@ -27,6 +27,7 @@ import de.ugoe.cs.comfort.data.graphs.CallType;
 import de.ugoe.cs.comfort.data.graphs.DependencyGraph;
 import de.ugoe.cs.comfort.data.models.IUnit;
 import de.ugoe.cs.comfort.filer.models.Result;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
@@ -36,7 +37,7 @@ import org.junit.Test;
 /**
  * @author Fabian Trautsch
  */
-public class TestCoverageCollectorTest extends BaseTest {
+public class TestCoverageCollectorTest extends BaseMetricCollectorTest {
     private final String basePath = getPathToResource("metricCollectorTestData/ieeeAndistqb");
 
     private TestCoverageCollector testCoverageCollector;
@@ -44,7 +45,6 @@ public class TestCoverageCollectorTest extends BaseTest {
     private GeneralConfiguration javaConfig = new GeneralConfiguration();
     private GeneralConfiguration pythonConfig = new GeneralConfiguration();
 
-    private Set<Result> result = new HashSet<>();
     private Set<Result> expectedResult = new HashSet<>();
 
     private CoverageData covDataJava = new CoverageData();
@@ -54,7 +54,6 @@ public class TestCoverageCollectorTest extends BaseTest {
 
     @Before
     public void clearResults() {
-        result.clear();
         expectedResult.clear();
     }
 
@@ -122,92 +121,92 @@ public class TestCoverageCollectorTest extends BaseTest {
     }
 
     @Test
-    public void createCodeCoverageMetricJavaMethodLevelTest() {
-        testCoverageCollector = new TestCoverageCollector(javaConfig);
-        result = testCoverageCollector.createResultsJavaPythonMethodLevel(covDataJava);
+    public void createCodeCoverageMetricJavaMethodLevelTest() throws IOException {
+        testCoverageCollector = new TestCoverageCollector(javaConfig, filerMock);
+        testCoverageCollector.createResultsJavaPythonMethodLevel(covDataJava);
         expectedResult.add(new Result("org.foo.t1.Test1.test1", null, "cov_tcov_met", "66"));
         expectedResult.add(new Result("org.foo.t2.Test2.test1", null, "cov_tcov_met","33"));
         expectedResult.add(new Result("org.foo.t2.Test2.test2", null, "cov_tcov_met","33"));
-        assertEquals("Result set is not correct!", expectedResult, result);
+        assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
 
     }
 
     @Test
-    public void createCodeCoverageMetricPythonMethodTest() {
-        testCoverageCollector = new TestCoverageCollector(pythonConfig);
+    public void createCodeCoverageMetricPythonMethodTest() throws IOException {
+        testCoverageCollector = new TestCoverageCollector(pythonConfig, filerMock);
 
-        result = testCoverageCollector.createResultsJavaPythonMethodLevel(covDataPython);
+        testCoverageCollector.createResultsJavaPythonMethodLevel(covDataPython);
         expectedResult.add(new Result("tests.test_module1.Module1Test.test", null, "cov_tcov_met", "66"));
         expectedResult.add(new Result("tests.test_module2.Module2Test.test", null, "cov_tcov_met", "33"));
         expectedResult.add(new Result("tests.test_module2.Module2Test.test2", null, "cov_tcov_met", "33"));
-        assertEquals("Result set is not correct!", expectedResult, result);
+        assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
     @Test
-    public void createCodeCoverageMetricJavaClassLevelTest() {
-        testCoverageCollector = new TestCoverageCollector(javaConfig);
-        result = testCoverageCollector.createResultsJavaPythonClassLevel(covDataJava);
+    public void createCodeCoverageMetricJavaClassLevelTest() throws IOException {
+        testCoverageCollector = new TestCoverageCollector(javaConfig, filerMock);
+        testCoverageCollector.createResultsJavaPythonClassLevel(covDataJava);
         expectedResult.add(new Result("org.foo.t1.Test1", null, "cov_tcov", "66"));
         expectedResult.add(new Result("org.foo.t2.Test2", null, "cov_tcov", "66"));
-        assertEquals("Result set is not correct!", expectedResult, result);
+        assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
     @Test
-    public void createCodeCoverageMetricPythonClassTest() {
-        testCoverageCollector = new TestCoverageCollector(pythonConfig);
+    public void createCodeCoverageMetricPythonClassTest() throws IOException {
+        testCoverageCollector = new TestCoverageCollector(pythonConfig, filerMock);
 
-        result = testCoverageCollector.createResultsJavaPythonClassLevel(covDataPython);
+        testCoverageCollector.createResultsJavaPythonClassLevel(covDataPython);
         expectedResult.add(new Result("tests.test_module1", null, "cov_tcov", "66"));
         expectedResult.add(new Result("tests.test_module2", null, "cov_tcov", "66"));
-        assertEquals("Result set is not correct!", expectedResult, result);
+        assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
     @Test
-    public void createResultsForCallGraphJavaMethodLevelTest() {
-        testCoverageCollector = new TestCoverageCollector(javaConfig);
+    public void createResultsForCallGraphJavaMethodLevelTest() throws IOException {
+        testCoverageCollector = new TestCoverageCollector(javaConfig, filerMock);
 
-        result = testCoverageCollector.createResultsForCallGraphMethodLevel(javaCallGraph);
+        testCoverageCollector.createResultsForCallGraphMethodLevel(javaCallGraph);
         expectedResult.add(new Result("org.foo.t1.Test1.test1", null, "call_tcov_met", "66"));
         expectedResult.add(new Result("org.foo.t2.Test2.test1", null, "call_tcov_met", "100"));
         expectedResult.add(new Result("org.foo.t2.Test2.test2", null, "call_tcov_met", "33"));
-        assertEquals("Result set is not correct!", expectedResult, result);
+        assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
     @Test
-    public void createResultsForCallGraphJavaClassLevelTest() {
-        testCoverageCollector = new TestCoverageCollector(javaConfig);
+    public void createResultsForCallGraphJavaClassLevelTest() throws IOException {
+        testCoverageCollector = new TestCoverageCollector(javaConfig, filerMock);
 
-        result = testCoverageCollector.createResultsForCallGraphClassLevel(javaCallGraph);
+        testCoverageCollector.createResultsForCallGraphClassLevel(javaCallGraph);
         expectedResult.add(new Result("org.foo.t1.Test1", null, "call_tcov", "66"));
         expectedResult.add(new Result("org.foo.t2.Test2", null, "call_tcov", "100"));
-        assertEquals("Result set is not correct!", expectedResult, result);
+        assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
 
     @Test
-    public void createResultsForDependencyGraphJavaTest() {
-        testCoverageCollector = new TestCoverageCollector(javaConfig);
+    public void createResultsForDependencyGraphJavaTest() throws IOException {
+        testCoverageCollector = new TestCoverageCollector(javaConfig, filerMock);
 
-        result = testCoverageCollector.createResultsForDependencyGraph(javaDependencyGraph);
+        testCoverageCollector.createResultsForDependencyGraph(javaDependencyGraph);
         expectedResult.add(new Result("org.foo.Test1", null, "dep_tcov", "66"));
         expectedResult.add(new Result("org.foo.Test2", null, "dep_tcov", "100"));
-        assertEquals("Result set is not correct!", expectedResult, result);
+        assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
     @Test
-    public void createResultsForDependencyGraphPythonTest() {
+    public void createResultsForDependencyGraphPythonTest() throws IOException {
         DependencyGraph dependencyGraph = new DependencyGraph();
         dependencyGraph.putEdge(pyTest1, module1);
         dependencyGraph.putEdge(module1, module2);
         dependencyGraph.putEdge(pyTest2, module1);
         dependencyGraph.putEdge(pyTest2, module3);
 
-        testCoverageCollector = new TestCoverageCollector(pythonConfig);
+        testCoverageCollector = new TestCoverageCollector(pythonConfig, filerMock);
 
-        result = testCoverageCollector.createResultsForDependencyGraph(dependencyGraph);
+        testCoverageCollector.createResultsForDependencyGraph(dependencyGraph);
         expectedResult.add(new Result("tests.test1", Paths.get("tests/test1.py"), "dep_tcov", "66"));
         expectedResult.add(new Result("tests.test2", Paths.get("tests/test2.py"), "dep_tcov", "100"));
-        assertEquals("Result set is not correct!", expectedResult, result);
+        assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
 }

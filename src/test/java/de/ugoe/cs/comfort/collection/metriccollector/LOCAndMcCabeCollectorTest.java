@@ -24,6 +24,7 @@ import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
 import de.ugoe.cs.comfort.data.ProjectFiles;
 import de.ugoe.cs.comfort.exception.MetricCollectorException;
 import de.ugoe.cs.comfort.filer.models.Result;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
@@ -34,7 +35,7 @@ import org.junit.Test;
 /**
  * @author Fabian Trautsch
  */
-public class LOCAndMcCabeCollectorTest extends BaseTest {
+public class LOCAndMcCabeCollectorTest extends BaseMetricCollectorTest {
     private final String basePath = getPathToResource("metricCollectorTestData/locandmccabecollector");
 
     private LOCAndMcCabeCollector locAndMcCabeCollector;
@@ -71,11 +72,11 @@ public class LOCAndMcCabeCollectorTest extends BaseTest {
     public void getLOCAndMcCabeForPythonMethodTest() {
         try {
             pythonConfig.setMethodLevel(true);
-            locAndMcCabeCollector = new LOCAndMcCabeCollector(pythonConfig);
+            locAndMcCabeCollector = new LOCAndMcCabeCollector(pythonConfig, filerMock);
             Path testDemo = Paths.get(getPathToResource("metricCollectorTestData/locandmccabecollector/python/tests/testme.py"));
 
 
-            Set<Result> result = locAndMcCabeCollector.getLOCAndMcCabeForPythonMethod(null);
+            locAndMcCabeCollector.getLOCAndMcCabeForPythonMethod(null);
             Result findPort = new Result("testme.find_port", testDemo);
             findPort.addMetric("mc_cabe_sg", "1");
             findPort.addMetric("mc_cabe_all", "1");
@@ -174,9 +175,9 @@ public class LOCAndMcCabeCollectorTest extends BaseTest {
             regSubappSignalsRegHandlerHandler.addMetric("lloc", "5");
             expectedResult.add(regSubappSignalsRegHandlerHandler);
 
-            assertEquals("Result set is not correct!", expectedResult, result);
+            assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
 
-        } catch (MetricCollectorException e) {
+        } catch (MetricCollectorException | IOException e) {
             fail("Unexpected exception: "+e);
         }
 
@@ -186,8 +187,8 @@ public class LOCAndMcCabeCollectorTest extends BaseTest {
     public void getLOCAndMcCabeForJavaMethodTest() {
         try {
             javaConfig.setMethodLevel(true);
-            locAndMcCabeCollector = new LOCAndMcCabeCollector(javaConfig);
-            Set<Result> result = locAndMcCabeCollector.getLOCAndMcCabeForJavaMethod(projectFiles);
+            locAndMcCabeCollector = new LOCAndMcCabeCollector(javaConfig, filerMock);
+            locAndMcCabeCollector.getLOCAndMcCabeForJavaMethod(projectFiles);
             Result doSomethingResult = new Result("org.foo.JavaAbstractTestFile.doSomething", Paths.get("org/foo/JavaAbstractTestFile.java"));
             doSomethingResult.addMetric("mc_cabe", "0");
             doSomethingResult.addMetric("lloc", "1");
@@ -255,7 +256,7 @@ public class LOCAndMcCabeCollectorTest extends BaseTest {
             expectedResult.add(complete2Result);
 
 
-            assertEquals("Result set is not correct!", expectedResult, result);
+            assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
 
         } catch (MetricCollectorException e) {
             fail("Unexpected exception: "+e);
@@ -265,8 +266,9 @@ public class LOCAndMcCabeCollectorTest extends BaseTest {
     @Test
     public void getLOCAndMcCabeForJavaClassTest() {
         try {
-            locAndMcCabeCollector = new LOCAndMcCabeCollector(javaConfig);
-            Set<Result> result = locAndMcCabeCollector.getLOCAndMcCabeForJavaClass(projectFiles);
+            locAndMcCabeCollector = new LOCAndMcCabeCollector(javaConfig, filerMock);
+            locAndMcCabeCollector.getLOCAndMcCabeForJavaClass(projectFiles);
+
             Result javaTestFileResult = new Result("org.foo.JavaTestFile", Paths.get("org/foo/JavaTestFile.java"));
             javaTestFileResult.addMetric("lloc", "126");
             javaTestFileResult.addMetric("cloc", "20");
@@ -277,7 +279,7 @@ public class LOCAndMcCabeCollectorTest extends BaseTest {
 
             expectedResult.add(javaTestFileResult);
             expectedResult.add(javaAbstractTestFile);
-            assertEquals("Result set is not correct!", expectedResult, result);
+            assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
         } catch (MetricCollectorException e) {
             fail("Unexpected exception: "+e);
         }

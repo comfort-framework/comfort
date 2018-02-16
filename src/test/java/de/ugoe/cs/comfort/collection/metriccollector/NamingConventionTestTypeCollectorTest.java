@@ -25,6 +25,7 @@ import de.ugoe.cs.comfort.data.ProjectFiles;
 import de.ugoe.cs.comfort.data.models.IUnit;
 import de.ugoe.cs.comfort.data.models.JavaMethod;
 import de.ugoe.cs.comfort.filer.models.Result;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
@@ -35,7 +36,7 @@ import org.junit.Test;
 /**
  * @author Fabian Trautsch
  */
-public class NamingConventionTestTypeCollectorTest extends BaseTest{
+public class NamingConventionTestTypeCollectorTest extends BaseMetricCollectorTest {
     private final String basePath = getPathToResource("metricCollectorTestData/numassertcollector");
 
     private GeneralConfiguration configuration = new GeneralConfiguration();
@@ -45,7 +46,7 @@ public class NamingConventionTestTypeCollectorTest extends BaseTest{
     }
 
     @Test
-    public void classificationTest() {
+    public void classificationTest() throws IOException {
         HashSet<Path> codeFiles = new HashSet<>();
         codeFiles.add(Paths.get("src/main/java/org/foo/Main.java"));
         codeFiles.add(Paths.get("src/main/java/org/foo/models/Person.java"));
@@ -103,16 +104,16 @@ public class NamingConventionTestTypeCollectorTest extends BaseTest{
                 Paths.get("src/main/java/unit/fooTest.java"), "files_nc",TestType.UNIT.name()));
 
 
-        NamingConventionTestTypeCollector nc = new NamingConventionTestTypeCollector(configuration);
-        Set<Result> result = nc.createResults(projectFiles);
+        NamingConventionTestTypeCollector nc = new NamingConventionTestTypeCollector(configuration, filerMock);
+        nc.createResults(projectFiles);
 
-        assertEquals("size do not match", expectedResult.size(), result.size());
-        assertEquals("wrong classification", expectedResult, result);
+        assertEquals("size do not match", expectedResult.size(), filerMock.getResults().getResults().size());
+        assertEquals("wrong classification", expectedResult, filerMock.getResults().getResults());
     }
 
 
     @Test
-    public void classificationTwoMatchesTest() {
+    public void classificationTwoMatchesTest() throws IOException {
         HashSet<Path> codeFiles = new HashSet<>();
         codeFiles.add(Paths.get("src/main/java/org/foo/models/Person.java"));
         codeFiles.add(Paths.get("src/main/java/org/foo/models/PersonStream.java"));
@@ -127,11 +128,11 @@ public class NamingConventionTestTypeCollectorTest extends BaseTest{
                 Paths.get("src/test/java/org/foo/models/PersonStreamTest.java"), "files_nc", TestType.UNIT.name()));
 
 
-        NamingConventionTestTypeCollector nc = new NamingConventionTestTypeCollector(configuration);
-        Set<Result> result = nc.createResults(projectFiles);
+        NamingConventionTestTypeCollector nc = new NamingConventionTestTypeCollector(configuration, filerMock);
+        nc.createResults(projectFiles);
 
-        assertEquals("size do not match", expectedResult.size(), result.size());
-        assertEquals("wrong classification", expectedResult, result);
+        assertEquals("size do not match", expectedResult.size(), filerMock.getResults().getResults().size());
+        assertEquals("wrong classification", expectedResult, filerMock.getResults().getResults());
     }
 
     @Test
@@ -150,8 +151,8 @@ public class NamingConventionTestTypeCollectorTest extends BaseTest{
         covData.add(fooIT2, new HashSet<>());
         covData.add(fooTestInit, new HashSet<>());
 
-        NamingConventionTestTypeCollector nc = new NamingConventionTestTypeCollector(configuration);
-        Set<Result> result = nc.createResults(covData);
+        NamingConventionTestTypeCollector nc = new NamingConventionTestTypeCollector(configuration, filerMock);
+        nc.createResults(covData);
 
         Set<Result> expectedResult = new HashSet<>();
         expectedResult.add(new Result("org.foo.models.Persontest.<init>",
@@ -171,6 +172,6 @@ public class NamingConventionTestTypeCollectorTest extends BaseTest{
         expectedResult.add(new Result("unit.fooTest.<init>",
                 Paths.get("src/test/java/unit/fooTest.java"), "cov_nc", TestType.UNIT.name()));
 
-        assertEquals("wrong classification", expectedResult, result);
+        assertEquals("wrong classification", expectedResult, filerMock.getResults().getResults());
     }
 }

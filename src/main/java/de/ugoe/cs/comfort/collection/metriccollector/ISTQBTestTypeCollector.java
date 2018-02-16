@@ -26,7 +26,9 @@ import de.ugoe.cs.comfort.data.graphs.CallGraph;
 import de.ugoe.cs.comfort.data.graphs.DependencyGraph;
 import de.ugoe.cs.comfort.data.graphs.IGraph;
 import de.ugoe.cs.comfort.data.models.IUnit;
+import de.ugoe.cs.comfort.filer.BaseFiler;
 import de.ugoe.cs.comfort.filer.models.Result;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -37,52 +39,52 @@ import java.util.Set;
  */
 public class ISTQBTestTypeCollector extends BaseMetricCollector {
 
-    public ISTQBTestTypeCollector(GeneralConfiguration configuration) {
-        super(configuration);
+    public ISTQBTestTypeCollector(GeneralConfiguration configuration, BaseFiler filer) {
+        super(configuration, filer);
     }
 
     @SupportsMethod
     @SupportsJava
     @SupportsPython
-    public Set<Result> createResultsJavaMethodLevelCallGraph(CallGraph graph) {
-        return classifyUsingGraph(graph, "call_istqb_met");
+    public void createResultsJavaMethodLevelCallGraph(CallGraph graph) throws IOException {
+        filer.storeResults(classifyUsingGraph(graph, "call_istqb_met"));
     }
 
     @SupportsClass
     @SupportsJava
     @SupportsPython
-    public Set<Result> createResultsJavaClassLevelCallGraph(CallGraph callGraph) {
+    public void createResultsJavaClassLevelCallGraph(CallGraph callGraph) throws IOException {
         logger.warn("Using depedency graph representation of call graph for strategy {}", this.getClass().getName());
-        return classifyUsingGraph(callGraph.getDependencyGraphRepresentation(), "call_istqb");
+        filer.storeResults(classifyUsingGraph(callGraph.getDependencyGraphRepresentation(), "call_istqb"));
     }
 
     @SupportsPython
     @SupportsJava
     @SupportsClass
-    public Set<Result> createResultsJavaPythonClassDepGraph(DependencyGraph dependencyGraph) {
-        return classifyUsingGraph(dependencyGraph, "dep_istqb");
+    public void createResultsJavaPythonClassDepGraph(DependencyGraph dependencyGraph) throws IOException {
+        filer.storeResults(classifyUsingGraph(dependencyGraph, "dep_istqb"));
     }
 
     @SupportsPython
     @SupportsJava
     @SupportsClass
-    public Set<Result> createResultsJavaPythonClassCoverage(CoverageData dataSet) {
+    public void createResultsJavaPythonClassCoverage(CoverageData dataSet) throws IOException {
         Map<IUnit, Integer> unitAndAmountOfPackagesTested = getUniqueTestedClasses(dataSet.getCoverageDataClassLevel());
 
         // Merge results from different methods on class level
-        return TestTypeDetectionUtils.generateResults(generalConf, unitAndAmountOfPackagesTested,
-                generalConf.getMethodLevel(), "cov_istqb");
+        filer.storeResults(TestTypeDetectionUtils.generateResults(generalConf, unitAndAmountOfPackagesTested,
+                generalConf.getMethodLevel(), "cov_istqb"));
     }
 
     @SupportsPython
     @SupportsJava
     @SupportsMethod
-    public Set<Result> createResultsJavaPythonMethodCoverage(CoverageData dataSet) {
+    public void createResultsJavaPythonMethodCoverage(CoverageData dataSet) throws IOException {
         Map<IUnit, Integer> unitAndAmountOfPackagesTested = getUniqueTestedClasses(dataSet.getCoverageData());
 
         // Merge results from different methods on class level
-        return TestTypeDetectionUtils.generateResults(generalConf, unitAndAmountOfPackagesTested,
-                generalConf.getMethodLevel(), "cov_istqb_met");
+        filer.storeResults(TestTypeDetectionUtils.generateResults(generalConf, unitAndAmountOfPackagesTested,
+                generalConf.getMethodLevel(), "cov_istqb_met"));
     }
 
     private Map<IUnit, Integer> getUniqueTestedClasses(Map<IUnit, Set<IUnit>> callerCalleePairs) {

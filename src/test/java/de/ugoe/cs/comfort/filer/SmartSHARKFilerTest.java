@@ -18,20 +18,19 @@ package de.ugoe.cs.comfort.filer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.spy;
-import static org.powermock.api.mockito.PowerMockito.verifyPrivate;
-import static org.powermock.api.mockito.PowerMockito.when;
 
 import de.ugoe.cs.comfort.DatabaseTest;
 import de.ugoe.cs.comfort.collection.metriccollector.TestType;
 import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
-import de.ugoe.cs.comfort.database.models.MutationResult;
-import de.ugoe.cs.comfort.database.models.TestState;
+import de.ugoe.cs.smartshark.model.MutationResult;
+import de.ugoe.cs.smartshark.model.TestState;
 import de.ugoe.cs.comfort.filer.models.Result;
 import de.ugoe.cs.comfort.filer.models.ResultSet;
 import de.ugoe.cs.smartshark.model.Commit;
 import de.ugoe.cs.smartshark.model.VCSSystem;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -39,22 +38,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.bson.types.ObjectId;
-import org.eclipse.jgit.lib.Constants;
-import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.lib.StoredConfig;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Fabian Trautsch
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(SmartSHARKFiler.class)
 public class SmartSHARKFilerTest extends DatabaseTest {
+
     private GeneralConfiguration configuration = new GeneralConfiguration();
 
     private Commit commit;
@@ -115,20 +107,117 @@ public class SmartSHARKFilerTest extends DatabaseTest {
         mongoClient.dropDatabase(DB_NAME);
     }
 
-    private SmartSHARKFiler getMockedSmartSHARKFiler() throws Exception {
-        // Mock Repository and the config so that the right values are eturned
-        Repository repositoryMock = mock(Repository.class);
-        StoredConfig storedConfigMock = mock(StoredConfig.class);
-        when(storedConfigMock.getString("remote", "origin", "url")).thenReturn("git@github.com:comfort-framework/comfort.git");
-        when(repositoryMock.getConfig()).thenReturn(storedConfigMock);
-        org.eclipse.jgit.lib.ObjectId objectId = org.eclipse.jgit.lib.ObjectId.fromString("13a2f32a6c91a472d186348d7dfbdf8b9e92f16f");
-        when(repositoryMock.resolve(Constants.HEAD)).thenReturn(objectId);
+    @Test
+    public void storeSingleResultTest() throws IOException {
+        SmartSHARKFiler smartSHARKFiler = new SmartSHARKFiler(configuration, configuration.getFilerConfiguration(),
+                commit.getId(), new HashMap<Path, ObjectId>(){{
+            put(Paths.get(modelTest.getPath()), modelTest.getId());
+            put(Paths.get(modelTest1.getPath()), modelTest1.getId());
+        }});
 
-        SmartSHARKFiler smartSHARKFiler = spy(new SmartSHARKFiler());
-        when(smartSHARKFiler, "getRepository", configuration.getProjectDir()).thenReturn(repositoryMock);
+        res1.addMetric("istqb_call", TestType.UNIT.name());
+        smartSHARKFiler.storeResult(res1);
 
-        return smartSHARKFiler;
+        // Check stored results
+        TestState testState = datastore.createQuery(TestState.class).order("name").get();
+
+
+        TestState expectedState = new TestState();
+        expectedState.setId(testState.getId());
+        expectedState.setName("de.foo.bar.ModelTest");
+        expectedState.setCommitId(commit.getId());
+        expectedState.setFileId(modelTest.getId());
+        expectedState.setMetrics(new HashMap<String, String>(){{
+            put("istqb_call", TestType.UNIT.name());
+        }});
+
+        assertEquals(expectedState, testState);
     }
+
+    @Test
+    public void storeTwoSingleResultTest() throws IOException {
+        SmartSHARKFiler smartSHARKFiler = new SmartSHARKFiler(configuration, configuration.getFilerConfiguration(),
+                commit.getId(), new HashMap<Path, ObjectId>(){{
+            put(Paths.get(modelTest.getPath()), modelTest.getId());
+            put(Paths.get(modelTest1.getPath()), modelTest1.getId());
+        }});
+
+        res1.addMetric("istqb_call", TestType.UNIT.name());
+        smartSHARKFiler.storeResult(res1);
+
+        Result res3 = new Result("de.foo.bar.ModelTest", Paths.get("src/de/foo/bar/ModelTest.java"), "fantasy_metric", "5");
+        smartSHARKFiler.storeResult(res3);
+
+        // Check stored results
+        TestState testState = datastore.createQuery(TestState.class).order("name").get();
+
+
+        TestState expectedState = new TestState();
+        expectedState.setId(testState.getId());
+        expectedState.setName("de.foo.bar.ModelTest");
+        expectedState.setCommitId(commit.getId());
+        expectedState.setFileId(modelTest.getId());
+        expectedState.setMetrics(new HashMap<String, String>(){{
+            put("istqb_call", TestType.UNIT.name());
+            put("fantasy_metric", "5");
+        }});
+
+        assertEquals(expectedState, testState);
+    }
+
+    @Test
+    public void storeTwoDifferentResultsAfterAnotherTest() throws IOException {
+        SmartSHARKFiler smartSHARKFiler = new SmartSHARKFiler(configuration, configuration.getFilerConfiguration(),
+                commit.getId(), new HashMap<Path, ObjectId>(){{
+            put(Paths.get(modelTest.getPath()), modelTest.getId());
+            put(Paths.get(modelTest1.getPath()), modelTest1.getId());
+        }});
+
+        // Create test data
+        res1.addMetric("istqb_call", TestType.UNIT.name());
+        res2.addMetric("istqb_call", TestType.INTEGRATION.name());
+        resultsToStore.add(res1);
+        resultsToStore.add(res2);
+
+        resultSet.addResults(resultsToStore);
+        smartSHARKFiler.storeResults(resultSet.getResults());
+
+        resultsToStore.clear();
+        Result res3 = new Result("de.foo.bar.ModelTest", Paths.get("src/de/foo/bar/ModelTest.java"), "fantasy_metric", "5");
+        Result res4 = new Result("de.foo.bar.ModelTest1", Paths.get("src/de/foo/bar/ModelTest1.java"), "fantasy_metric", "2");
+        resultsToStore.add(res3);
+        resultsToStore.add(res4);
+        smartSHARKFiler.storeResults(resultsToStore);
+
+        // Check stored results
+        List<TestState> testStates = datastore.createQuery(TestState.class).order("name").asList();
+
+        List<TestState> expectedStates = new ArrayList<>();
+        TestState res1State = new TestState();
+        res1State.setId(testStates.get(0).getId());
+        res1State.setName("de.foo.bar.ModelTest");
+        res1State.setCommitId(commit.getId());
+        res1State.setFileId(modelTest.getId());
+        res1State.setMetrics(new HashMap<String, String>(){{
+            put("istqb_call", TestType.UNIT.name());
+            put("fantasy_metric", "5");
+        }});
+        expectedStates.add(res1State);
+
+        TestState res2State = new TestState();
+        res2State.setId(testStates.get(1).getId());
+        res2State.setName("de.foo.bar.ModelTest1");
+        res2State.setCommitId(commit.getId());
+        res2State.setFileId(modelTest1.getId());
+        res2State.setMetrics(new HashMap<String, String>(){{
+            put("istqb_call", TestType.INTEGRATION.name());
+            put("fantasy_metric", "2");
+        }});
+        expectedStates.add(res2State);
+
+        assertEquals(expectedStates, testStates);
+    }
+
 
     @Test
     public void storeResultsOnlyMetricsTest() throws Exception {
@@ -140,11 +229,15 @@ public class SmartSHARKFilerTest extends DatabaseTest {
 
         resultSet.addResults(resultsToStore);
 
-        SmartSHARKFiler smartSHARKFiler = getMockedSmartSHARKFiler();
-        smartSHARKFiler.storeResults(configuration, resultSet);
+        SmartSHARKFiler smartSHARKFiler = new SmartSHARKFiler(configuration, configuration.getFilerConfiguration(),
+                commit.getId(), new HashMap<Path, ObjectId>(){{
+            put(Paths.get(modelTest.getPath()), modelTest.getId());
+            put(Paths.get(modelTest1.getPath()), modelTest1.getId());
+        }});
+        smartSHARKFiler.storeResults(resultSet.getResults());
 
         // Verify that getRepository is called
-        verifyPrivate(smartSHARKFiler).invoke("getRepository", configuration.getProjectDir());
+        //verifyPrivate(smartSHARKFiler).invoke("getRepository", configuration.getProjectDir());
 
         // Check stored results
         List<TestState> testStates = datastore.createQuery(TestState.class).order("name").asList();
@@ -192,31 +285,32 @@ public class SmartSHARKFilerTest extends DatabaseTest {
 
         resultSet.addResults(resultsToStore);
 
-        SmartSHARKFiler smartSHARKFiler = getMockedSmartSHARKFiler();
-        smartSHARKFiler.storeResults(configuration, resultSet);
-
-        // Verify that getRepository is called
-        verifyPrivate(smartSHARKFiler).invoke("getRepository", configuration.getProjectDir());
+        SmartSHARKFiler smartSHARKFiler = new SmartSHARKFiler(configuration, configuration.getFilerConfiguration(),
+                commit.getId(), new HashMap<Path, ObjectId>(){{
+            put(Paths.get(modelTest.getPath()), modelTest.getId());
+            put(Paths.get(modelTest1.getPath()), modelTest1.getId());
+        }});
+        smartSHARKFiler.storeResults(resultSet.getResults());
 
         // Check stored results
         List<TestState> testStates = datastore.createQuery(TestState.class).order("name").asList();
 
         // Get stored mutations
-        de.ugoe.cs.comfort.database.models.Mutation dbMutation1 = datastore.createQuery(de.ugoe.cs.comfort.database.models.Mutation.class)
+        de.ugoe.cs.smartshark.model.Mutation dbMutation1 = datastore.createQuery(de.ugoe.cs.smartshark.model.Mutation.class)
                 .field("location").equal("de.foo.bar.Model.addBatch")
                 .field("m_type").equal("org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator")
                 .field("l_num").equal(10)
                 .get();
         assertNotNull(dbMutation1);
 
-        de.ugoe.cs.comfort.database.models.Mutation dbMutation2 = datastore.createQuery(de.ugoe.cs.comfort.database.models.Mutation.class)
+        de.ugoe.cs.smartshark.model.Mutation dbMutation2 = datastore.createQuery(de.ugoe.cs.smartshark.model.Mutation.class)
                 .field("location").equal("de.foo.bar.Model.addBatch")
                 .field("m_type").equal("org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator")
                 .field("l_num").equal(11)
                 .get();
         assertNotNull(dbMutation2);
 
-        de.ugoe.cs.comfort.database.models.Mutation dbMutation3 = datastore.createQuery(de.ugoe.cs.comfort.database.models.Mutation.class)
+        de.ugoe.cs.smartshark.model.Mutation dbMutation3 = datastore.createQuery(de.ugoe.cs.smartshark.model.Mutation.class)
                 .field("location").equal("de.foo.bar.Model.addBatch")
                 .field("m_type").equal("org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator")
                 .field("l_num").equal(30)
@@ -260,5 +354,4 @@ public class SmartSHARKFilerTest extends DatabaseTest {
         assertEquals(expectedStates, testStates);
 
     }
-
 }

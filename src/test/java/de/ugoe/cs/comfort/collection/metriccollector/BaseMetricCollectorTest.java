@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2017 University of Goettingen, Germany
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package de.ugoe.cs.comfort.filer;
+package de.ugoe.cs.comfort.collection.metriccollector;
 
-import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
-import de.ugoe.cs.comfort.filer.models.Result;
-import de.ugoe.cs.comfort.filer.models.ResultSet;
-import java.io.IOException;
+import de.ugoe.cs.comfort.BaseTest;
+import org.junit.Before;
 
 /**
  * @author Fabian Trautsch
  */
-public interface IFiler {
+public class BaseMetricCollectorTest extends BaseTest {
+    protected FilerMock filerMock;
 
-    void storeResults(GeneralConfiguration configuration, ResultSet results) throws IOException;
-
-    void storeResult(GeneralConfiguration configuration, Result result) throws IOException;
-
+    @Before
+    public void setFilerMock() {
+        filerMock = new FilerMock(null, null);
+    }
 }

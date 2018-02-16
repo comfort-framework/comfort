@@ -27,6 +27,7 @@ import de.ugoe.cs.comfort.data.CoverageData;
 import de.ugoe.cs.comfort.data.ProjectFiles;
 import de.ugoe.cs.comfort.data.models.IUnit;
 import de.ugoe.cs.comfort.exception.LoaderException;
+import de.ugoe.cs.comfort.filer.BaseFiler;
 import de.ugoe.cs.comfort.filer.models.Result;
 import de.ugoe.cs.smartshark.model.Project;
 import java.io.IOException;
@@ -46,14 +47,14 @@ import java.util.stream.Collectors;
  */
 public class NamingConventionTestTypeCollector extends BaseMetricCollector {
 
-    public NamingConventionTestTypeCollector(GeneralConfiguration configuration) {
-        super(configuration);
+    public NamingConventionTestTypeCollector(GeneralConfiguration configuration, BaseFiler filer) {
+        super(configuration, filer);
     }
 
     @SupportsPython
     @SupportsJava
     @SupportsClass
-    public Set<Result> createResults(ProjectFiles projectFiles) {
+    public void createResults(ProjectFiles projectFiles) throws IOException {
         // Get all code files without tests in a list for comparison later on
         List<String> codeFileNamesWithoutTests = new ArrayList<>();
         projectFiles.getCodeFilesWithoutTestFiles().forEach(
@@ -69,13 +70,13 @@ public class NamingConventionTestTypeCollector extends BaseMetricCollector {
         }
 
         logger.debug("Got the following classification results: {}", result);
-        return result;
+        filer.storeResults(result);
     }
 
     @SupportsPython
     @SupportsJava
     @SupportsMethod
-    public Set<Result> createResults(CoverageData coverageData) {
+    public void createResults(CoverageData coverageData) {
         try {
             // Create filer map
             Set<Result> result = new HashSet<>();
@@ -92,10 +93,9 @@ public class NamingConventionTestTypeCollector extends BaseMetricCollector {
             }
 
             logger.debug("Got the following classification results: {}", result);
-            return result;
+            filer.storeResults(result);
         } catch (IOException e) {
             logger.catching(e);
-            return null;
         }
     }
 

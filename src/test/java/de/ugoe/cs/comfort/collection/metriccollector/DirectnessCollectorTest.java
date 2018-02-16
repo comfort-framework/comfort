@@ -24,6 +24,7 @@ import de.ugoe.cs.comfort.data.graphs.CallEdge;
 import de.ugoe.cs.comfort.data.graphs.CallGraph;
 import de.ugoe.cs.comfort.data.graphs.CallType;
 import de.ugoe.cs.comfort.filer.models.Result;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import org.junit.Before;
@@ -32,7 +33,7 @@ import org.junit.Test;
 /**
  * @author Fabian Trautsch
  */
-public class DirectnessCollectorTest extends BaseTest {
+public class DirectnessCollectorTest extends BaseMetricCollectorTest {
     private final String basePath = getPathToResource("metricCollectorTestData/ieeeAndistqb");
 
     private DirectnessCollector directnessCollector;
@@ -44,9 +45,6 @@ public class DirectnessCollectorTest extends BaseTest {
 
     private CallGraph javaCallGraph = new CallGraph();
     private CallGraph pythonCallGraph = new CallGraph();
-
-    private Set<Result> result;
-
 
     @Before
     public void createJavaConfig() {
@@ -92,50 +90,50 @@ public class DirectnessCollectorTest extends BaseTest {
     }
 
     @Test
-    public void createDirectnessMetricForJavaOnMethodLevelTest() {
+    public void createDirectnessMetricForJavaOnMethodLevelTest() throws IOException {
         javaConfig.setMethodLevel(true);
-        directnessCollector = new DirectnessCollector(javaConfig);
-        result = directnessCollector.createDirectnessMetricForJavaOnMethodLevel(javaCallGraph);
+        directnessCollector = new DirectnessCollector(javaConfig, filerMock);
+        directnessCollector.createDirectnessMetricForJavaOnMethodLevel(javaCallGraph);
 
         expectedResult.add(new Result("org.foo.t1.Test1.test1", null, "call_dire","33.3333"));
         expectedResult.add(new Result("org.foo.t2.Test2.test1", null, "call_dire","66.6667"));
 
-        assertEquals(expectedResult, result);
+        assertEquals(expectedResult, filerMock.getResults().getResults());
 
     }
 
     @Test
-    public void createDirectnessMetricForJavaOnClassLevelTest() {
-        directnessCollector = new DirectnessCollector(javaConfig);
-        result = directnessCollector.createDirectnessMetricForJavaOnClassLevel(javaCallGraph);
+    public void createDirectnessMetricForJavaOnClassLevelTest() throws IOException {
+        directnessCollector = new DirectnessCollector(javaConfig, filerMock);
+        directnessCollector.createDirectnessMetricForJavaOnClassLevel(javaCallGraph);
 
         expectedResult.add(new Result("org.foo.t1.Test1", null, "call_dire","33.3333"));
         expectedResult.add(new Result("org.foo.t2.Test2", null, "call_dire","66.6667"));
 
-        assertEquals(expectedResult, result);
+        assertEquals(expectedResult, filerMock.getResults().getResults());
     }
 
     @Test
-    public void createDirectnessMetricForPythonOnMethodLevelTest() {
+    public void createDirectnessMetricForPythonOnMethodLevelTest() throws IOException {
         pythonConfig.setMethodLevel(true);
-        directnessCollector = new DirectnessCollector(pythonConfig);
-        result = directnessCollector.createDirectnessMetricForJavaOnMethodLevel(pythonCallGraph);
+        directnessCollector = new DirectnessCollector(pythonConfig, filerMock);
+        directnessCollector.createDirectnessMetricForJavaOnMethodLevel(pythonCallGraph);
 
         expectedResult.add(new Result("tests.test_module1.Module1Test.test", null, "call_dire","66.6667"));
         expectedResult.add(new Result("tests.test_module1.Module1Test.test2", null, "call_dire","33.3333"));
 
-        assertEquals(expectedResult, result);
+        assertEquals(expectedResult, filerMock.getResults().getResults());
     }
 
     @Test
-    public void createDirectnessMetricForPythonOnClassLevelTest() {
-        directnessCollector = new DirectnessCollector(pythonConfig);
-        result = directnessCollector.createDirectnessMetricForJavaOnClassLevel(pythonCallGraph);
+    public void createDirectnessMetricForPythonOnClassLevelTest() throws IOException {
+        directnessCollector = new DirectnessCollector(pythonConfig, filerMock);
+        directnessCollector.createDirectnessMetricForJavaOnClassLevel(pythonCallGraph);
 
         expectedResult.add(new Result("tests.test_module1", null, "call_dire","66.6667"));
         expectedResult.add(new Result("package1.package2.test_demo", null, "call_dire","33.3333"));
 
-        assertEquals(expectedResult, result);
+        assertEquals(expectedResult, filerMock.getResults().getResults());
     }
 
 

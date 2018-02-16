@@ -33,8 +33,6 @@ repositories {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile group: 'com.github.stefanbirkner', name: 'system-rules', version: '1.17.0'
-    testCompile group: 'org.powermock', name: 'powermock-module-junit4', version: powerMockVersion
-    testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: powerMockVersion
     compile group: 'com.google.guava', name: 'guava', version: '23.6-jre'
     compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: log4jVersion
     compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4jVersion

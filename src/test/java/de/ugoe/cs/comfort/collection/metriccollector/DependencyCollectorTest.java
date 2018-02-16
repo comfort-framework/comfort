@@ -27,6 +27,7 @@ import de.ugoe.cs.comfort.data.graphs.CallType;
 import de.ugoe.cs.comfort.data.graphs.DependencyGraph;
 import de.ugoe.cs.comfort.data.models.IUnit;
 import de.ugoe.cs.comfort.filer.models.Result;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import org.junit.Before;
@@ -35,7 +36,7 @@ import org.junit.Test;
 /**
  * @author Fabian Trautsch
  */
-public class DependencyCollectorTest extends BaseTest {
+public class DependencyCollectorTest extends BaseMetricCollectorTest {
     private final String basePath = getPathToResource("metricCollectorTestData/ieeeAndistqb");
 
     private DependencyCollector dependencyCollector;
@@ -113,10 +114,12 @@ public class DependencyCollectorTest extends BaseTest {
     }
 
     @Test
-    public void getDependencyForJavaOnMethodLevelTest() {
+    public void getDependencyForJavaOnMethodLevelTest() throws IOException {
         javaConfig.setMethodLevel(true);
-        dependencyCollector = new DependencyCollector(javaConfig);
-        result = dependencyCollector.getNumberOfDependentUnitsForMethod(javaCallGraph);
+        dependencyCollector = new DependencyCollector(javaConfig, filerMock);
+        dependencyCollector.getNumberOfDependentUnitsForMethod(javaCallGraph);
+
+        result = filerMock.getResults().getResults();
 
         expectedResult.add(new Result("org.foo.t1.Test1.test1", null, "call_dep","3"));
         expectedResult.add(new Result("org.foo.t2.Test2.test1", null, "call_dep","2"));
@@ -126,9 +129,11 @@ public class DependencyCollectorTest extends BaseTest {
     }
 
     @Test
-    public void getDependencyForJavaOnClassLevelTest() {
-        dependencyCollector = new DependencyCollector(javaConfig);
-        result = dependencyCollector.getNumberOfDependentUnitsForClass(javaDependencyGraph);
+    public void getDependencyForJavaOnClassLevelTest() throws IOException {
+        dependencyCollector = new DependencyCollector(javaConfig, filerMock);
+        dependencyCollector.getNumberOfDependentUnitsForClass(javaDependencyGraph);
+
+        result = filerMock.getResults().getResults();
 
         expectedResult.add(new Result("org.foo.Test1", null, "call_dep","3"));
         expectedResult.add(new Result("org.foo.Test2", null, "call_dep","3"));
@@ -138,7 +143,7 @@ public class DependencyCollectorTest extends BaseTest {
     }
 
     @Test
-    public void getDependencyForJavaUsingCoverageData() {
+    public void getDependencyForJavaUsingCoverageData() throws IOException{
         javaConfig.setMethodLevel(true);
         Set<IUnit> testedMethodsOfTest1 = new HashSet<>();
         testedMethodsOfTest1.add(covP1C1M1);
@@ -152,8 +157,10 @@ public class DependencyCollectorTest extends BaseTest {
         covData.add(T2M1, testedMethodsOfTest2);
         covData.add(T1Test1, new HashSet<>());
 
-        dependencyCollector = new DependencyCollector(javaConfig);
-        result = dependencyCollector.getNumberOfDependentUnitsForCoverageData(covData);
+        dependencyCollector = new DependencyCollector(javaConfig, filerMock);
+        dependencyCollector.getNumberOfDependentUnitsForCoverageData(covData);
+
+        result = filerMock.getResults().getResults();
 
         expectedResult.add(new Result("org.foo.t1.Test1.m1", null, "cov_dep", "1"));
         expectedResult.add(new Result("org.foo.t2.Test2.m1", null, "cov_dep", "2"));

@@ -18,10 +18,12 @@ package de.ugoe.cs.comfort.filer;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import de.ugoe.cs.comfort.configuration.FilerConfiguration;
 import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
 import de.ugoe.cs.comfort.filer.models.Mutation;
 import de.ugoe.cs.comfort.filer.models.Result;
 import de.ugoe.cs.comfort.filer.models.ResultSet;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -36,27 +38,59 @@ import java.util.stream.Collectors;
 /**
  * @author Fabian Trautsch
  */
-public class CSVFiler implements IFiler{
+public class CSVFiler extends BaseFiler {
+
+    public CSVFiler(GeneralConfiguration generalConfiguration, FilerConfiguration filerConfiguration) {
+        super(generalConfiguration, filerConfiguration);
+    }
 
     @Override
-    public void storeResults(GeneralConfiguration configuration, ResultSet results) throws IOException {
-        List<Result> sortedResultsById = new ArrayList<>(results.getResults());
+    public void storeResults(Set<Result> results) throws IOException {
+        resultSet.addResults(results);
+
+        // Store as CSV
+        storeResultsAsCSV();
+    }
+
+    @Override
+    public void storeResult(Result result) throws IOException {
+        // Merge with result with the same id -> add to result set
+        resultSet.addResults(new HashSet<Result>(){
+            {
+                add(result);
+            }
+        });
+
+        // Store result
+        storeResultsAsCSV();
+    }
+
+    private void clearCSVFile() throws IOException {
+        if(Files.exists(Paths.get(filerConfiguration.getMetricsCSVPath()))) {
+            Files.delete(Paths.get(filerConfiguration.getMetricsCSVPath()));
+        }
+    }
+
+    private void storeResultsAsCSV() throws IOException {
+        clearCSVFile();
+
+        List<Result> sortedResultsById = new ArrayList<>(resultSet.getResults());
         sortedResultsById.sort(Comparator.comparing(Result::getId));
 
         // Create metrics csv
-        List<String> metricHeaders = getHeadersForMetricsCSVFile(results);
+        List<String> metricHeaders = getHeadersForMetricsCSVFile(resultSet);
         String resultsAsCSV = String.join(",", metricHeaders)+"\n";
 
         resultsAsCSV += sortedResultsById.stream()
                 .map(result -> toMetricsCSVRow(result, metricHeaders))
                 .collect(Collectors.joining(System.getProperty("line.separator")));
 
-        Files.write(Paths.get(configuration.getFilerConfiguration().getMetricsCSVPath()),
+        Files.write(Paths.get(filerConfiguration.getMetricsCSVPath()),
                 resultsAsCSV.getBytes(UTF_8));
 
         // Create mutation csv
-        if(configuration.getFilerConfiguration().getMutationCSVPath() != null) {
-            List<String> mutationHeaders = getHeadersForMutationsCSVFile(results);
+        if(filerConfiguration.getMutationCSVPath() != null) {
+            List<String> mutationHeaders = getHeadersForMutationsCSVFile(resultSet);
             resultsAsCSV = String.join(",", mutationHeaders) + "\n";
             resultsAsCSV += sortedResultsById.stream()
                     .map(result -> toMutationCSVRow(result, mutationHeaders))
@@ -64,7 +98,7 @@ public class CSVFiler implements IFiler{
                     .collect(Collectors.joining(System.getProperty("line.separator")));
 
 
-            Files.write(Paths.get(configuration.getFilerConfiguration().getMutationCSVPath()),
+            Files.write(Paths.get(filerConfiguration.getMutationCSVPath()),
                     resultsAsCSV.getBytes(UTF_8));
         }
     }
@@ -139,4 +173,6 @@ public class CSVFiler implements IFiler{
         headers.add("result");
         return headers;
     }
+
+
 }

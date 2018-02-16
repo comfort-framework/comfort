@@ -21,7 +21,9 @@ import de.ugoe.cs.comfort.collection.BaseModel;
 import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
 import de.ugoe.cs.comfort.data.DataSet;
 import de.ugoe.cs.comfort.exception.MetricCollectorException;
+import de.ugoe.cs.comfort.filer.BaseFiler;
 import de.ugoe.cs.comfort.filer.models.Result;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashSet;
@@ -34,17 +36,20 @@ import java.util.Set;
  */
 public class BaseMetricCollector extends BaseModel {
     protected FileNameUtils fileNameUtils;
+    protected BaseFiler filer;
 
 
-    BaseMetricCollector(GeneralConfiguration configuration) {
+    BaseMetricCollector(GeneralConfiguration configuration, BaseFiler filer) {
         super(configuration);
 
         if(generalConf.getProjectDir() != null) {
             this.fileNameUtils = new FileNameUtils(generalConf);
         }
+
+        this.filer = filer;
     }
 
-    public Set<Result> collectData(DataSet data) throws MetricCollectorException {
+    public void collectData(DataSet data) throws MetricCollectorException {
         Set<String> classNamesOfArguments = new HashSet<>();
         classNamesOfArguments.add(data.getClass().getName());
 
@@ -53,14 +58,21 @@ public class BaseMetricCollector extends BaseModel {
                 // We need to find the method where the annotations are fitting to the configuration and
                 // where the parameter types are fitting
                 if (shouldMethodBeExecuted(method) && checkIfParameterTypesAreFitting(method, classNamesOfArguments)) {
-                    return (Set<Result>) method.invoke(this, data);
+                    method.invoke(this, data);
                 }
             } catch (IllegalAccessException | InvocationTargetException e) {
-                throw new MetricCollectorException(e.getMessage());
+                throw new MetricCollectorException(e.getCause().getMessage());
             }
         }
-        throw new MetricCollectorException("No method found that supports "+generalConf.getLanguage()
-                +" on "+generalConf.getMethodLevel()+" level");
+
+        if(generalConf.getMethodLevel()) {
+            throw new MetricCollectorException("No method found that supports "+generalConf.getLanguage()
+                    +" on method level");
+        } else {
+            throw new MetricCollectorException("No method found that supports "+generalConf.getLanguage()
+                    +" on class level");
+        }
+
     }
 
 

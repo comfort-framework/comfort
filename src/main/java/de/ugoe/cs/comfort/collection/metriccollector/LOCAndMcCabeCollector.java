@@ -29,6 +29,7 @@ import de.ugoe.cs.comfort.collection.metriccollector.parsing.ASTMethodVisitor;
 import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
 import de.ugoe.cs.comfort.data.ProjectFiles;
 import de.ugoe.cs.comfort.exception.MetricCollectorException;
+import de.ugoe.cs.comfort.filer.BaseFiler;
 import de.ugoe.cs.comfort.filer.models.Result;
 import java.io.BufferedReader;
 import java.io.File;
@@ -58,13 +59,13 @@ import java.util.regex.Pattern;
  */
 public class LOCAndMcCabeCollector extends BaseMetricCollector {
 
-    public LOCAndMcCabeCollector(GeneralConfiguration configuration) {
-        super(configuration);
+    public LOCAndMcCabeCollector(GeneralConfiguration configuration, BaseFiler filer) {
+        super(configuration, filer);
     }
 
     @SupportsPython
     @SupportsMethod
-    public Set<Result> getLOCAndMcCabeForPythonMethod(ProjectFiles projectFiles) throws MetricCollectorException {
+    public void getLOCAndMcCabeForPythonMethod(ProjectFiles projectFiles) throws MetricCollectorException, IOException {
         // Create process builder
         ProcessBuilder builder = new ProcessBuilder();
         builder.directory(generalConf.getProjectDir().toFile());
@@ -95,7 +96,7 @@ public class LOCAndMcCabeCollector extends BaseMetricCollector {
         }
 
         builder.command("python3", tempFile.toString(), generalConf.getProjectDir().toString());
-        return executeCommandAndGenerateGraph(builder);
+        filer.storeResults(executeCommandAndGenerateGraph(builder));
     }
 
     private Set<Result> executeCommandAndGenerateGraph(ProcessBuilder builder) throws MetricCollectorException {
@@ -166,7 +167,7 @@ public class LOCAndMcCabeCollector extends BaseMetricCollector {
 
     @SupportsJava
     @SupportsClass
-    public Set<Result> getLOCAndMcCabeForJavaClass(ProjectFiles projectFiles) throws MetricCollectorException {
+    public void getLOCAndMcCabeForJavaClass(ProjectFiles projectFiles) throws MetricCollectorException {
         try {
             Set<Result> results = new HashSet<>();
             for(Path testFile: projectFiles.getTestFiles()) {
@@ -189,7 +190,7 @@ public class LOCAndMcCabeCollector extends BaseMetricCollector {
                         astClassNode.getLLOC(), astClassNode.getCLOC()));
             }
 
-            return results;
+            filer.storeResults(results);
         } catch (IOException e) {
             throw new MetricCollectorException("Could not collect metrics: "+e.getMessage());
         }
@@ -197,7 +198,7 @@ public class LOCAndMcCabeCollector extends BaseMetricCollector {
 
     @SupportsJava
     @SupportsMethod
-    public Set<Result> getLOCAndMcCabeForJavaMethod(ProjectFiles projectFiles) throws MetricCollectorException {
+    public void getLOCAndMcCabeForJavaMethod(ProjectFiles projectFiles) throws MetricCollectorException {
         try {
             Set<Result> results = new HashSet<>();
             for(Path testFile: projectFiles.getTestFiles()) {
@@ -222,7 +223,7 @@ public class LOCAndMcCabeCollector extends BaseMetricCollector {
                 }
             }
 
-            return results;
+            filer.storeResults(results);
         } catch (IOException e) {
             throw new MetricCollectorException("Could not collect metrics: "+e.getMessage());
         }

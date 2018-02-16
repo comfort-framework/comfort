@@ -82,6 +82,57 @@ public class CSVFilerTest extends BaseTest{
     }
 
     @Test
+    /*
+    This test mimicks the reoccuring event that one metriccollector calls store results and afterwards another
+    metric collectors calls it again. The expected results are merged results with both metrics
+     */
+    public void csvFilerStoreTwoResultSetsAfterAnotherTest() {
+        try {
+            res1.addMetric("istqb_call", TestType.UNIT.name());
+            res2.addMetric("istqb_call", TestType.INTEGRATION.name());
+            resultsToStore.add(res1);
+            resultsToStore.add(res2);
+
+            // Store results
+            CSVFiler csvFiler = new CSVFiler(configuration, configuration.getFilerConfiguration());
+            csvFiler.storeResults(resultsToStore);
+
+            resultsToStore.clear();
+            Result res3 = new Result("de.foo.bar.ModelTest", Paths.get("src/de/foo/bar/ModelTest.java"), "fantasy_metric", "5");
+            Result res4 = new Result("de.foo.bar.ModelTest1", Paths.get("src/de/foo/bar/ModelTest1.java"), "fantasy_metric", "2");
+            resultsToStore.add(res3);
+            resultsToStore.add(res4);
+            csvFiler.storeResults(resultsToStore);
+
+            // Check contents of file
+            String content = new String(Files.readAllBytes(metricsCSVPath), ("UTF-8"));
+            String expectedContent =
+                    "id,path,fantasy_metric,istqb_call\n" +
+                    "de.foo.bar.ModelTest,src/de/foo/bar/ModelTest.java,5,UNIT\n" +
+                    "de.foo.bar.ModelTest1,src/de/foo/bar/ModelTest1.java,2,INTEGRATION";
+
+
+            assertEquals("Contents not the same!", expectedContent, content);
+        } catch (IOException e) {
+            fail("Unexpected exception! "+e);
+        }
+    }
+
+    @Test
+    public void storeSingleResultTest() throws IOException {
+        CSVFiler csvFiler = new CSVFiler(configuration, configuration.getFilerConfiguration());
+        res1.addMetric("istqb_call", TestType.UNIT.name());
+        csvFiler.storeResult(res1);
+
+        // Check contents of file
+        String content = new String(Files.readAllBytes(metricsCSVPath), ("UTF-8"));
+        String expectedContent =
+                "id,path,istqb_call\n" +
+                "de.foo.bar.ModelTest,src/de/foo/bar/ModelTest.java,UNIT";
+        assertEquals("Contents not the same!", expectedContent, content);
+    }
+
+    @Test
     public void storeMutationDataTest() {
         // Create test data
         res1.addMutationResults(mutations1);
@@ -121,10 +172,10 @@ public class CSVFilerTest extends BaseTest{
 
     private void testResultsAgainstExpectedOutput(ResultSet results, String expectedContent, Path csvPath) {
         Path createdCSVFile;
-        CSVFiler csvFiler = new CSVFiler();
+        CSVFiler csvFiler = new CSVFiler(configuration, configuration.getFilerConfiguration());
         try {
             // Store results
-            csvFiler.storeResults(configuration, results);
+            csvFiler.storeResults(results.getResults());
 
             // Check contents of file
             String content = new String(Files.readAllBytes(csvPath), ("UTF-8"));

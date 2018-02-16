@@ -34,24 +34,21 @@ public class ResultSet {
     }
 
     public void addResults(Set<Result> results) {
-        Set<Result> newResultSet = new HashSet<>();
         for(Result resultToStore: results) {
-            Result foundResult = getResultById(resultToStore.getId());
-            foundResult.mergeResult(resultToStore);
-            newResultSet.add(foundResult);
+            addResult(resultToStore);
         }
-        this.results = newResultSet;
     }
 
-    private Result getResultById(String id) {
+    public void addResult(Result resultToStore) {
         for(Result result: this.results) {
-            if(result.getId().equals(id)) {
-                return result;
+            if(result.getId().equals(resultToStore.getId())) {
+                result.mergeResult(resultToStore);
+                return;
             }
         }
 
-        return new Result(id);
+        // If we are here, we did not find the result, so we need to add it
+        results.add(resultToStore);
     }
-
 
 }

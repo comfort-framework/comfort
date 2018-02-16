@@ -22,7 +22,9 @@ import de.ugoe.cs.comfort.collection.metriccollector.mutation.MutationDataCollec
 import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
 import de.ugoe.cs.comfort.data.CoverageData;
 import de.ugoe.cs.comfort.data.models.IUnit;
+import de.ugoe.cs.comfort.filer.BaseFiler;
 import de.ugoe.cs.comfort.filer.models.Result;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -38,15 +40,13 @@ import java.util.concurrent.TimeUnit;
  * @author Fabian Trautsch
  */
 public class MutationDataCollector extends BaseMetricCollector {
-    private Set<Result> results = new HashSet<>();
-
-    public MutationDataCollector(GeneralConfiguration configuration) {
-        super(configuration);
+    public MutationDataCollector(GeneralConfiguration configuration, BaseFiler filer) {
+        super(configuration, filer);
     }
 
     @SupportsMethod
     @SupportsJava
-    public Set<Result> getMutationDataMetrics(CoverageData data) {
+    public void getMutationDataMetrics(CoverageData data) throws IOException {
 
         final ExecutorService executor = Executors.newFixedThreadPool(generalConf.getNThreads());
         CompletionService<Result> pool = new ExecutorCompletionService<>(executor);
@@ -59,12 +59,18 @@ public class MutationDataCollector extends BaseMetricCollector {
         for (int i=0; i<data.getCoverageData().size(); i++) {
             try {
                 Result result = pool.take().get();
-                results.add(result);
+
+                // Added here as it can be the case that a result could not be produced which would then result
+                // in a null result.
+                if(result != null) {
+                    synchronized(this) {
+                        filer.storeResult(result);
+                    }
+                }
             } catch (InterruptedException | ExecutionException e) {
                 logger.catching(e);
             }
         }
         executor.shutdown();
-        return results;
     }
 }

@@ -27,6 +27,7 @@ import de.ugoe.cs.comfort.data.graphs.CallEdge;
 import de.ugoe.cs.comfort.data.graphs.CallGraph;
 import de.ugoe.cs.comfort.data.models.IUnit;
 import de.ugoe.cs.comfort.exception.MetricCollectorException;
+import de.ugoe.cs.comfort.filer.BaseFiler;
 import de.ugoe.cs.comfort.filer.models.Result;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -40,14 +41,14 @@ import org.apache.bcel.classfile.ClassParser;
  * @author Fabian Trautsch
  */
 public class NumAssertionCollector extends BaseMetricCollector {
-    public NumAssertionCollector(GeneralConfiguration configuration) {
-        super(configuration);
+    public NumAssertionCollector(GeneralConfiguration configuration, BaseFiler filer) {
+        super(configuration, filer);
     }
 
     @SupportsMethod
     @SupportsClass
     @SupportsJava
-    public Set<Result> getNumberOfAssertionsForJava(ClassFiles classFiles) throws MetricCollectorException {
+    public void getNumberOfAssertionsForJava(ClassFiles classFiles) throws MetricCollectorException {
         ClassParser cp;
         Set<Path> testClassFiles = classFiles.getTestFiles();
 
@@ -59,7 +60,7 @@ public class NumAssertionCollector extends BaseMetricCollector {
                         generalConf.getMethodLevel(), classFiles);
                 visitor.start();
             }
-            return results;
+            filer.storeResults(results);
         } catch (IOException e) {
             throw new MetricCollectorException("Error in executing NumAssertionCollector: "+e.getMessage());
         }
@@ -68,7 +69,7 @@ public class NumAssertionCollector extends BaseMetricCollector {
     @SupportsMethod
     @SupportsJava
     @SupportsPython
-    public Set<Result> getNumberOfAssertionsForCallGraph(CallGraph callGraph) {
+    public void getNumberOfAssertionsForCallGraph(CallGraph callGraph) throws IOException {
         Map<String, Result> allResults = new HashMap<>();
         for(IUnit testNode : callGraph.getTestNodes()) {
 
@@ -87,13 +88,13 @@ public class NumAssertionCollector extends BaseMetricCollector {
 
         Set<Result> results = new HashSet<>();
         results.addAll(allResults.values());
-        return results;
+        filer.storeResults(results);
     }
 
     @SupportsClass
     @SupportsJava
     @SupportsPython
-    public Set<Result> getNumberOfAssertionsForCallGraphOnClassLevel(CallGraph callGraph) {
+    public void getNumberOfAssertionsForCallGraphOnClassLevel(CallGraph callGraph) throws IOException {
         Map<String, Result> allResults = new HashMap<>();
         for(IUnit testNode : callGraph.getTestNodes()) {
 
@@ -113,7 +114,7 @@ public class NumAssertionCollector extends BaseMetricCollector {
 
         Set<Result> results = new HashSet<>();
         results.addAll(allResults.values());
-        return results;
+        filer.storeResults(results);
     }
 
 }

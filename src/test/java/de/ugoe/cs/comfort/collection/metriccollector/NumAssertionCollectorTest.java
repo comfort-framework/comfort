@@ -27,6 +27,7 @@ import de.ugoe.cs.comfort.data.graphs.CallGraph;
 import de.ugoe.cs.comfort.data.graphs.CallType;
 import de.ugoe.cs.comfort.exception.MetricCollectorException;
 import de.ugoe.cs.comfort.filer.models.Result;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
@@ -37,7 +38,7 @@ import org.junit.Test;
 /**
  * @author Fabian Trautsch
  */
-public class NumAssertionCollectorTest extends BaseTest {
+public class NumAssertionCollectorTest extends BaseMetricCollectorTest {
     private final String basePath = getPathToResource("metricCollectorTestData/numassertcollector");
 
     private NumAssertionCollector numAssertionCollector;
@@ -83,16 +84,16 @@ public class NumAssertionCollectorTest extends BaseTest {
     public void getNumberOfAssertionsForJavaOnMethodLevelTest() {
         try {
             javaConfig.setMethodLevel(true);
-            numAssertionCollector = new NumAssertionCollector(javaConfig);
+            numAssertionCollector = new NumAssertionCollector(javaConfig, filerMock);
             ClassFiles classFiles = new ClassFiles(javaConfig, testFiles, null);
-            Set<Result> result = numAssertionCollector.getNumberOfAssertionsForJava(classFiles);
+            numAssertionCollector.getNumberOfAssertionsForJava(classFiles);
 
             expectedResult.add(new Result("org.foo.models.AddressTest.getAddressTest", Paths.get("src/test/java/org/foo/models/AddressTest.java"), "num_asserts", "1"));
             expectedResult.add(new Result("org.foo.models.AddressTest.<init>", Paths.get("src/test/java/org/foo/models/AddressTest.java"), "num_asserts", "0"));
             expectedResult.add(new Result("org.foo.models.AddressTest.getAddressTest2", Paths.get("src/test/java/org/foo/models/AddressTest.java"), "num_asserts", "1"));
             expectedResult.add(new Result("org.foo.models.PersonTest.getPersonTest1", Paths.get("src/test/java/org/foo/models/PersonTest.java"), "num_asserts", "3"));
             expectedResult.add(new Result("org.foo.models.PersonTest.<init>", Paths.get("src/test/java/org/foo/models/PersonTest.java"), "num_asserts", "0"));
-            assertEquals("Result set is not correct!", expectedResult, result);
+            assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
         } catch (MetricCollectorException e) {
             fail("Unexpected exception: "+e);
         }
@@ -101,37 +102,37 @@ public class NumAssertionCollectorTest extends BaseTest {
     @Test
     public void getNumberOfAssertionsForJavaOnClassLevelTest() {
         try {
-            numAssertionCollector = new NumAssertionCollector(javaConfig);
+            numAssertionCollector = new NumAssertionCollector(javaConfig, filerMock);
             ClassFiles classFiles = new ClassFiles(javaConfig, testFiles, null);
-            Set<Result> result = numAssertionCollector.getNumberOfAssertionsForJava(classFiles);
+            numAssertionCollector.getNumberOfAssertionsForJava(classFiles);
 
             expectedResult.add(new Result("org.foo.models.AddressTest", Paths.get("src/test/java/org/foo/models/AddressTest.java"), "num_asserts", "2"));
             expectedResult.add(new Result("org.foo.models.PersonTest", Paths.get("src/test/java/org/foo/models/PersonTest.java"), "num_asserts", "3"));
-            assertEquals("Result set is not correct!", expectedResult, result);
+            assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
         } catch (MetricCollectorException e) {
             fail("Unexpected exception: "+e);
         }
     }
 
     @Test
-    public void getNumberOfAssertionsForCallGraphClassLevelTest() {
-        numAssertionCollector = new NumAssertionCollector(javaConfig);
-        Set<Result> result = numAssertionCollector.getNumberOfAssertionsForCallGraphOnClassLevel(javaCallGraph);
+    public void getNumberOfAssertionsForCallGraphClassLevelTest() throws IOException {
+        numAssertionCollector = new NumAssertionCollector(javaConfig, filerMock);
+        numAssertionCollector.getNumberOfAssertionsForCallGraphOnClassLevel(javaCallGraph);
 
         expectedResult.add(new Result("org.foo.t1.Test1", null, "num_asserts", "3"));
         expectedResult.add(new Result("org.foo.t2.Test2", null, "num_asserts", "3"));
-        assertEquals("Result set is not correct!", expectedResult, result);
+        assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
     @Test
-    public void getNumberOfAssertionsForCallGraphMethodLevelTest() {
+    public void getNumberOfAssertionsForCallGraphMethodLevelTest() throws IOException {
         javaConfig.setMethodLevel(true);
-        numAssertionCollector = new NumAssertionCollector(javaConfig);
-        Set<Result> result = numAssertionCollector.getNumberOfAssertionsForCallGraph(javaCallGraph);
+        numAssertionCollector = new NumAssertionCollector(javaConfig, filerMock);
+        numAssertionCollector.getNumberOfAssertionsForCallGraph(javaCallGraph);
 
         expectedResult.add(new Result("org.foo.t1.Test1.test1", null, "num_asserts", "3"));
         expectedResult.add(new Result("org.foo.t2.Test2.test1", null, "num_asserts", "2"));
         expectedResult.add(new Result("org.foo.t2.Test2.test2", null, "num_asserts", "1"));
-        assertEquals("Result set is not correct!", expectedResult, result);
+        assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 }

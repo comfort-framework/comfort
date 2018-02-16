@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2017 University of Goettingen, Germany
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,18 +16,28 @@
 
 package de.ugoe.cs.comfort.filer;
 
+import de.ugoe.cs.comfort.collection.BaseModel;
+import de.ugoe.cs.comfort.configuration.FilerConfiguration;
 import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
 import de.ugoe.cs.comfort.filer.models.Result;
 import de.ugoe.cs.comfort.filer.models.ResultSet;
 import java.io.IOException;
+import java.util.Set;
 
 /**
  * @author Fabian Trautsch
  */
-public interface IFiler {
+public abstract class BaseFiler extends BaseModel {
+    protected ResultSet resultSet = new ResultSet();
+    protected FilerConfiguration filerConfiguration;
 
-    void storeResults(GeneralConfiguration configuration, ResultSet results) throws IOException;
+    public BaseFiler(GeneralConfiguration generalConfiguration, FilerConfiguration filerConfiguration) {
+        super(generalConfiguration);
 
-    void storeResult(GeneralConfiguration configuration, Result result) throws IOException;
+        this.filerConfiguration = filerConfiguration;
+    }
 
+    public abstract void storeResults(Set<Result> results) throws IOException;
+
+    public abstract void storeResult(Result result) throws IOException;
 }

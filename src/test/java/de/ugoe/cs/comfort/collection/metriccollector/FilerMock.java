@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2017 University of Goettingen, Germany
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,20 +14,38 @@
  * limitations under the License.
  */
 
-package de.ugoe.cs.comfort.filer;
+package de.ugoe.cs.comfort.collection.metriccollector;
 
+import de.ugoe.cs.comfort.configuration.FilerConfiguration;
 import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
+import de.ugoe.cs.comfort.filer.BaseFiler;
 import de.ugoe.cs.comfort.filer.models.Result;
 import de.ugoe.cs.comfort.filer.models.ResultSet;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Fabian Trautsch
  */
-public interface IFiler {
+public class FilerMock extends BaseFiler {
+    private ResultSet resultSet = new ResultSet();
 
-    void storeResults(GeneralConfiguration configuration, ResultSet results) throws IOException;
+    public FilerMock(GeneralConfiguration generalConfiguration, FilerConfiguration filerConfiguration) {
+        super(generalConfiguration, filerConfiguration);
+    }
 
-    void storeResult(GeneralConfiguration configuration, Result result) throws IOException;
+    @Override
+    public void storeResults(Set<Result> results) {
+        resultSet.addResults(results);
+    }
 
+    @Override
+    public void storeResult(Result result) {
+        resultSet.addResult(result);
+    }
+
+    public ResultSet getResults() {
+        return resultSet;
+    }
 }

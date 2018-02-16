@@ -24,6 +24,7 @@ import de.ugoe.cs.comfort.data.CoverageData;
 import de.ugoe.cs.comfort.data.models.JavaMethod;
 import de.ugoe.cs.comfort.filer.models.Mutation;
 import de.ugoe.cs.comfort.filer.models.Result;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -34,7 +35,7 @@ import org.junit.Test;
 /**
  * @author Fabian Trautsch
  */
-public class MutationDataCollectorTest extends BaseTest {
+public class MutationDataCollectorTest extends BaseMetricCollectorTest {
     private final String basePath = getPathToResource("metricCollectorTestData/mutationdatacollector");
     private GeneralConfiguration javaConfig = new GeneralConfiguration();
 
@@ -46,17 +47,17 @@ public class MutationDataCollectorTest extends BaseTest {
     }
 
     @Test
-    public void collectMutationDataTestSingleThreaded() {
+    public void collectMutationDataTestSingleThreaded() throws IOException {
         collectMutationData();
     }
 
     @Test
-    public void collectMutationDataMultiThreaded() {
+    public void collectMutationDataMultiThreaded() throws IOException {
         javaConfig.setNThreads(2);
         collectMutationData();
     }
 
-    private void collectMutationData() {
+    private void collectMutationData() throws IOException {
         CoverageData covData = new CoverageData();
         covData.add(new JavaMethod("Module1Test", "getNameTest", new ArrayList<>(), null), null);
         covData.add(new JavaMethod("Module1Test", "getNumberTest", new ArrayList<>(), null), null);
@@ -64,8 +65,8 @@ public class MutationDataCollectorTest extends BaseTest {
         covData.add(new JavaMethod("Module2Test", "getNumberTest", new ArrayList<>(), null), null);
 
 
-        MutationDataCollector mutationDataCollector = new MutationDataCollector(javaConfig);
-        Set<Result> results = mutationDataCollector.getMutationDataMetrics(covData);
+        MutationDataCollector mutationDataCollector = new MutationDataCollector(javaConfig, filerMock);
+        mutationDataCollector.getMutationDataMetrics(covData);
 
         Set<Result> expectedResult = new HashSet<>();
         Result mod1NameTest = new Result("Module1Test.getNameTest", Paths.get("src/test/java/Module1Test.java"));
@@ -126,6 +127,6 @@ public class MutationDataCollectorTest extends BaseTest {
         expectedResult.add(mod1NumberTest);
         expectedResult.add(mod2NameTest);
         expectedResult.add(mod2NumberTest);
-        assertEquals("Result set is not correct!", expectedResult, results);
+        assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 }

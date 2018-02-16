@@ -25,7 +25,9 @@ import de.ugoe.cs.comfort.data.CoverageData;
 import de.ugoe.cs.comfort.data.graphs.CallGraph;
 import de.ugoe.cs.comfort.data.graphs.DependencyGraph;
 import de.ugoe.cs.comfort.data.models.IUnit;
+import de.ugoe.cs.comfort.filer.BaseFiler;
 import de.ugoe.cs.comfort.filer.models.Result;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -34,33 +36,33 @@ import java.util.Set;
  * @author Fabian Trautsch
  */
 public class DependencyCollector extends BaseMetricCollector {
-    public DependencyCollector(GeneralConfiguration configuration) {
-        super(configuration);
+    public DependencyCollector(GeneralConfiguration configuration, BaseFiler filer) {
+        super(configuration, filer);
     }
 
     @SupportsJava
     @SupportsPython
     @SupportsMethod
-    public Set<Result> getNumberOfDependentUnitsForMethod(CallGraph callGraph) {
+    public void getNumberOfDependentUnitsForMethod(CallGraph callGraph) throws IOException {
         Map<IUnit, Set<IUnit>> callerCalleePairs = TestTypeDetectionUtils
                 .getCallPairsOnClassLevel(callGraph);
-        return generateResults(callerCalleePairs, "call_dep");
+        filer.storeResults(generateResults(callerCalleePairs, "call_dep"));
     }
 
     @SupportsJava
     @SupportsPython
     @SupportsClass
-    public Set<Result> getNumberOfDependentUnitsForClass(DependencyGraph dependencyGraph) {
+    public void getNumberOfDependentUnitsForClass(DependencyGraph dependencyGraph) throws IOException {
         Map<IUnit, Set<IUnit>> callerCalleePairs = TestTypeDetectionUtils
                 .getCallPairsOnClassLevel(dependencyGraph);
-        return generateResults(callerCalleePairs, "call_dep");
+        filer.storeResults(generateResults(callerCalleePairs, "call_dep"));
     }
 
     @SupportsJava
     @SupportsPython
     @SupportsMethod
-    public Set<Result> getNumberOfDependentUnitsForCoverageData(CoverageData data) {
-        return generateResults(data.getCoverageData(), "cov_dep");
+    public void getNumberOfDependentUnitsForCoverageData(CoverageData data) throws IOException {
+        filer.storeResults(generateResults(data.getCoverageData(), "cov_dep"));
     }
 
     private Set<Result> generateResults(Map<IUnit, Set<IUnit>> callerCalleePairs, String metricName) {

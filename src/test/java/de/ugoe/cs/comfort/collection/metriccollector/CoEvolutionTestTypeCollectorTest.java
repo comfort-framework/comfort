@@ -24,6 +24,7 @@ import de.ugoe.cs.comfort.BaseTest;
 import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
 import de.ugoe.cs.comfort.data.ChangeSet;
 import de.ugoe.cs.comfort.filer.models.Result;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -37,7 +38,7 @@ import org.junit.Test;
 /**
  * @author Fabian Trautsch
  */
-public class CoEvolutionTestTypeCollectorTest extends BaseTest {
+public class CoEvolutionTestTypeCollectorTest extends BaseMetricCollectorTest {
     private Map<Path, Multiset<Path>> changeMap = new HashMap<>();
     private GeneralConfiguration configuration = new GeneralConfiguration();
 
@@ -54,7 +55,7 @@ public class CoEvolutionTestTypeCollectorTest extends BaseTest {
     }
 
     @Test
-    public void classifyTest() {
+    public void classifyTest() throws IOException {
         // Create data for test
         String[] changedWithTest1 = {"fileA", "fileB", "fileB"};
         addToChangeMap("test1", changedWithTest1);
@@ -74,18 +75,19 @@ public class CoEvolutionTestTypeCollectorTest extends BaseTest {
 
     }
 
-    private void executeCollector(ChangeSet changeSet, Set<Result> expectedResult) {
+    private void executeCollector(ChangeSet changeSet, Set<Result> expectedResult) throws IOException {
         // Execute strategy
-        CoEvolutionTestTypeCollector coEvolutionTestTypeCollector = new CoEvolutionTestTypeCollector(configuration);
-        Set<Result> result = coEvolutionTestTypeCollector.createResults(changeSet);
+        CoEvolutionTestTypeCollector coEvolutionTestTypeCollector = new CoEvolutionTestTypeCollector(configuration, filerMock);
+        coEvolutionTestTypeCollector.createResults(changeSet);
+        Set<Result> result = filerMock.getResults().getResults();
 
-        assertEquals("size not equal", expectedResult.size(), result.size());
+                assertEquals("size not equal", expectedResult.size(), result.size());
         assertEquals("detection is wrong", expectedResult, result);
 
     }
 
     @Test
-    public void classifyWithEmptyChangeSet() {
+    public void classifyWithEmptyChangeSet() throws IOException {
         // Create data for test
         String[] changedWithTest1 = {};
         addToChangeMap("test1", changedWithTest1);
@@ -102,7 +104,7 @@ public class CoEvolutionTestTypeCollectorTest extends BaseTest {
     }
 
     @Test
-    public void classifyWithChangeSetOfSizeOne() {
+    public void classifyWithChangeSetOfSizeOne() throws IOException {
         // Create data for test
         String[] changedWithTest1 = {"fileA"};
         addToChangeMap("test1", changedWithTest1);

@@ -27,6 +27,7 @@ import de.ugoe.cs.comfort.data.graphs.CallType;
 import de.ugoe.cs.comfort.data.graphs.DependencyGraph;
 import de.ugoe.cs.comfort.data.models.IUnit;
 import de.ugoe.cs.comfort.filer.models.Result;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
@@ -36,7 +37,7 @@ import org.junit.Test;
 /**
  * @author Fabian Trautsch
  */
-public class ISTQBTestTypeCollectorTest extends BaseTest{
+public class ISTQBTestTypeCollectorTest extends BaseMetricCollectorTest {
     private final String basePath = getPathToResource("metricCollectorTestData/ieeeAndistqb");
 
     private ISTQBTestTypeCollector istqbTestTypeCollector;
@@ -44,7 +45,6 @@ public class ISTQBTestTypeCollectorTest extends BaseTest{
     private GeneralConfiguration javaConfig = new GeneralConfiguration();
     private GeneralConfiguration pythonConfig = new GeneralConfiguration();
 
-    private Set<Result> result = new HashSet<>();
     private Set<Result> expectedResult = new HashSet<>();
 
     @Before
@@ -60,12 +60,11 @@ public class ISTQBTestTypeCollectorTest extends BaseTest{
 
     @Before
     public void clearResults() {
-        result.clear();
         expectedResult.clear();
     }
 
     @Test
-    public void classifyPythonDependencyGraphTest() {
+    public void classifyPythonDependencyGraphTest() throws IOException {
         DependencyGraph dependencyGraph = new DependencyGraph();
         dependencyGraph.putEdge(pyTest1, module1);
         dependencyGraph.putEdge(pyTest2, module1);
@@ -73,17 +72,17 @@ public class ISTQBTestTypeCollectorTest extends BaseTest{
         dependencyGraph.putEdge(pyTest3, moduleInit);
         dependencyGraph.putEdge(moduleInit, module1);
 
-        istqbTestTypeCollector = new ISTQBTestTypeCollector(pythonConfig);
-        result = istqbTestTypeCollector.createResultsJavaPythonClassDepGraph(dependencyGraph);
+        istqbTestTypeCollector = new ISTQBTestTypeCollector(pythonConfig, filerMock);
+        istqbTestTypeCollector.createResultsJavaPythonClassDepGraph(dependencyGraph);
         expectedResult.add(new Result("tests.test1", Paths.get("tests/test1.py"), "dep_istqb", TestType.UNIT.name()));
         expectedResult.add(new Result("tests.test2", Paths.get("tests/test2.py"), "dep_istqb", TestType.INTEGRATION.name()));
         expectedResult.add(new Result("tests.test3", Paths.get("tests/test3.py"), "dep_istqb", TestType.INTEGRATION.name()));
-        assertEquals("Result set is not correct!", expectedResult, result);
+        assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
 
     @Test
-    public void classifyDependencyGraphTest() {
+    public void classifyDependencyGraphTest() throws IOException {
         /*
          * Graph:
          * org.foo.t1.T1 -> org.foo.C2
@@ -101,16 +100,16 @@ public class ISTQBTestTypeCollectorTest extends BaseTest{
         dependencyGraph.putEdge(fooTest, C1);
         dependencyGraph.putEdge(C1, C2);
 
-        istqbTestTypeCollector = new ISTQBTestTypeCollector(javaConfig);
-        result = istqbTestTypeCollector.createResultsJavaPythonClassDepGraph(dependencyGraph);
+        istqbTestTypeCollector = new ISTQBTestTypeCollector(javaConfig, filerMock);
+        istqbTestTypeCollector.createResultsJavaPythonClassDepGraph(dependencyGraph);
         expectedResult.add(new Result("org.foo.models.AddressTest", Paths.get("src/test/java/org/foo/models/AddressTest.java"), "dep_istqb",TestType.UNIT.name()));
         expectedResult.add(new Result("org.foo.view.blatestbla", Paths.get("src/test/java/org/foo/view/blatestbla.java"), "dep_istqb",TestType.INTEGRATION.name()));
         expectedResult.add(new Result("unit.fooTest", Paths.get("src/test/java/unit/fooTest.java"), "dep_istqb",TestType.INTEGRATION.name()));
-        assertEquals("Result set is not correct!", expectedResult, result);
+        assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
     @Test
-    public void classifyJavaCallGraphClassLevelTest() {
+    public void classifyJavaCallGraphClassLevelTest() throws IOException {
         /*
          * Graph:
          * org.foo.t1.Test1:<init> -> org.foo.C2:<init>
@@ -132,17 +131,17 @@ public class ISTQBTestTypeCollectorTest extends BaseTest{
         callGraph.addEdge(new CallEdge(CallType.INVOKE_SPECIAL, 0, T3Test1, C1M1_p1));
         callGraph.addEdge(new CallEdge(CallType.INVOKE_SPECIAL, 0, C1M1_p1, C4M1));
 
-        istqbTestTypeCollector = new ISTQBTestTypeCollector(javaConfig);
-        result = istqbTestTypeCollector.createResultsJavaClassLevelCallGraph(callGraph);
+        istqbTestTypeCollector = new ISTQBTestTypeCollector(javaConfig, filerMock);
+        istqbTestTypeCollector.createResultsJavaClassLevelCallGraph(callGraph);
         expectedResult.add(new Result("org.foo.t1.Test1", null, "call_istqb",TestType.UNIT.name()));
         expectedResult.add(new Result("org.foo.t2.Test2", null, "call_istqb",TestType.INTEGRATION.name()));
         expectedResult.add(new Result("org.foo.t3.Test3", null, "call_istqb",TestType.INTEGRATION.name()));
 
-        assertEquals("Result set is not correct!", expectedResult, result);
+        assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
     @Test
-    public void classifyCallGraphMethodLevelTest() {
+    public void classifyCallGraphMethodLevelTest() throws IOException {
         /*
          * Graph:
          * org.foo.t1.Test1:<init> -> org.foo.C2:<init>
@@ -164,18 +163,18 @@ public class ISTQBTestTypeCollectorTest extends BaseTest{
         callGraph.addEdge(new CallEdge(CallType.INVOKE_SPECIAL, 0, C1M1_p1, C4M1));
 
         javaConfig.setMethodLevel(true);
-        istqbTestTypeCollector = new ISTQBTestTypeCollector(javaConfig);
-        result = istqbTestTypeCollector.createResultsJavaMethodLevelCallGraph(callGraph);
+        istqbTestTypeCollector = new ISTQBTestTypeCollector(javaConfig, filerMock);
+        istqbTestTypeCollector.createResultsJavaMethodLevelCallGraph(callGraph);
         expectedResult.add(new Result("org.foo.t1.Test1.m1", null, "call_istqb_met",TestType.UNIT.name()));
         expectedResult.add(new Result("org.foo.t1.Test1.test1", null, "call_istqb_met",TestType.UNIT.name()));
         expectedResult.add(new Result("org.foo.t2.Test2.m1", null, "call_istqb_met",TestType.INTEGRATION.name()));
         expectedResult.add(new Result("org.foo.t3.Test3.test1", null, "call_istqb_met",TestType.INTEGRATION.name()));
 
-        assertEquals("Result set is not correct!", expectedResult, result);
+        assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
     @Test
-    public void classifyCodeCoveragePythonTest() {
+    public void classifyCodeCoveragePythonTest() throws IOException {
         Set<IUnit> testedMethodsOfTest1 = new HashSet<>();
         testedMethodsOfTest1.add(pyModule2Init);
         testedMethodsOfTest1.add(pyModule2Foo);
@@ -188,15 +187,15 @@ public class ISTQBTestTypeCollectorTest extends BaseTest{
         covData.add(pyTest1Test, testedMethodsOfTest1);
         covData.add(pyTest2Test, testedMethodsOfTest2);
 
-        istqbTestTypeCollector = new ISTQBTestTypeCollector(pythonConfig);
-        result = istqbTestTypeCollector.createResultsJavaPythonClassCoverage(covData);
+        istqbTestTypeCollector = new ISTQBTestTypeCollector(pythonConfig, filerMock);
+        istqbTestTypeCollector.createResultsJavaPythonClassCoverage(covData);
         expectedResult.add(new Result("tests.test_module1", null, "cov_istqb", TestType.UNIT.name()));
         expectedResult.add(new Result("tests.test_module2", null, "cov_istqb", TestType.INTEGRATION.name()));
-        assertEquals("Result set is not correct!", expectedResult, result);
+        assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
     @Test
-    public void classifyCodeCoverageJavaMethodLevelTest() {
+    public void classifyCodeCoverageJavaMethodLevelTest() throws IOException {
         Set<IUnit> testedMethodsOfTest1 = new HashSet<>();
         testedMethodsOfTest1.add(covP1C1M1);
         testedMethodsOfTest1.add(covP1C1M2);
@@ -211,16 +210,16 @@ public class ISTQBTestTypeCollectorTest extends BaseTest{
         covData.add(T1Test1, testedMethodsOfTest2);
 
 
-        istqbTestTypeCollector = new ISTQBTestTypeCollector(javaConfig);
-        result = istqbTestTypeCollector.createResultsJavaPythonMethodCoverage(covData);
+        istqbTestTypeCollector = new ISTQBTestTypeCollector(javaConfig, filerMock);
+        istqbTestTypeCollector.createResultsJavaPythonMethodCoverage(covData);
         expectedResult.add(new Result("org.foo.t1.Test1.m1", null, "cov_istqb_met", TestType.UNIT.name()));
         expectedResult.add(new Result("org.foo.t2.Test2.m1", null, "cov_istqb_met", TestType.INTEGRATION.name()));
         expectedResult.add(new Result("org.foo.t1.Test1.test1", null,"cov_istqb_met",  TestType.INTEGRATION.name()));
-        assertEquals("Result set is not correct!", expectedResult, result);
+        assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
     @Test
-    public void classifyCodeCoverageJavaClassLevelTest() {
+    public void classifyCodeCoverageJavaClassLevelTest() throws IOException {
         Set<IUnit> testedMethodsOfTest1 = new HashSet<>();
         testedMethodsOfTest1.add(covP1C1M1);
         testedMethodsOfTest1.add(covP1C1M2);
@@ -233,15 +232,15 @@ public class ISTQBTestTypeCollectorTest extends BaseTest{
         covData.add(T1Test1, testedMethodsOfTest1);
         covData.add(T2M1, testedMethodsOfTest2);
 
-        istqbTestTypeCollector = new ISTQBTestTypeCollector(javaConfig);
-        result = istqbTestTypeCollector.createResultsJavaPythonClassCoverage(covData);
+        istqbTestTypeCollector = new ISTQBTestTypeCollector(javaConfig, filerMock);
+        istqbTestTypeCollector.createResultsJavaPythonClassCoverage(covData);
         expectedResult.add(new Result("org.foo.t1.Test1", null, "cov_istqb",TestType.UNIT.name()));
         expectedResult.add(new Result("org.foo.t2.Test2", null, "cov_istqb", TestType.INTEGRATION.name()));
-        assertEquals("Result set is not correct!", expectedResult, result);
+        assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
     @Test
-    public void classifyCodeCoverageJavaClassLevelSameClassDifferentMethodsTest() {
+    public void classifyCodeCoverageJavaClassLevelSameClassDifferentMethodsTest() throws IOException {
         Set<IUnit> testedMethodsOfTest1 = new HashSet<>();
         testedMethodsOfTest1.add(covP1C1M1);
         testedMethodsOfTest1.add(covP1C1M2);
@@ -254,10 +253,10 @@ public class ISTQBTestTypeCollectorTest extends BaseTest{
         covData.add(T1Test1, testedMethodsOfTest1);
         covData.add(T1M1, testedMethodsOfTest2);
 
-        istqbTestTypeCollector = new ISTQBTestTypeCollector(javaConfig);
-        result = istqbTestTypeCollector.createResultsJavaPythonClassCoverage(covData);
+        istqbTestTypeCollector = new ISTQBTestTypeCollector(javaConfig, filerMock);
+        istqbTestTypeCollector.createResultsJavaPythonClassCoverage(covData);
         expectedResult.add(new Result("org.foo.t1.Test1", null, "cov_istqb",TestType.INTEGRATION.name()));
-        assertEquals("Result set is not correct!", expectedResult, result);
+        assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
 }

@@ -26,7 +26,9 @@ import de.ugoe.cs.comfort.data.graphs.CallGraph;
 import de.ugoe.cs.comfort.data.graphs.DependencyGraph;
 import de.ugoe.cs.comfort.data.graphs.IGraph;
 import de.ugoe.cs.comfort.data.models.IUnit;
+import de.ugoe.cs.comfort.filer.BaseFiler;
 import de.ugoe.cs.comfort.filer.models.Result;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -37,15 +39,15 @@ import java.util.Set;
  */
 public class IEEETestTypeCollector extends BaseMetricCollector {
 
-    public IEEETestTypeCollector(GeneralConfiguration configuration) {
-        super(configuration);
+    public IEEETestTypeCollector(GeneralConfiguration configuration, BaseFiler filer) {
+        super(configuration, filer);
     }
 
     @SupportsClass
     @SupportsJava
     @SupportsPython
-    public Set<Result> createResultsJavaPythonClassLevelCallGraph(CallGraph callGraph) {
-        return classifyUsingGraph(callGraph.getDependencyGraphRepresentation(), "call_ieee");
+    public void createResultsJavaPythonClassLevelCallGraph(CallGraph callGraph) throws IOException {
+        filer.storeResults(classifyUsingGraph(callGraph.getDependencyGraphRepresentation(), "call_ieee"));
     }
 
 
@@ -53,41 +55,41 @@ public class IEEETestTypeCollector extends BaseMetricCollector {
     @SupportsMethod
     @SupportsJava
     @SupportsPython
-    public Set<Result> createResultsJavaPythonMethodLevelCallGraph(CallGraph graph) {
-        return classifyUsingGraph(graph, "call_ieee_met");
+    public void createResultsJavaPythonMethodLevelCallGraph(CallGraph graph) throws IOException {
+        filer.storeResults(classifyUsingGraph(graph, "call_ieee_met"));
     }
 
 
     @SupportsJava
     @SupportsPython
     @SupportsClass
-    public Set<Result> createResultsJavaPythonDepGraph(DependencyGraph dependencyGraph) {
-        return classifyUsingGraph(dependencyGraph, "dep_ieee");
+    public void createResultsJavaPythonDepGraph(DependencyGraph dependencyGraph) throws IOException {
+        filer.storeResults(classifyUsingGraph(dependencyGraph, "dep_ieee"));
     }
 
 
     @SupportsJava
     @SupportsPython
     @SupportsClass
-    public Set<Result> createResultsJavaPythonCoverageClass(CoverageData dataSet) {
+    public void createResultsJavaPythonCoverageClass(CoverageData dataSet) throws IOException {
         Map<IUnit, Integer> unitAndAmountOfPackagesTested =
                 getUniqueTestedPackages(dataSet.getCoverageDataClassLevel());
 
         // Merge results from different methods on class level
-        return TestTypeDetectionUtils.generateResults(generalConf, unitAndAmountOfPackagesTested,
-                generalConf.getMethodLevel(), "cov_ieee");
+        filer.storeResults(TestTypeDetectionUtils.generateResults(generalConf, unitAndAmountOfPackagesTested,
+                generalConf.getMethodLevel(), "cov_ieee"));
     }
 
 
     @SupportsJava
     @SupportsPython
     @SupportsMethod
-    public Set<Result> createResultsJavaPythonCoverageMethod(CoverageData dataSet) {
+    public void createResultsJavaPythonCoverageMethod(CoverageData dataSet) throws IOException {
         Map<IUnit, Integer> unitAndAmountOfPackagesTested = getUniqueTestedPackages(dataSet.getCoverageData());
 
         // Merge results from different methods on class level
-        return TestTypeDetectionUtils.generateResults(generalConf, unitAndAmountOfPackagesTested,
-                generalConf.getMethodLevel(), "cov_ieee_met");
+        filer.storeResults(TestTypeDetectionUtils.generateResults(generalConf, unitAndAmountOfPackagesTested,
+                generalConf.getMethodLevel(), "cov_ieee_met"));
     }
 
 

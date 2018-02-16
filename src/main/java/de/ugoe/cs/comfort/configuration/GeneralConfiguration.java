@@ -19,7 +19,9 @@ package de.ugoe.cs.comfort.configuration;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
+import de.ugoe.cs.comfort.filer.BaseFiler;
 import de.ugoe.cs.comfort.filer.IFiler;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -117,10 +119,11 @@ public class GeneralConfiguration {
         this.nThreads = nThreads;
     }
 
-    public IFiler getFiler() throws ClassNotFoundException, IllegalAccessException,
-            InstantiationException {
-        IFiler filer = (IFiler) Class.forName("de.ugoe.cs.comfort.filer." + this.filerConfiguration.getName())
-                .newInstance();
+    public BaseFiler getFiler() throws ClassNotFoundException, IllegalAccessException,
+            InstantiationException, NoSuchMethodException, InvocationTargetException {
+        BaseFiler filer = (BaseFiler) Class.forName("de.ugoe.cs.comfort.filer." + this.filerConfiguration.getName())
+                .getConstructor(GeneralConfiguration.class, FilerConfiguration.class)
+                .newInstance(this, filerConfiguration);
         LOGGER.info("Using filer {}...", filer.getClass().getCanonicalName());
         return filer;
     }

@@ -25,7 +25,9 @@ import de.ugoe.cs.comfort.data.CoverageData;
 import de.ugoe.cs.comfort.data.graphs.CallGraph;
 import de.ugoe.cs.comfort.data.graphs.DependencyGraph;
 import de.ugoe.cs.comfort.data.models.IUnit;
+import de.ugoe.cs.comfort.filer.BaseFiler;
 import de.ugoe.cs.comfort.filer.models.Result;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -36,14 +38,14 @@ import java.util.Set;
  */
 public class TestCoverageCollector extends BaseMetricCollector{
 
-    public TestCoverageCollector(GeneralConfiguration configuration) {
-        super(configuration);
+    public TestCoverageCollector(GeneralConfiguration configuration, BaseFiler filer) {
+        super(configuration, filer);
     }
 
     @SupportsMethod
     @SupportsJava
     @SupportsPython
-    public Set<Result> createResultsJavaPythonMethodLevel(CoverageData coverageData) {
+    public void createResultsJavaPythonMethodLevel(CoverageData coverageData) throws IOException {
         Map<IUnit, Set<String>> testAndCoveredMethods = new HashMap<>();
 
         for (Map.Entry<IUnit, Set<IUnit>> entry : coverageData.getCoverageData().entrySet()) {
@@ -52,14 +54,14 @@ public class TestCoverageCollector extends BaseMetricCollector{
             testAndCoveredMethods.put(entry.getKey(), coveredMethods);
         }
 
-        return createResultsForMap(testAndCoveredMethods, true, "cov_tcov_met");
+        filer.storeResults(createResultsForMap(testAndCoveredMethods, true, "cov_tcov_met"));
     }
 
 
     @SupportsClass
     @SupportsJava
     @SupportsPython
-    public Set<Result> createResultsJavaPythonClassLevel(CoverageData coverageData) {
+    public void createResultsJavaPythonClassLevel(CoverageData coverageData) throws IOException {
         Map<IUnit, Set<String>> testAndCoveredMethods = new HashMap<>();
 
         for (Map.Entry<IUnit, Set<IUnit>> entry : coverageData.getCoverageDataClassLevel().entrySet()) {
@@ -68,13 +70,13 @@ public class TestCoverageCollector extends BaseMetricCollector{
             testAndCoveredMethods.put(entry.getKey(), coveredMethods);
         }
 
-        return createResultsForMap(testAndCoveredMethods, false, "cov_tcov");
+        filer.storeResults(createResultsForMap(testAndCoveredMethods, false, "cov_tcov"));
     }
 
     @SupportsJava
     @SupportsPython
     @SupportsMethod
-    public Set<Result> createResultsForCallGraphMethodLevel(CallGraph callGraph) {
+    public void createResultsForCallGraphMethodLevel(CallGraph callGraph) throws IOException {
         Map<IUnit, Set<IUnit>> callerCalleePairs =
                 TestTypeDetectionUtils.getCallPairsOnClassLevel(callGraph);
         Map<IUnit, Set<String>> testAndCoveredMethods = new HashMap<>();
@@ -83,13 +85,13 @@ public class TestCoverageCollector extends BaseMetricCollector{
             entry.getValue().forEach(testedMethod -> coveredMethods.add(testedMethod.getFQNOfUnit()));
             testAndCoveredMethods.put(entry.getKey(), coveredMethods);
         }
-        return createResultsForMap(testAndCoveredMethods, true, "call_tcov_met");
+        filer.storeResults(createResultsForMap(testAndCoveredMethods, true, "call_tcov_met"));
     }
 
     @SupportsJava
     @SupportsPython
     @SupportsClass
-    public Set<Result> createResultsForCallGraphClassLevel(CallGraph callGraph) {
+    public void createResultsForCallGraphClassLevel(CallGraph callGraph) throws IOException {
         Map<IUnit, Set<IUnit>> callerCalleePairs =
                 TestTypeDetectionUtils.getCallPairsOnClassLevel(callGraph.getDependencyGraphRepresentation());
         Map<IUnit, Set<String>> testAndCoveredMethods = new HashMap<>();
@@ -98,13 +100,13 @@ public class TestCoverageCollector extends BaseMetricCollector{
             entry.getValue().forEach(testedMethod -> coveredMethods.add(testedMethod.getFQNOfUnit()));
             testAndCoveredMethods.put(entry.getKey(), coveredMethods);
         }
-        return createResultsForMap(testAndCoveredMethods, false, "call_tcov");
+        filer.storeResults(createResultsForMap(testAndCoveredMethods, false, "call_tcov"));
     }
 
     @SupportsPython
     @SupportsJava
     @SupportsClass
-    public Set<Result> createResultsForDependencyGraph(DependencyGraph dependencyGraph) {
+    public void createResultsForDependencyGraph(DependencyGraph dependencyGraph) throws IOException {
         Map<IUnit, Set<IUnit>> callerCalleePairs =
                 TestTypeDetectionUtils.getCallPairsOnClassLevel(dependencyGraph);
         Map<IUnit, Set<String>> testAndCoveredMethods = new HashMap<>();
@@ -113,7 +115,7 @@ public class TestCoverageCollector extends BaseMetricCollector{
             entry.getValue().forEach(testedMethod -> coveredMethods.add(testedMethod.getFQNOfUnit()));
             testAndCoveredMethods.put(entry.getKey(), coveredMethods);
         }
-        return createResultsForMap(testAndCoveredMethods, false, "dep_tcov");
+        filer.storeResults(createResultsForMap(testAndCoveredMethods, false, "dep_tcov"));
     }
 
     private Set<Result> createResultsForMap(Map<IUnit, Set<String>> testAndCoveredMethods,
