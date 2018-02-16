@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import de.ugoe.cs.comfort.collection.filter.BaseFilter;
 import de.ugoe.cs.comfort.collection.loader.BaseLoader;
 import de.ugoe.cs.comfort.collection.metriccollector.BaseMetricCollector;
+import de.ugoe.cs.comfort.filer.BaseFiler;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,52 +29,53 @@ import java.util.List;
 /**
  * @author Fabian Trautsch
  */
-<span class="fc" id="L31">public class CollectionConfiguration {</span>
+<span class="fc" id="L32">public class CollectionConfiguration {</span>
 
     @JsonProperty(&quot;loader&quot;)
     private LoaderConfiguration loaderConf;
 
     @JsonGetter(&quot;loader&quot;)
     public LoaderConfiguration getLoaderConfiguration() {
-<span class="nc" id="L38">        return loaderConf;</span>
+<span class="nc" id="L39">        return loaderConf;</span>
     }
 
-<span class="fc" id="L41">    @JsonProperty(&quot;filters&quot;)</span>
+<span class="fc" id="L42">    @JsonProperty(&quot;filters&quot;)</span>
     private List&lt;String&gt; filterConf = new ArrayList&lt;&gt;();
 
-<span class="fc" id="L44">    @JsonProperty(&quot;collectors&quot;)</span>
+<span class="fc" id="L45">    @JsonProperty(&quot;collectors&quot;)</span>
     private List&lt;String&gt; collectorConf = new ArrayList&lt;&gt;();
 
     public BaseLoader getLoader(GeneralConfiguration conf) throws ClassNotFoundException, NoSuchMethodException,
             IllegalAccessException, InvocationTargetException, InstantiationException {
-<span class="fc" id="L49">        return (BaseLoader) Class</span>
-<span class="fc" id="L50">                .forName(&quot;de.ugoe.cs.comfort.collection.loader.&quot; + loaderConf.getName())</span>
-<span class="fc" id="L51">                .getConstructor(GeneralConfiguration.class, LoaderConfiguration.class)</span>
-<span class="fc" id="L52">                .newInstance(conf, loaderConf);</span>
+<span class="fc" id="L50">        return (BaseLoader) Class</span>
+<span class="fc" id="L51">                .forName(&quot;de.ugoe.cs.comfort.collection.loader.&quot; + loaderConf.getName())</span>
+<span class="fc" id="L52">                .getConstructor(GeneralConfiguration.class, LoaderConfiguration.class)</span>
+<span class="fc" id="L53">                .newInstance(conf, loaderConf);</span>
     }
 
     public List&lt;BaseFilter&gt; getFilter(GeneralConfiguration conf) throws ClassNotFoundException, NoSuchMethodException,
             IllegalAccessException, InvocationTargetException, InstantiationException {
-<span class="fc" id="L57">        List&lt;BaseFilter&gt; filters = new ArrayList&lt;&gt;();</span>
-<span class="fc bfc" id="L58" title="All 2 branches covered.">        for(String filter : filterConf) {</span>
-<span class="fc" id="L59">            filters.add((BaseFilter) Class</span>
-<span class="fc" id="L60">                        .forName(&quot;de.ugoe.cs.comfort.collection.filter.&quot; + filter)</span>
-<span class="fc" id="L61">                        .getConstructor(GeneralConfiguration.class)</span>
-<span class="fc" id="L62">                        .newInstance(conf));</span>
-<span class="fc" id="L63">        }</span>
-<span class="fc" id="L64">        return filters;</span>
+<span class="fc" id="L58">        List&lt;BaseFilter&gt; filters = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">        for(String filter : filterConf) {</span>
+<span class="fc" id="L60">            filters.add((BaseFilter) Class</span>
+<span class="fc" id="L61">                        .forName(&quot;de.ugoe.cs.comfort.collection.filter.&quot; + filter)</span>
+<span class="fc" id="L62">                        .getConstructor(GeneralConfiguration.class)</span>
+<span class="fc" id="L63">                        .newInstance(conf));</span>
+<span class="fc" id="L64">        }</span>
+<span class="fc" id="L65">        return filters;</span>
     }
 
-    public List&lt;BaseMetricCollector&gt; getMetricCollectors(GeneralConfiguration conf) throws ClassNotFoundException,
-            NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-<span class="fc" id="L69">        List&lt;BaseMetricCollector&gt; collectors = new ArrayList&lt;&gt;();</span>
-<span class="fc bfc" id="L70" title="All 2 branches covered.">        for(String collector : collectorConf) {</span>
-<span class="fc" id="L71">            collectors.add((BaseMetricCollector) Class</span>
-<span class="fc" id="L72">                    .forName(&quot;de.ugoe.cs.comfort.collection.metriccollector.&quot; + collector)</span>
-<span class="fc" id="L73">                    .getConstructor(GeneralConfiguration.class)</span>
-<span class="fc" id="L74">                    .newInstance(conf));</span>
-<span class="fc" id="L75">        }</span>
-<span class="fc" id="L76">        return collectors;</span>
+    public List&lt;BaseMetricCollector&gt; getMetricCollectors(GeneralConfiguration conf, BaseFiler filer)
+            throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException,
+            InstantiationException {
+<span class="fc" id="L71">        List&lt;BaseMetricCollector&gt; collectors = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L72" title="All 2 branches covered.">        for(String collector : collectorConf) {</span>
+<span class="fc" id="L73">            collectors.add((BaseMetricCollector) Class</span>
+<span class="fc" id="L74">                    .forName(&quot;de.ugoe.cs.comfort.collection.metriccollector.&quot; + collector)</span>
+<span class="fc" id="L75">                    .getConstructor(GeneralConfiguration.class, BaseFiler.class)</span>
+<span class="fc" id="L76">                    .newInstance(conf, filer));</span>
+<span class="fc" id="L77">        }</span>
+<span class="fc" id="L78">        return collectors;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

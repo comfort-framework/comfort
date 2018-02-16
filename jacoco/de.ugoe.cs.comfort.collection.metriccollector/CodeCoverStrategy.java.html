@@ -17,15 +17,16 @@
 package de.ugoe.cs.comfort.collection.metriccollector;
 
 import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
+import de.ugoe.cs.comfort.filer.BaseFiler;
 
 /**
  * @author Fabian Trautsch
  */
 public class CodeCoverStrategy extends BaseMetricCollector {
 
-    public CodeCoverStrategy(GeneralConfiguration configuration) {
-<span class="nc" id="L27">        super(configuration);</span>
-<span class="nc" id="L28">    }</span>
+    public CodeCoverStrategy(GeneralConfiguration configuration, BaseFiler filer) {
+<span class="nc" id="L28">        super(configuration, filer);</span>
+<span class="nc" id="L29">    }</span>
 }
     /*
 public class CodeCoverStrategy implements IMetricCollector {

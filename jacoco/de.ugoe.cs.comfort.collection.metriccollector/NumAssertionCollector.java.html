@@ -27,6 +27,7 @@ import de.ugoe.cs.comfort.data.graphs.CallEdge;
 import de.ugoe.cs.comfort.data.graphs.CallGraph;
 import de.ugoe.cs.comfort.data.models.IUnit;
 import de.ugoe.cs.comfort.exception.MetricCollectorException;
+import de.ugoe.cs.comfort.filer.BaseFiler;
 import de.ugoe.cs.comfort.filer.models.Result;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -40,81 +41,81 @@ import org.apache.bcel.classfile.ClassParser;
  * @author Fabian Trautsch
  */
 public class NumAssertionCollector extends BaseMetricCollector {
-    public NumAssertionCollector(GeneralConfiguration configuration) {
-<span class="fc" id="L44">        super(configuration);</span>
-<span class="fc" id="L45">    }</span>
+    public NumAssertionCollector(GeneralConfiguration configuration, BaseFiler filer) {
+<span class="fc" id="L45">        super(configuration, filer);</span>
+<span class="fc" id="L46">    }</span>
 
     @SupportsMethod
     @SupportsClass
     @SupportsJava
-    public Set&lt;Result&gt; getNumberOfAssertionsForJava(ClassFiles classFiles) throws MetricCollectorException {
+    public void getNumberOfAssertionsForJava(ClassFiles classFiles) throws MetricCollectorException {
         ClassParser cp;
-<span class="fc" id="L52">        Set&lt;Path&gt; testClassFiles = classFiles.getTestFiles();</span>
+<span class="fc" id="L53">        Set&lt;Path&gt; testClassFiles = classFiles.getTestFiles();</span>
 
         try {
-<span class="fc" id="L55">            Set&lt;Result&gt; results = new HashSet&lt;&gt;();</span>
-<span class="fc bfc" id="L56" title="All 2 branches covered.">            for(Path classFilePath: testClassFiles) {</span>
-<span class="fc" id="L57">                cp = new ClassParser(classFilePath.toString());</span>
-<span class="fc" id="L58">                MetricClassVisitor visitor = new MetricClassVisitor(cp.parse(), results, generalConf,</span>
-<span class="fc" id="L59">                        generalConf.getMethodLevel(), classFiles);</span>
-<span class="fc" id="L60">                visitor.start();</span>
-<span class="fc" id="L61">            }</span>
-<span class="fc" id="L62">            return results;</span>
-<span class="nc" id="L63">        } catch (IOException e) {</span>
-<span class="nc" id="L64">            throw new MetricCollectorException(&quot;Error in executing NumAssertionCollector: &quot;+e.getMessage());</span>
-        }
-    }
+<span class="fc" id="L56">            Set&lt;Result&gt; results = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L57" title="All 2 branches covered.">            for(Path classFilePath: testClassFiles) {</span>
+<span class="fc" id="L58">                cp = new ClassParser(classFilePath.toString());</span>
+<span class="fc" id="L59">                MetricClassVisitor visitor = new MetricClassVisitor(cp.parse(), results, generalConf,</span>
+<span class="fc" id="L60">                        generalConf.getMethodLevel(), classFiles);</span>
+<span class="fc" id="L61">                visitor.start();</span>
+<span class="fc" id="L62">            }</span>
+<span class="fc" id="L63">            filer.storeResults(results);</span>
+<span class="nc" id="L64">        } catch (IOException e) {</span>
+<span class="nc" id="L65">            throw new MetricCollectorException(&quot;Error in executing NumAssertionCollector: &quot;+e.getMessage());</span>
+<span class="fc" id="L66">        }</span>
+<span class="fc" id="L67">    }</span>
 
     @SupportsMethod
     @SupportsJava
     @SupportsPython
-    public Set&lt;Result&gt; getNumberOfAssertionsForCallGraph(CallGraph callGraph) {
-<span class="fc" id="L72">        Map&lt;String, Result&gt; allResults = new HashMap&lt;&gt;();</span>
-<span class="fc bfc" id="L73" title="All 2 branches covered.">        for(IUnit testNode : callGraph.getTestNodes()) {</span>
+    public void getNumberOfAssertionsForCallGraph(CallGraph callGraph) throws IOException {
+<span class="fc" id="L73">        Map&lt;String, Result&gt; allResults = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L74" title="All 2 branches covered.">        for(IUnit testNode : callGraph.getTestNodes()) {</span>
 
-<span class="fc" id="L75">            Result result = allResults.getOrDefault(testNode.getFQN(),</span>
-<span class="fc" id="L76">                    new Result(testNode.getFQN(), testNode.getFilePath(), &quot;num_asserts&quot;, &quot;0&quot;));</span>
-<span class="fc" id="L77">            Integer numAsserts = Integer.parseInt(result.getMetric(&quot;num_asserts&quot;));</span>
+<span class="fc" id="L76">            Result result = allResults.getOrDefault(testNode.getFQN(),</span>
+<span class="fc" id="L77">                    new Result(testNode.getFQN(), testNode.getFilePath(), &quot;num_asserts&quot;, &quot;0&quot;));</span>
+<span class="fc" id="L78">            Integer numAsserts = Integer.parseInt(result.getMetric(&quot;num_asserts&quot;));</span>
 
-<span class="fc bfc" id="L79" title="All 2 branches covered.">            for(CallEdge directlyConnectedEdge : callGraph.outEdges(testNode)) {</span>
-<span class="fc bfc" id="L80" title="All 2 branches covered.">                if(directlyConnectedEdge.getCallee().getFQN().contains(&quot;assert&quot;)) {</span>
-<span class="fc" id="L81">                    numAsserts++;</span>
+<span class="fc bfc" id="L80" title="All 2 branches covered.">            for(CallEdge directlyConnectedEdge : callGraph.outEdges(testNode)) {</span>
+<span class="fc bfc" id="L81" title="All 2 branches covered.">                if(directlyConnectedEdge.getCallee().getFQN().contains(&quot;assert&quot;)) {</span>
+<span class="fc" id="L82">                    numAsserts++;</span>
                 }
-<span class="fc" id="L83">            }</span>
-<span class="fc" id="L84">            result.addMetric(&quot;num_asserts&quot;, String.valueOf(numAsserts));</span>
-<span class="fc" id="L85">            allResults.put(testNode.getFQN(), result);</span>
-<span class="fc" id="L86">        }</span>
+<span class="fc" id="L84">            }</span>
+<span class="fc" id="L85">            result.addMetric(&quot;num_asserts&quot;, String.valueOf(numAsserts));</span>
+<span class="fc" id="L86">            allResults.put(testNode.getFQN(), result);</span>
+<span class="fc" id="L87">        }</span>
 
-<span class="fc" id="L88">        Set&lt;Result&gt; results = new HashSet&lt;&gt;();</span>
-<span class="fc" id="L89">        results.addAll(allResults.values());</span>
-<span class="fc" id="L90">        return results;</span>
-    }
+<span class="fc" id="L89">        Set&lt;Result&gt; results = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L90">        results.addAll(allResults.values());</span>
+<span class="fc" id="L91">        filer.storeResults(results);</span>
+<span class="fc" id="L92">    }</span>
 
     @SupportsClass
     @SupportsJava
     @SupportsPython
-    public Set&lt;Result&gt; getNumberOfAssertionsForCallGraphOnClassLevel(CallGraph callGraph) {
-<span class="fc" id="L97">        Map&lt;String, Result&gt; allResults = new HashMap&lt;&gt;();</span>
-<span class="fc bfc" id="L98" title="All 2 branches covered.">        for(IUnit testNode : callGraph.getTestNodes()) {</span>
+    public void getNumberOfAssertionsForCallGraphOnClassLevel(CallGraph callGraph) throws IOException {
+<span class="fc" id="L98">        Map&lt;String, Result&gt; allResults = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L99" title="All 2 branches covered.">        for(IUnit testNode : callGraph.getTestNodes()) {</span>
 
-<span class="fc" id="L100">            Result result = allResults.getOrDefault(testNode.getFQNOfUnit(),</span>
-<span class="fc" id="L101">                    new Result(testNode.getFQNOfUnit(), testNode.getFilePath(), &quot;num_asserts&quot;, &quot;0&quot;));</span>
-<span class="fc" id="L102">            Integer numAsserts = Integer.parseInt(result.getMetric(&quot;num_asserts&quot;));</span>
+<span class="fc" id="L101">            Result result = allResults.getOrDefault(testNode.getFQNOfUnit(),</span>
+<span class="fc" id="L102">                    new Result(testNode.getFQNOfUnit(), testNode.getFilePath(), &quot;num_asserts&quot;, &quot;0&quot;));</span>
+<span class="fc" id="L103">            Integer numAsserts = Integer.parseInt(result.getMetric(&quot;num_asserts&quot;));</span>
 
-<span class="fc bfc" id="L104" title="All 2 branches covered.">            for(CallEdge directlyConnectedEdge : callGraph.outEdges(testNode)) {</span>
-<span class="fc bfc" id="L105" title="All 2 branches covered.">                if(directlyConnectedEdge.getCallee().getFQN().contains(&quot;assert&quot;)) {</span>
-<span class="fc" id="L106">                    numAsserts++;</span>
+<span class="fc bfc" id="L105" title="All 2 branches covered.">            for(CallEdge directlyConnectedEdge : callGraph.outEdges(testNode)) {</span>
+<span class="fc bfc" id="L106" title="All 2 branches covered.">                if(directlyConnectedEdge.getCallee().getFQN().contains(&quot;assert&quot;)) {</span>
+<span class="fc" id="L107">                    numAsserts++;</span>
                 }
-<span class="fc" id="L108">            }</span>
+<span class="fc" id="L109">            }</span>
 
-<span class="fc" id="L110">            result.addMetric(&quot;num_asserts&quot;, String.valueOf(numAsserts));</span>
-<span class="fc" id="L111">            allResults.put(testNode.getFQNOfUnit(), result);</span>
-<span class="fc" id="L112">        }</span>
+<span class="fc" id="L111">            result.addMetric(&quot;num_asserts&quot;, String.valueOf(numAsserts));</span>
+<span class="fc" id="L112">            allResults.put(testNode.getFQNOfUnit(), result);</span>
+<span class="fc" id="L113">        }</span>
 
-<span class="fc" id="L114">        Set&lt;Result&gt; results = new HashSet&lt;&gt;();</span>
-<span class="fc" id="L115">        results.addAll(allResults.values());</span>
-<span class="fc" id="L116">        return results;</span>
-    }
+<span class="fc" id="L115">        Set&lt;Result&gt; results = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L116">        results.addAll(allResults.values());</span>
+<span class="fc" id="L117">        filer.storeResults(results);</span>
+<span class="fc" id="L118">    }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

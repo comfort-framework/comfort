@@ -34,25 +34,22 @@ public class ResultSet {
     }
 
     public void addResults(Set&lt;Result&gt; results) {
-<span class="fc" id="L37">        Set&lt;Result&gt; newResultSet = new HashSet&lt;&gt;();</span>
-<span class="fc bfc" id="L38" title="All 2 branches covered.">        for(Result resultToStore: results) {</span>
-<span class="fc" id="L39">            Result foundResult = getResultById(resultToStore.getId());</span>
-<span class="fc" id="L40">            foundResult.mergeResult(resultToStore);</span>
-<span class="fc" id="L41">            newResultSet.add(foundResult);</span>
-<span class="fc" id="L42">        }</span>
-<span class="fc" id="L43">        this.results = newResultSet;</span>
-<span class="fc" id="L44">    }</span>
+<span class="fc bfc" id="L37" title="All 2 branches covered.">        for(Result resultToStore: results) {</span>
+<span class="fc" id="L38">            addResult(resultToStore);</span>
+<span class="fc" id="L39">        }</span>
+<span class="fc" id="L40">    }</span>
 
-    private Result getResultById(String id) {
-<span class="fc bfc" id="L47" title="All 2 branches covered.">        for(Result result: this.results) {</span>
-<span class="pc bpc" id="L48" title="1 of 2 branches missed.">            if(result.getId().equals(id)) {</span>
-<span class="fc" id="L49">                return result;</span>
+    public void addResult(Result resultToStore) {
+<span class="fc bfc" id="L43" title="All 2 branches covered.">        for(Result result: this.results) {</span>
+<span class="fc bfc" id="L44" title="All 2 branches covered.">            if(result.getId().equals(resultToStore.getId())) {</span>
+<span class="fc" id="L45">                result.mergeResult(resultToStore);</span>
+<span class="fc" id="L46">                return;</span>
             }
-<span class="nc" id="L51">        }</span>
+<span class="fc" id="L48">        }</span>
 
-<span class="fc" id="L53">        return new Result(id);</span>
-    }
-
+        // If we are here, we did not find the result, so we need to add it
+<span class="fc" id="L51">        results.add(resultToStore);</span>
+<span class="fc" id="L52">    }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

@@ -25,7 +25,9 @@ import de.ugoe.cs.comfort.data.CoverageData;
 import de.ugoe.cs.comfort.data.graphs.CallGraph;
 import de.ugoe.cs.comfort.data.graphs.DependencyGraph;
 import de.ugoe.cs.comfort.data.models.IUnit;
+import de.ugoe.cs.comfort.filer.BaseFiler;
 import de.ugoe.cs.comfort.filer.models.Result;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -36,103 +38,103 @@ import java.util.Set;
  */
 public class TestCoverageCollector extends BaseMetricCollector{
 
-    public TestCoverageCollector(GeneralConfiguration configuration) {
-<span class="fc" id="L40">        super(configuration);</span>
-<span class="fc" id="L41">    }</span>
+    public TestCoverageCollector(GeneralConfiguration configuration, BaseFiler filer) {
+<span class="fc" id="L42">        super(configuration, filer);</span>
+<span class="fc" id="L43">    }</span>
 
     @SupportsMethod
     @SupportsJava
     @SupportsPython
-    public Set&lt;Result&gt; createResultsJavaPythonMethodLevel(CoverageData coverageData) {
-<span class="fc" id="L47">        Map&lt;IUnit, Set&lt;String&gt;&gt; testAndCoveredMethods = new HashMap&lt;&gt;();</span>
+    public void createResultsJavaPythonMethodLevel(CoverageData coverageData) throws IOException {
+<span class="fc" id="L49">        Map&lt;IUnit, Set&lt;String&gt;&gt; testAndCoveredMethods = new HashMap&lt;&gt;();</span>
 
-<span class="fc bfc" id="L49" title="All 2 branches covered.">        for (Map.Entry&lt;IUnit, Set&lt;IUnit&gt;&gt; entry : coverageData.getCoverageData().entrySet()) {</span>
-<span class="fc" id="L50">            Set&lt;String&gt; coveredMethods = testAndCoveredMethods.getOrDefault(entry.getKey(), new HashSet&lt;&gt;());</span>
-<span class="fc" id="L51">            entry.getValue().forEach(testedMethod -&gt; coveredMethods.add(testedMethod.getFQNOfUnit()));</span>
-<span class="fc" id="L52">            testAndCoveredMethods.put(entry.getKey(), coveredMethods);</span>
-<span class="fc" id="L53">        }</span>
+<span class="fc bfc" id="L51" title="All 2 branches covered.">        for (Map.Entry&lt;IUnit, Set&lt;IUnit&gt;&gt; entry : coverageData.getCoverageData().entrySet()) {</span>
+<span class="fc" id="L52">            Set&lt;String&gt; coveredMethods = testAndCoveredMethods.getOrDefault(entry.getKey(), new HashSet&lt;&gt;());</span>
+<span class="fc" id="L53">            entry.getValue().forEach(testedMethod -&gt; coveredMethods.add(testedMethod.getFQNOfUnit()));</span>
+<span class="fc" id="L54">            testAndCoveredMethods.put(entry.getKey(), coveredMethods);</span>
+<span class="fc" id="L55">        }</span>
 
-<span class="fc" id="L55">        return createResultsForMap(testAndCoveredMethods, true, &quot;cov_tcov_met&quot;);</span>
-    }
+<span class="fc" id="L57">        filer.storeResults(createResultsForMap(testAndCoveredMethods, true, &quot;cov_tcov_met&quot;));</span>
+<span class="fc" id="L58">    }</span>
 
 
     @SupportsClass
     @SupportsJava
     @SupportsPython
-    public Set&lt;Result&gt; createResultsJavaPythonClassLevel(CoverageData coverageData) {
-<span class="fc" id="L63">        Map&lt;IUnit, Set&lt;String&gt;&gt; testAndCoveredMethods = new HashMap&lt;&gt;();</span>
+    public void createResultsJavaPythonClassLevel(CoverageData coverageData) throws IOException {
+<span class="fc" id="L65">        Map&lt;IUnit, Set&lt;String&gt;&gt; testAndCoveredMethods = new HashMap&lt;&gt;();</span>
 
-<span class="fc bfc" id="L65" title="All 2 branches covered.">        for (Map.Entry&lt;IUnit, Set&lt;IUnit&gt;&gt; entry : coverageData.getCoverageDataClassLevel().entrySet()) {</span>
-<span class="fc" id="L66">            Set&lt;String&gt; coveredMethods = testAndCoveredMethods.getOrDefault(entry.getKey(), new HashSet&lt;&gt;());</span>
-<span class="fc" id="L67">            entry.getValue().forEach(testedMethod -&gt; coveredMethods.add(testedMethod.getFQNOfUnit()));</span>
-<span class="fc" id="L68">            testAndCoveredMethods.put(entry.getKey(), coveredMethods);</span>
-<span class="fc" id="L69">        }</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">        for (Map.Entry&lt;IUnit, Set&lt;IUnit&gt;&gt; entry : coverageData.getCoverageDataClassLevel().entrySet()) {</span>
+<span class="fc" id="L68">            Set&lt;String&gt; coveredMethods = testAndCoveredMethods.getOrDefault(entry.getKey(), new HashSet&lt;&gt;());</span>
+<span class="fc" id="L69">            entry.getValue().forEach(testedMethod -&gt; coveredMethods.add(testedMethod.getFQNOfUnit()));</span>
+<span class="fc" id="L70">            testAndCoveredMethods.put(entry.getKey(), coveredMethods);</span>
+<span class="fc" id="L71">        }</span>
 
-<span class="fc" id="L71">        return createResultsForMap(testAndCoveredMethods, false, &quot;cov_tcov&quot;);</span>
-    }
+<span class="fc" id="L73">        filer.storeResults(createResultsForMap(testAndCoveredMethods, false, &quot;cov_tcov&quot;));</span>
+<span class="fc" id="L74">    }</span>
 
     @SupportsJava
     @SupportsPython
     @SupportsMethod
-    public Set&lt;Result&gt; createResultsForCallGraphMethodLevel(CallGraph callGraph) {
-<span class="fc" id="L78">        Map&lt;IUnit, Set&lt;IUnit&gt;&gt; callerCalleePairs =</span>
-<span class="fc" id="L79">                TestTypeDetectionUtils.getCallPairsOnClassLevel(callGraph);</span>
-<span class="fc" id="L80">        Map&lt;IUnit, Set&lt;String&gt;&gt; testAndCoveredMethods = new HashMap&lt;&gt;();</span>
-<span class="fc bfc" id="L81" title="All 2 branches covered.">        for (Map.Entry&lt;IUnit, Set&lt;IUnit&gt;&gt; entry : callerCalleePairs.entrySet()) {</span>
-<span class="fc" id="L82">            Set&lt;String&gt; coveredMethods = testAndCoveredMethods.getOrDefault(entry.getKey(), new HashSet&lt;&gt;());</span>
-<span class="fc" id="L83">            entry.getValue().forEach(testedMethod -&gt; coveredMethods.add(testedMethod.getFQNOfUnit()));</span>
-<span class="fc" id="L84">            testAndCoveredMethods.put(entry.getKey(), coveredMethods);</span>
-<span class="fc" id="L85">        }</span>
-<span class="fc" id="L86">        return createResultsForMap(testAndCoveredMethods, true, &quot;call_tcov_met&quot;);</span>
-    }
+    public void createResultsForCallGraphMethodLevel(CallGraph callGraph) throws IOException {
+<span class="fc" id="L80">        Map&lt;IUnit, Set&lt;IUnit&gt;&gt; callerCalleePairs =</span>
+<span class="fc" id="L81">                TestTypeDetectionUtils.getCallPairsOnClassLevel(callGraph);</span>
+<span class="fc" id="L82">        Map&lt;IUnit, Set&lt;String&gt;&gt; testAndCoveredMethods = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L83" title="All 2 branches covered.">        for (Map.Entry&lt;IUnit, Set&lt;IUnit&gt;&gt; entry : callerCalleePairs.entrySet()) {</span>
+<span class="fc" id="L84">            Set&lt;String&gt; coveredMethods = testAndCoveredMethods.getOrDefault(entry.getKey(), new HashSet&lt;&gt;());</span>
+<span class="fc" id="L85">            entry.getValue().forEach(testedMethod -&gt; coveredMethods.add(testedMethod.getFQNOfUnit()));</span>
+<span class="fc" id="L86">            testAndCoveredMethods.put(entry.getKey(), coveredMethods);</span>
+<span class="fc" id="L87">        }</span>
+<span class="fc" id="L88">        filer.storeResults(createResultsForMap(testAndCoveredMethods, true, &quot;call_tcov_met&quot;));</span>
+<span class="fc" id="L89">    }</span>
 
     @SupportsJava
     @SupportsPython
     @SupportsClass
-    public Set&lt;Result&gt; createResultsForCallGraphClassLevel(CallGraph callGraph) {
-<span class="fc" id="L93">        Map&lt;IUnit, Set&lt;IUnit&gt;&gt; callerCalleePairs =</span>
-<span class="fc" id="L94">                TestTypeDetectionUtils.getCallPairsOnClassLevel(callGraph.getDependencyGraphRepresentation());</span>
-<span class="fc" id="L95">        Map&lt;IUnit, Set&lt;String&gt;&gt; testAndCoveredMethods = new HashMap&lt;&gt;();</span>
-<span class="fc bfc" id="L96" title="All 2 branches covered.">        for (Map.Entry&lt;IUnit, Set&lt;IUnit&gt;&gt; entry : callerCalleePairs.entrySet()) {</span>
-<span class="fc" id="L97">            Set&lt;String&gt; coveredMethods = testAndCoveredMethods.getOrDefault(entry.getKey(), new HashSet&lt;&gt;());</span>
-<span class="fc" id="L98">            entry.getValue().forEach(testedMethod -&gt; coveredMethods.add(testedMethod.getFQNOfUnit()));</span>
-<span class="fc" id="L99">            testAndCoveredMethods.put(entry.getKey(), coveredMethods);</span>
-<span class="fc" id="L100">        }</span>
-<span class="fc" id="L101">        return createResultsForMap(testAndCoveredMethods, false, &quot;call_tcov&quot;);</span>
-    }
+    public void createResultsForCallGraphClassLevel(CallGraph callGraph) throws IOException {
+<span class="fc" id="L95">        Map&lt;IUnit, Set&lt;IUnit&gt;&gt; callerCalleePairs =</span>
+<span class="fc" id="L96">                TestTypeDetectionUtils.getCallPairsOnClassLevel(callGraph.getDependencyGraphRepresentation());</span>
+<span class="fc" id="L97">        Map&lt;IUnit, Set&lt;String&gt;&gt; testAndCoveredMethods = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">        for (Map.Entry&lt;IUnit, Set&lt;IUnit&gt;&gt; entry : callerCalleePairs.entrySet()) {</span>
+<span class="fc" id="L99">            Set&lt;String&gt; coveredMethods = testAndCoveredMethods.getOrDefault(entry.getKey(), new HashSet&lt;&gt;());</span>
+<span class="fc" id="L100">            entry.getValue().forEach(testedMethod -&gt; coveredMethods.add(testedMethod.getFQNOfUnit()));</span>
+<span class="fc" id="L101">            testAndCoveredMethods.put(entry.getKey(), coveredMethods);</span>
+<span class="fc" id="L102">        }</span>
+<span class="fc" id="L103">        filer.storeResults(createResultsForMap(testAndCoveredMethods, false, &quot;call_tcov&quot;));</span>
+<span class="fc" id="L104">    }</span>
 
     @SupportsPython
     @SupportsJava
     @SupportsClass
-    public Set&lt;Result&gt; createResultsForDependencyGraph(DependencyGraph dependencyGraph) {
-<span class="fc" id="L108">        Map&lt;IUnit, Set&lt;IUnit&gt;&gt; callerCalleePairs =</span>
-<span class="fc" id="L109">                TestTypeDetectionUtils.getCallPairsOnClassLevel(dependencyGraph);</span>
-<span class="fc" id="L110">        Map&lt;IUnit, Set&lt;String&gt;&gt; testAndCoveredMethods = new HashMap&lt;&gt;();</span>
-<span class="fc bfc" id="L111" title="All 2 branches covered.">        for (Map.Entry&lt;IUnit, Set&lt;IUnit&gt;&gt; entry : callerCalleePairs.entrySet()) {</span>
-<span class="fc" id="L112">            Set&lt;String&gt; coveredMethods = testAndCoveredMethods.getOrDefault(entry.getKey(), new HashSet&lt;&gt;());</span>
-<span class="fc" id="L113">            entry.getValue().forEach(testedMethod -&gt; coveredMethods.add(testedMethod.getFQNOfUnit()));</span>
-<span class="fc" id="L114">            testAndCoveredMethods.put(entry.getKey(), coveredMethods);</span>
-<span class="fc" id="L115">        }</span>
-<span class="fc" id="L116">        return createResultsForMap(testAndCoveredMethods, false, &quot;dep_tcov&quot;);</span>
-    }
+    public void createResultsForDependencyGraph(DependencyGraph dependencyGraph) throws IOException {
+<span class="fc" id="L110">        Map&lt;IUnit, Set&lt;IUnit&gt;&gt; callerCalleePairs =</span>
+<span class="fc" id="L111">                TestTypeDetectionUtils.getCallPairsOnClassLevel(dependencyGraph);</span>
+<span class="fc" id="L112">        Map&lt;IUnit, Set&lt;String&gt;&gt; testAndCoveredMethods = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L113" title="All 2 branches covered.">        for (Map.Entry&lt;IUnit, Set&lt;IUnit&gt;&gt; entry : callerCalleePairs.entrySet()) {</span>
+<span class="fc" id="L114">            Set&lt;String&gt; coveredMethods = testAndCoveredMethods.getOrDefault(entry.getKey(), new HashSet&lt;&gt;());</span>
+<span class="fc" id="L115">            entry.getValue().forEach(testedMethod -&gt; coveredMethods.add(testedMethod.getFQNOfUnit()));</span>
+<span class="fc" id="L116">            testAndCoveredMethods.put(entry.getKey(), coveredMethods);</span>
+<span class="fc" id="L117">        }</span>
+<span class="fc" id="L118">        filer.storeResults(createResultsForMap(testAndCoveredMethods, false, &quot;dep_tcov&quot;));</span>
+<span class="fc" id="L119">    }</span>
 
     private Set&lt;Result&gt; createResultsForMap(Map&lt;IUnit, Set&lt;String&gt;&gt; testAndCoveredMethods,
                                             boolean methodLevel, String metricName) {
         // First we need to go through everything and get the number of all covered methods by all tests
-<span class="fc" id="L122">        Set&lt;String&gt; allCoveredMethods = new HashSet&lt;&gt;();</span>
-<span class="fc bfc" id="L123" title="All 2 branches covered.">        for(Map.Entry&lt;IUnit, Set&lt;String&gt;&gt; entry: testAndCoveredMethods.entrySet()) {</span>
-<span class="fc" id="L124">            allCoveredMethods.addAll(entry.getValue());</span>
-<span class="fc" id="L125">        }</span>
-<span class="fc" id="L126">        int overallCoveredMethods = allCoveredMethods.size();</span>
+<span class="fc" id="L124">        Set&lt;String&gt; allCoveredMethods = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L125" title="All 2 branches covered.">        for(Map.Entry&lt;IUnit, Set&lt;String&gt;&gt; entry: testAndCoveredMethods.entrySet()) {</span>
+<span class="fc" id="L126">            allCoveredMethods.addAll(entry.getValue());</span>
+<span class="fc" id="L127">        }</span>
+<span class="fc" id="L128">        int overallCoveredMethods = allCoveredMethods.size();</span>
 
         // Afterwards we calculate the percentage of covered methods for all tests
-<span class="fc" id="L129">        Set&lt;Result&gt; results = new HashSet&lt;&gt;();</span>
-<span class="fc bfc" id="L130" title="All 2 branches covered.">        for (Map.Entry&lt;IUnit, Set&lt;String&gt;&gt; entry : testAndCoveredMethods.entrySet()) {</span>
-<span class="fc" id="L131">            int percent = (100 * entry.getValue().size() / overallCoveredMethods);</span>
-<span class="fc" id="L132">            results.add(new Result(entry.getKey().getFQN(), entry.getKey().getFilePath(), metricName,</span>
-<span class="fc" id="L133">                    String.valueOf(percent)));</span>
-<span class="fc" id="L134">        }</span>
-<span class="fc" id="L135">        return results;</span>
+<span class="fc" id="L131">        Set&lt;Result&gt; results = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L132" title="All 2 branches covered.">        for (Map.Entry&lt;IUnit, Set&lt;String&gt;&gt; entry : testAndCoveredMethods.entrySet()) {</span>
+<span class="fc" id="L133">            int percent = (100 * entry.getValue().size() / overallCoveredMethods);</span>
+<span class="fc" id="L134">            results.add(new Result(entry.getKey().getFQN(), entry.getKey().getFilePath(), metricName,</span>
+<span class="fc" id="L135">                    String.valueOf(percent)));</span>
+<span class="fc" id="L136">        }</span>
+<span class="fc" id="L137">        return results;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

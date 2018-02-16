@@ -198,12 +198,6 @@
 </file>
 <file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/database/models/FileAggregation.java">
 </file>
-<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/database/models/Mutation.java">
-</file>
-<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/database/models/MutationResult.java">
-</file>
-<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/database/models/TestState.java">
-</file>
 <file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/database/models/package-info.java">
 </file>
 <file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/exception/FilterException.java">
@@ -217,6 +211,8 @@
 <file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/exception/MutationResultException.java">
 </file>
 <file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/exception/package-info.java">
+</file>
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/filer/BaseFiler.java">
 </file>
 <file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/filer/CSVFiler.java">
 </file>

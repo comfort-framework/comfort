@@ -26,7 +26,9 @@ import de.ugoe.cs.comfort.data.graphs.CallGraph;
 import de.ugoe.cs.comfort.data.graphs.DependencyGraph;
 import de.ugoe.cs.comfort.data.graphs.IGraph;
 import de.ugoe.cs.comfort.data.models.IUnit;
+import de.ugoe.cs.comfort.filer.BaseFiler;
 import de.ugoe.cs.comfort.filer.models.Result;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -37,74 +39,74 @@ import java.util.Set;
  */
 public class ISTQBTestTypeCollector extends BaseMetricCollector {
 
-    public ISTQBTestTypeCollector(GeneralConfiguration configuration) {
-<span class="fc" id="L41">        super(configuration);</span>
-<span class="fc" id="L42">    }</span>
+    public ISTQBTestTypeCollector(GeneralConfiguration configuration, BaseFiler filer) {
+<span class="fc" id="L43">        super(configuration, filer);</span>
+<span class="fc" id="L44">    }</span>
 
     @SupportsMethod
     @SupportsJava
     @SupportsPython
-    public Set&lt;Result&gt; createResultsJavaMethodLevelCallGraph(CallGraph graph) {
-<span class="fc" id="L48">        return classifyUsingGraph(graph, &quot;call_istqb_met&quot;);</span>
-    }
+    public void createResultsJavaMethodLevelCallGraph(CallGraph graph) throws IOException {
+<span class="fc" id="L50">        filer.storeResults(classifyUsingGraph(graph, &quot;call_istqb_met&quot;));</span>
+<span class="fc" id="L51">    }</span>
 
     @SupportsClass
     @SupportsJava
     @SupportsPython
-    public Set&lt;Result&gt; createResultsJavaClassLevelCallGraph(CallGraph callGraph) {
-<span class="fc" id="L55">        logger.warn(&quot;Using depedency graph representation of call graph for strategy {}&quot;, this.getClass().getName());</span>
-<span class="fc" id="L56">        return classifyUsingGraph(callGraph.getDependencyGraphRepresentation(), &quot;call_istqb&quot;);</span>
-    }
+    public void createResultsJavaClassLevelCallGraph(CallGraph callGraph) throws IOException {
+<span class="fc" id="L57">        logger.warn(&quot;Using depedency graph representation of call graph for strategy {}&quot;, this.getClass().getName());</span>
+<span class="fc" id="L58">        filer.storeResults(classifyUsingGraph(callGraph.getDependencyGraphRepresentation(), &quot;call_istqb&quot;));</span>
+<span class="fc" id="L59">    }</span>
 
     @SupportsPython
     @SupportsJava
     @SupportsClass
-    public Set&lt;Result&gt; createResultsJavaPythonClassDepGraph(DependencyGraph dependencyGraph) {
-<span class="fc" id="L63">        return classifyUsingGraph(dependencyGraph, &quot;dep_istqb&quot;);</span>
-    }
+    public void createResultsJavaPythonClassDepGraph(DependencyGraph dependencyGraph) throws IOException {
+<span class="fc" id="L65">        filer.storeResults(classifyUsingGraph(dependencyGraph, &quot;dep_istqb&quot;));</span>
+<span class="fc" id="L66">    }</span>
 
     @SupportsPython
     @SupportsJava
     @SupportsClass
-    public Set&lt;Result&gt; createResultsJavaPythonClassCoverage(CoverageData dataSet) {
-<span class="fc" id="L70">        Map&lt;IUnit, Integer&gt; unitAndAmountOfPackagesTested = getUniqueTestedClasses(dataSet.getCoverageDataClassLevel());</span>
+    public void createResultsJavaPythonClassCoverage(CoverageData dataSet) throws IOException {
+<span class="fc" id="L72">        Map&lt;IUnit, Integer&gt; unitAndAmountOfPackagesTested = getUniqueTestedClasses(dataSet.getCoverageDataClassLevel());</span>
 
         // Merge results from different methods on class level
-<span class="fc" id="L73">        return TestTypeDetectionUtils.generateResults(generalConf, unitAndAmountOfPackagesTested,</span>
-<span class="fc" id="L74">                generalConf.getMethodLevel(), &quot;cov_istqb&quot;);</span>
-    }
+<span class="fc" id="L75">        filer.storeResults(TestTypeDetectionUtils.generateResults(generalConf, unitAndAmountOfPackagesTested,</span>
+<span class="fc" id="L76">                generalConf.getMethodLevel(), &quot;cov_istqb&quot;));</span>
+<span class="fc" id="L77">    }</span>
 
     @SupportsPython
     @SupportsJava
     @SupportsMethod
-    public Set&lt;Result&gt; createResultsJavaPythonMethodCoverage(CoverageData dataSet) {
-<span class="fc" id="L81">        Map&lt;IUnit, Integer&gt; unitAndAmountOfPackagesTested = getUniqueTestedClasses(dataSet.getCoverageData());</span>
+    public void createResultsJavaPythonMethodCoverage(CoverageData dataSet) throws IOException {
+<span class="fc" id="L83">        Map&lt;IUnit, Integer&gt; unitAndAmountOfPackagesTested = getUniqueTestedClasses(dataSet.getCoverageData());</span>
 
         // Merge results from different methods on class level
-<span class="fc" id="L84">        return TestTypeDetectionUtils.generateResults(generalConf, unitAndAmountOfPackagesTested,</span>
-<span class="fc" id="L85">                generalConf.getMethodLevel(), &quot;cov_istqb_met&quot;);</span>
-    }
+<span class="fc" id="L86">        filer.storeResults(TestTypeDetectionUtils.generateResults(generalConf, unitAndAmountOfPackagesTested,</span>
+<span class="fc" id="L87">                generalConf.getMethodLevel(), &quot;cov_istqb_met&quot;));</span>
+<span class="fc" id="L88">    }</span>
 
     private Map&lt;IUnit, Integer&gt; getUniqueTestedClasses(Map&lt;IUnit, Set&lt;IUnit&gt;&gt; callerCalleePairs) {
-<span class="fc" id="L89">        Map&lt;IUnit, Integer&gt; testAndAmountOfClassesTested = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L91">        Map&lt;IUnit, Integer&gt; testAndAmountOfClassesTested = new HashMap&lt;&gt;();</span>
 
-<span class="fc bfc" id="L91" title="All 2 branches covered.">        for (Map.Entry&lt;IUnit, Set&lt;IUnit&gt;&gt; entry : callerCalleePairs.entrySet()) {</span>
-<span class="fc" id="L92">            Set&lt;String&gt; classes = new HashSet&lt;&gt;();</span>
-<span class="fc" id="L93">            entry.getValue().forEach(iUnit -&gt; classes.add(iUnit.getFQNOfUnit()));</span>
-<span class="fc" id="L94">            testAndAmountOfClassesTested.put(entry.getKey(), classes.size());</span>
-<span class="fc" id="L95">        }</span>
+<span class="fc bfc" id="L93" title="All 2 branches covered.">        for (Map.Entry&lt;IUnit, Set&lt;IUnit&gt;&gt; entry : callerCalleePairs.entrySet()) {</span>
+<span class="fc" id="L94">            Set&lt;String&gt; classes = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L95">            entry.getValue().forEach(iUnit -&gt; classes.add(iUnit.getFQNOfUnit()));</span>
+<span class="fc" id="L96">            testAndAmountOfClassesTested.put(entry.getKey(), classes.size());</span>
+<span class="fc" id="L97">        }</span>
 
-<span class="fc" id="L97">        return testAndAmountOfClassesTested;</span>
+<span class="fc" id="L99">        return testAndAmountOfClassesTested;</span>
     }
 
     private Set&lt;Result&gt; classifyUsingGraph(IGraph graph, String metricName) {
-<span class="fc" id="L101">        Map&lt;IUnit, Set&lt;IUnit&gt;&gt; callerCalleePairs =</span>
-<span class="fc" id="L102">                TestTypeDetectionUtils.getCallPairsOnClassLevel(graph);</span>
-<span class="fc" id="L103">        Map&lt;IUnit, Integer&gt; testAndAmountOfUnitsTested = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L104">        callerCalleePairs.forEach((caller, callees) -&gt; testAndAmountOfUnitsTested.put(caller, callees.size()));</span>
+<span class="fc" id="L103">        Map&lt;IUnit, Set&lt;IUnit&gt;&gt; callerCalleePairs =</span>
+<span class="fc" id="L104">                TestTypeDetectionUtils.getCallPairsOnClassLevel(graph);</span>
+<span class="fc" id="L105">        Map&lt;IUnit, Integer&gt; testAndAmountOfUnitsTested = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L106">        callerCalleePairs.forEach((caller, callees) -&gt; testAndAmountOfUnitsTested.put(caller, callees.size()));</span>
 
-<span class="fc" id="L106">        return TestTypeDetectionUtils.generateResults(generalConf, testAndAmountOfUnitsTested,</span>
-<span class="fc" id="L107">                generalConf.getMethodLevel(), metricName);</span>
+<span class="fc" id="L108">        return TestTypeDetectionUtils.generateResults(generalConf, testAndAmountOfUnitsTested,</span>
+<span class="fc" id="L109">                generalConf.getMethodLevel(), metricName);</span>
     }
 
 

@@ -32,17 +32,17 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 public class Result {
     private String id;
     private Path pathToFile;
-<span class="fc" id="L35">    private Map&lt;String, String&gt; metrics = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L36">    private Set&lt;Mutation&gt; mutationResults = new HashSet&lt;&gt;();</span>
+<span class="pc" id="L35">    private Map&lt;String, String&gt; metrics = new HashMap&lt;&gt;();</span>
+<span class="pc" id="L36">    private Set&lt;Mutation&gt; mutationResults = new HashSet&lt;&gt;();</span>
 
 <span class="fc" id="L38">    public Result(String id, Path pathToFile) {</span>
 <span class="fc" id="L39">        this.id = id;</span>
 <span class="fc" id="L40">        this.pathToFile = pathToFile;</span>
 <span class="fc" id="L41">    }</span>
 
-<span class="fc" id="L43">    public Result(String id) {</span>
-<span class="fc" id="L44">        this.id = id;</span>
-<span class="fc" id="L45">    }</span>
+<span class="nc" id="L43">    public Result(String id) {</span>
+<span class="nc" id="L44">        this.id = id;</span>
+<span class="nc" id="L45">    }</span>
 
 <span class="fc" id="L47">    public Result(String id, Path pathToFile, String metricName, String metricValue) {</span>
 <span class="fc" id="L48">        this.id = id;</span>

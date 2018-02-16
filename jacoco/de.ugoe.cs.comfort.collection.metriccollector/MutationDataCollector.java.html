@@ -22,7 +22,9 @@ import de.ugoe.cs.comfort.collection.metriccollector.mutation.MutationDataCollec
 import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
 import de.ugoe.cs.comfort.data.CoverageData;
 import de.ugoe.cs.comfort.data.models.IUnit;
+import de.ugoe.cs.comfort.filer.BaseFiler;
 import de.ugoe.cs.comfort.filer.models.Result;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -38,15 +40,13 @@ import java.util.concurrent.TimeUnit;
  * @author Fabian Trautsch
  */
 public class MutationDataCollector extends BaseMetricCollector {
-<span class="fc" id="L41">    private Set&lt;Result&gt; results = new HashSet&lt;&gt;();</span>
-
-    public MutationDataCollector(GeneralConfiguration configuration) {
-<span class="fc" id="L44">        super(configuration);</span>
+    public MutationDataCollector(GeneralConfiguration configuration, BaseFiler filer) {
+<span class="fc" id="L44">        super(configuration, filer);</span>
 <span class="fc" id="L45">    }</span>
 
     @SupportsMethod
     @SupportsJava
-    public Set&lt;Result&gt; getMutationDataMetrics(CoverageData data) {
+    public void getMutationDataMetrics(CoverageData data) throws IOException {
 
 <span class="fc" id="L51">        final ExecutorService executor = Executors.newFixedThreadPool(generalConf.getNThreads());</span>
 <span class="fc" id="L52">        CompletionService&lt;Result&gt; pool = new ExecutorCompletionService&lt;&gt;(executor);</span>
@@ -59,13 +59,19 @@ public class MutationDataCollector extends BaseMetricCollector {
 <span class="fc bfc" id="L59" title="All 2 branches covered.">        for (int i=0; i&lt;data.getCoverageData().size(); i++) {</span>
             try {
 <span class="fc" id="L61">                Result result = pool.take().get();</span>
-<span class="fc" id="L62">                results.add(result);</span>
-<span class="nc" id="L63">            } catch (InterruptedException | ExecutionException e) {</span>
-<span class="nc" id="L64">                logger.catching(e);</span>
-<span class="fc" id="L65">            }</span>
+
+                // Added here as it can be the case that a result could not be produced which would then result
+                // in a null result.
+<span class="pc bpc" id="L65" title="1 of 2 branches missed.">                if(result != null) {</span>
+<span class="fc" id="L66">                    synchronized(this) {</span>
+<span class="fc" id="L67">                        filer.storeResult(result);</span>
+<span class="pc" id="L68">                    }</span>
+                }
+<span class="nc" id="L70">            } catch (InterruptedException | ExecutionException e) {</span>
+<span class="nc" id="L71">                logger.catching(e);</span>
+<span class="fc" id="L72">            }</span>
         }
-<span class="fc" id="L67">        executor.shutdown();</span>
-<span class="fc" id="L68">        return results;</span>
-    }
+<span class="fc" id="L74">        executor.shutdown();</span>
+<span class="fc" id="L75">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

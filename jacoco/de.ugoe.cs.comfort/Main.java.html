@@ -26,8 +26,7 @@ import de.ugoe.cs.comfort.data.DataSet;
 import de.ugoe.cs.comfort.exception.FilterException;
 import de.ugoe.cs.comfort.exception.LoaderException;
 import de.ugoe.cs.comfort.exception.MetricCollectorException;
-import de.ugoe.cs.comfort.filer.IFiler;
-import de.ugoe.cs.comfort.filer.models.ResultSet;
+import de.ugoe.cs.comfort.filer.BaseFiler;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
@@ -46,27 +45,28 @@ import org.apache.logging.log4j.core.layout.PatternLayout;
 /**
  * @author Fabian Trautsch
  */
-<span class="nc" id="L49">public class Main {</span>
-<span class="fc" id="L50">    private static final Logger LOGGER = LogManager.getLogger(Main.class.getName());</span>
+<span class="nc" id="L48">public class Main {</span>
+<span class="fc" id="L49">    private static final Logger LOGGER = LogManager.getLogger(Main.class.getName());</span>
 
     public static void main(String[] args) {
-<span class="pc bpc" id="L53" title="1 of 2 branches missed.">        if(args.length != 1) {</span>
-<span class="nc" id="L54">            System.out.println(&quot;You need to give the location to the config.json as argument!&quot;);</span>
-<span class="nc" id="L55">            System.exit(1);</span>
+<span class="pc bpc" id="L52" title="1 of 2 branches missed.">        if(args.length != 1) {</span>
+<span class="nc" id="L53">            System.out.println(&quot;You need to give the location to the config.json as argument!&quot;);</span>
+<span class="nc" id="L54">            System.exit(1);</span>
         }
 
         try {
             // Load configuration
-<span class="fc" id="L60">            GeneralConfiguration config = loadConfiguration(args[0]);</span>
+<span class="fc" id="L59">            GeneralConfiguration config = loadConfiguration(args[0]);</span>
 
             // SetUp Logging
-<span class="fc" id="L63">            setupLogging(config);</span>
-
-            // Create object in which all results are stored
-<span class="fc" id="L66">            ResultSet resultSet = new ResultSet();</span>
+<span class="fc" id="L62">            setupLogging(config);</span>
 
             // Get collections that should be done
-<span class="fc" id="L69">            List&lt;CollectionConfiguration&gt; collections = config.getCollections();</span>
+<span class="fc" id="L65">            List&lt;CollectionConfiguration&gt; collections = config.getCollections();</span>
+
+            // Load filer
+<span class="fc" id="L68">            BaseFiler filer = config.getFiler();</span>
+<span class="fc" id="L69">            LOGGER.info(&quot;Using filer {}...&quot;, filer.getClass().getName());</span>
 
             // Execute each collection
 <span class="fc bfc" id="L72" title="All 2 branches covered.">            for(CollectionConfiguration collection: collections) {</span>
@@ -86,50 +86,46 @@ import org.apache.logging.log4j.core.layout.PatternLayout;
 <span class="fc" id="L86">                    }</span>
 
                     // Then, execute the metric collection
-<span class="fc" id="L89">                    List&lt;BaseMetricCollector&gt; collectors = collection.getMetricCollectors(config);</span>
-<span class="fc bfc" id="L90" title="All 2 branches covered.">                    for (BaseMetricCollector collector : collectors) {</span>
+<span class="fc" id="L89">                    List&lt;BaseMetricCollector&gt; collectors = collection.getMetricCollectors(config, filer);</span>
+<span class="pc bpc" id="L90" title="1 of 2 branches missed.">                    for (BaseMetricCollector collector : collectors) {</span>
 <span class="fc" id="L91">                        LOGGER.info(&quot;Using collector {}...&quot;, collector.getClass().getName());</span>
-<span class="fc" id="L92">                        resultSet.addResults(collector.collectData(data));</span>
-<span class="fc" id="L93">                        LOGGER.info(&quot;Collection successful...&quot;);</span>
-<span class="fc" id="L94">                    }</span>
-<span class="nc" id="L95">                } catch(LoaderException | FilterException | MetricCollectorException e) {</span>
-<span class="nc" id="L96">                    LOGGER.catching(e);</span>
-<span class="fc" id="L97">                }</span>
+<span class="nc" id="L92">                        collector.collectData(data);</span>
+<span class="nc" id="L93">                        LOGGER.info(&quot;Collection successful...&quot;);</span>
+<span class="nc" id="L94">                    }</span>
+<span class="fc" id="L95">                } catch(LoaderException | FilterException | MetricCollectorException e) {</span>
+<span class="fc" id="L96">                    LOGGER.catching(e);</span>
+<span class="nc" id="L97">                }</span>
 <span class="fc" id="L98">            }</span>
 
-            // Load filer
-<span class="fc" id="L101">            IFiler filer = config.getFiler();</span>
-<span class="fc" id="L102">            LOGGER.info(&quot;Using filer {}...&quot;, filer.getClass().getName());</span>
-<span class="fc" id="L103">            filer.storeResults(config, resultSet);</span>
-<span class="fc" id="L104">            LOGGER.info(&quot;Storing of data successful.&quot;);</span>
+<span class="fc" id="L100">            LOGGER.info(&quot;Execution successful.&quot;);</span>
 
-<span class="nc" id="L106">            System.exit(0);</span>
+<span class="nc" id="L102">            System.exit(0);</span>
 
-<span class="fc" id="L108">        } catch (InvocationTargetException | NoSuchMethodException | ClassNotFoundException | IllegalAccessException</span>
+<span class="fc" id="L104">        } catch (InvocationTargetException | NoSuchMethodException | ClassNotFoundException | IllegalAccessException</span>
             | InstantiationException | IOException e) {
-<span class="fc" id="L110">            LOGGER.catching(e);</span>
-<span class="nc" id="L111">            System.exit(1);</span>
-<span class="nc" id="L112">        }</span>
-<span class="nc" id="L113">    }</span>
+<span class="fc" id="L106">            LOGGER.catching(e);</span>
+<span class="nc" id="L107">            System.exit(1);</span>
+<span class="nc" id="L108">        }</span>
+<span class="nc" id="L109">    }</span>
 
     private static GeneralConfiguration loadConfiguration(String configLocation) throws IOException {
         // Load config
-<span class="fc" id="L117">        byte[] data  = Files.readAllBytes(Paths.get(configLocation));</span>
-<span class="fc" id="L118">        ObjectMapper mapper = new ObjectMapper();</span>
-<span class="fc" id="L119">        return mapper.readValue(data, GeneralConfiguration.class);</span>
+<span class="fc" id="L113">        byte[] data  = Files.readAllBytes(Paths.get(configLocation));</span>
+<span class="fc" id="L114">        ObjectMapper mapper = new ObjectMapper();</span>
+<span class="fc" id="L115">        return mapper.readValue(data, GeneralConfiguration.class);</span>
     }
 
     private static void setupLogging(GeneralConfiguration configuration) {
         // Configure logging
-<span class="fc" id="L124">        final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);</span>
-<span class="fc" id="L125">        final Configuration config = ctx.getConfiguration();</span>
-<span class="fc" id="L126">        PatternLayout layout = PatternLayout.newBuilder().withPattern(&quot;%d [%t] %-5p - %msg%n&quot;).build();</span>
-<span class="fc" id="L127">        Appender appender = FileAppender.newBuilder().withFileName(configuration.getLogFile())</span>
-<span class="fc" id="L128">                .withName(&quot;File&quot;).withLayout(layout).build();</span>
-<span class="fc" id="L129">        appender.start();</span>
-<span class="fc" id="L130">        config.addAppender(appender);</span>
-<span class="fc" id="L131">        config.getRootLogger().addAppender(appender, Level.getLevel(configuration.getLogLevel()), null);</span>
-<span class="fc" id="L132">        ctx.updateLoggers();</span>
-<span class="fc" id="L133">    }</span>
+<span class="fc" id="L120">        final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);</span>
+<span class="fc" id="L121">        final Configuration config = ctx.getConfiguration();</span>
+<span class="fc" id="L122">        PatternLayout layout = PatternLayout.newBuilder().withPattern(&quot;%d [%t] %-5p - %msg%n&quot;).build();</span>
+<span class="fc" id="L123">        Appender appender = FileAppender.newBuilder().withFileName(configuration.getLogFile())</span>
+<span class="fc" id="L124">                .withName(&quot;File&quot;).withLayout(layout).build();</span>
+<span class="fc" id="L125">        appender.start();</span>
+<span class="fc" id="L126">        config.addAppender(appender);</span>
+<span class="fc" id="L127">        config.getRootLogger().addAppender(appender, Level.getLevel(configuration.getLogLevel()), null);</span>
+<span class="fc" id="L128">        ctx.updateLoggers();</span>
+<span class="fc" id="L129">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>
