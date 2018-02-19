@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 import de.ugoe.cs.comfort.filer.BaseFiler;
-import de.ugoe.cs.comfort.filer.IFiler;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -58,9 +57,24 @@ public class GeneralConfiguration {
         return filerConfiguration;
     }
 
+    public void setFilerConfiguration(FilerConfiguration filerConfiguration) {
+        this.filerConfiguration = filerConfiguration;
+    }
+
     @JsonGetter("collections")
     public List<CollectionConfiguration> getCollections() {
         return collections;
+    }
+
+    @JsonProperty("forceRerun")
+    private boolean forceRerun = false;
+
+    public boolean isForceRerun() {
+        return forceRerun;
+    }
+
+    public void setForceRerun(boolean forceRerun) {
+        this.forceRerun = forceRerun;
     }
 
     public void setMethodLevel(boolean methodLevel) {

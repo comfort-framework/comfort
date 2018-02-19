@@ -18,15 +18,14 @@ package de.ugoe.cs.comfort.collection.metriccollector.mutation.executors;
 
 import de.ugoe.cs.comfort.collection.metriccollector.mutation.MutationChangeClassifier;
 import de.ugoe.cs.comfort.collection.metriccollector.mutation.MutationExecutionResult;
+import de.ugoe.cs.comfort.collection.metriccollector.mutation.MutationLocation;
 import de.ugoe.cs.comfort.exception.MutationResultException;
 import de.ugoe.cs.comfort.filer.models.Mutation;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -36,11 +35,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
@@ -139,7 +133,9 @@ public class PITExecutor implements IMutationExecutor {
     }
 
     @Override
-    public Set<Mutation> getDetailedResults(Path projectRoot) throws IOException {
+    public Set<Mutation> getDetailedResults(Path projectRoot,
+                                            Map<MutationLocation, String> generatedMutationsAndItsClassification)
+            throws IOException {
         String line;
         Set<Mutation> mutationResults = new HashSet<>();
 
@@ -157,15 +153,20 @@ public class PITExecutor implements IMutationExecutor {
 
             // Try to get a change clasification for the mutation
             // But we catch the exceptions here, as this kind of data is not crucial
-            String changeClassification = null;
+            MutationLocation mutationLocation = new MutationLocation(location, mutationOperator, lineNumber);
+            String changeClassification = generatedMutationsAndItsClassification.getOrDefault(mutationLocation, null);
             try {
-                changeClassification = MutationChangeClassifier.getChangeClassification(
-                        projectRoot, cols[0], mutationOperator, lineNumber
-                );
+                if(changeClassification == null) {
+                    changeClassification = MutationChangeClassifier.getChangeClassification(
+                            projectRoot, cols[0], mutationOperator, lineNumber
+                    );
+                    generatedMutationsAndItsClassification.put(mutationLocation, changeClassification);
+                }
                 logger.debug("Got the following change classification {}", changeClassification);
             } catch (MutationResultException e) {
                 logger.catching(e);
             }
+
             mutationResults.add(new Mutation(location, mutationOperator, lineNumber, result, changeClassification));
         }
         br.close();

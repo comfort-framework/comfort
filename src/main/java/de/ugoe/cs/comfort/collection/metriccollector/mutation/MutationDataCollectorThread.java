@@ -24,9 +24,9 @@ import de.ugoe.cs.comfort.data.models.IUnit;
 import de.ugoe.cs.comfort.filer.models.Mutation;
 import de.ugoe.cs.comfort.filer.models.Result;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -34,17 +34,21 @@ import org.apache.logging.log4j.Logger;
  * @author Fabian Trautsch
  */
 public class MutationDataCollectorThread implements Callable<Result> {
-    private IUnit unit;
-    private GeneralConfiguration generalConf;
-    private FileNameUtils fileNameUtils;
-    private Logger logger = LogManager.getLogger(this.getClass().getName());
-    private String threadName = Thread.currentThread().getName();
+    private final IUnit unit;
+    private final GeneralConfiguration generalConf;
+    private final FileNameUtils fileNameUtils;
+    private final Logger logger = LogManager.getLogger(this.getClass().getName());
+    private final String threadName = Thread.currentThread().getName();
+
+    private Map<MutationLocation, String> generatedMutationsAndItsClassification;
 
     public MutationDataCollectorThread(IUnit unit, GeneralConfiguration generalConfiguration,
-                                       FileNameUtils fileNameUtils) {
+                                       FileNameUtils fileNameUtils,
+                                       Map<MutationLocation, String> generatedMutationsAndItsClassification) {
         this.unit = unit;
         this.generalConf = generalConfiguration;
         this.fileNameUtils = fileNameUtils;
+        this.generatedMutationsAndItsClassification = generatedMutationsAndItsClassification;
     }
 
     @Override
@@ -70,7 +74,8 @@ public class MutationDataCollectorThread implements Callable<Result> {
             );
 
             // If execution was successful, we will read the results
-            Set<Mutation> mutationResults = mutationExecutor.getDetailedResults(generalConf.getProjectDir());
+            Set<Mutation> mutationResults = mutationExecutor.getDetailedResults(
+                    generalConf.getProjectDir(), generatedMutationsAndItsClassification);
 
             // And add these results to this specific test
             result.addMutationResults(mutationResults);

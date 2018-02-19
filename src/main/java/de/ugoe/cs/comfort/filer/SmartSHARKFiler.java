@@ -24,7 +24,6 @@ import de.ugoe.cs.comfort.configuration.FilerConfiguration;
 import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
 import de.ugoe.cs.comfort.filer.models.Mutation;
 import de.ugoe.cs.comfort.filer.models.Result;
-import de.ugoe.cs.comfort.filer.models.ResultSet;
 import de.ugoe.cs.smartshark.model.Commit;
 import de.ugoe.cs.smartshark.model.File;
 import de.ugoe.cs.smartshark.model.MutationResult;
@@ -39,10 +38,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.processing.Filer;
-import org.apache.bcel.Const;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Repository;
@@ -133,6 +128,22 @@ public class SmartSHARKFiler extends BaseFiler {
             storeTestState(testState);
         }
 
+    }
+
+    public Set<String> getTestStateWithMutationResults() {
+        Set<String> testStatesWithMutationResults = new HashSet<>();
+
+        datastore.createQuery(TestState.class)
+                .field("commit_id").equal(commitId)
+                .field("mutation_res").exists()
+                .field("mutation_res").notEqual(null)
+                .project("name", true)
+                .forEach(
+                        testState -> testStatesWithMutationResults.add(testState.getName())
+            );
+
+
+        return testStatesWithMutationResults;
     }
 
     private Set<MutationResult> createMutationResults(Result result) {

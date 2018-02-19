@@ -19,10 +19,12 @@ package de.ugoe.cs.comfort.collection.metriccollector;
 import de.ugoe.cs.comfort.annotations.SupportsJava;
 import de.ugoe.cs.comfort.annotations.SupportsMethod;
 import de.ugoe.cs.comfort.collection.metriccollector.mutation.MutationDataCollectorThread;
+import de.ugoe.cs.comfort.collection.metriccollector.mutation.MutationLocation;
 import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
 import de.ugoe.cs.comfort.data.CoverageData;
 import de.ugoe.cs.comfort.data.models.IUnit;
 import de.ugoe.cs.comfort.filer.BaseFiler;
+import de.ugoe.cs.comfort.filer.SmartSHARKFiler;
 import de.ugoe.cs.comfort.filer.models.Result;
 import java.io.IOException;
 import java.util.HashSet;
@@ -34,7 +36,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Fabian Trautsch
@@ -52,11 +53,26 @@ public class MutationDataCollector extends BaseMetricCollector {
         CompletionService<Result> pool = new ExecutorCompletionService<>(executor);
 
 
-        for (Map.Entry<IUnit, Set<IUnit>> entry : data.getCoverageData().entrySet()) {
-            pool.submit(new MutationDataCollectorThread(entry.getKey(), generalConf, fileNameUtils));
+        Set<String> alreadyAnalyzedTests = new HashSet<>();
+        // We can only get this if we are using the smartsharkfiler
+        if(generalConf.getFilerConfiguration().getName().endsWith("SmartSHARKFiler")) {
+            SmartSHARKFiler shFiler = (SmartSHARKFiler) filer;
+            alreadyAnalyzedTests.addAll(shFiler.getTestStateWithMutationResults());
         }
 
-        for (int i=0; i<data.getCoverageData().size(); i++) {
+        int analyzedTests = 0;
+        Map<MutationLocation, String> generatedMutationsAndItsClassification = new ConcurrentHashMap<>();
+        for (Map.Entry<IUnit, Set<IUnit>> entry : data.getCoverageData().entrySet()) {
+            if(alreadyAnalyzedTests.contains(entry.getKey().getFQN()) && !generalConf.isForceRerun()) {
+                logger.debug("Test {} already has mutation data...", entry.getKey().getFQN());
+            } else {
+                analyzedTests++;
+                pool.submit(new MutationDataCollectorThread(entry.getKey(), generalConf, fileNameUtils,
+                        generatedMutationsAndItsClassification));
+            }
+        }
+
+        for (int i=0; i<analyzedTests; i++) {
             try {
                 Result result = pool.take().get();
 

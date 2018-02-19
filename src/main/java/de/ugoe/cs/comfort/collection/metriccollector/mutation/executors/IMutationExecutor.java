@@ -17,9 +17,11 @@
 package de.ugoe.cs.comfort.collection.metriccollector.mutation.executors;
 
 import de.ugoe.cs.comfort.collection.metriccollector.mutation.MutationExecutionResult;
+import de.ugoe.cs.comfort.collection.metriccollector.mutation.MutationLocation;
 import de.ugoe.cs.comfort.filer.models.Mutation;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -27,8 +29,10 @@ import java.util.Set;
  */
 public interface IMutationExecutor {
 
-    public MutationExecutionResult execute(Path projectRoot, String className, String methodName) throws IOException;
+    MutationExecutionResult execute(Path projectRoot, String className, String methodName) throws IOException;
 
-    public Set<Mutation> getDetailedResults(Path projectRoot) throws IOException;
+    Set<Mutation> getDetailedResults(Path projectRoot,
+                                     Map<MutationLocation, String> generatedMutationsAndItsClassification)
+            throws IOException;
 
 }

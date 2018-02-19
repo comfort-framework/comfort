@@ -18,7 +18,7 @@ package de.ugoe.cs.comfort.collection.metriccollector;
 
 import static org.junit.Assert.assertEquals;
 
-import de.ugoe.cs.comfort.BaseTest;
+import de.ugoe.cs.comfort.configuration.FilerConfiguration;
 import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
 import de.ugoe.cs.comfort.data.CoverageData;
 import de.ugoe.cs.comfort.data.models.JavaMethod;
@@ -38,12 +38,15 @@ import org.junit.Test;
 public class MutationDataCollectorTest extends BaseMetricCollectorTest {
     private final String basePath = getPathToResource("metricCollectorTestData/mutationdatacollector");
     private GeneralConfiguration javaConfig = new GeneralConfiguration();
+    private FilerConfiguration filerConfiguration = new FilerConfiguration();
 
 
     @Before
     public void createJavaConfig() {
         javaConfig.setProjectDir(basePath);
         javaConfig.setMethodLevel(true);
+        filerConfiguration.setName("MockFiler");
+        javaConfig.setFilerConfiguration(filerConfiguration);
     }
 
     @Test
