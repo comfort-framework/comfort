@@ -19,10 +19,12 @@ package de.ugoe.cs.comfort.collection.metriccollector;
 import de.ugoe.cs.comfort.annotations.SupportsJava;
 import de.ugoe.cs.comfort.annotations.SupportsMethod;
 import de.ugoe.cs.comfort.collection.metriccollector.mutation.MutationDataCollectorThread;
+import de.ugoe.cs.comfort.collection.metriccollector.mutation.MutationLocation;
 import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
 import de.ugoe.cs.comfort.data.CoverageData;
 import de.ugoe.cs.comfort.data.models.IUnit;
 import de.ugoe.cs.comfort.filer.BaseFiler;
+import de.ugoe.cs.comfort.filer.SmartSHARKFiler;
 import de.ugoe.cs.comfort.filer.models.Result;
 import java.io.IOException;
 import java.util.HashSet;
@@ -34,44 +36,58 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Fabian Trautsch
  */
 public class MutationDataCollector extends BaseMetricCollector {
     public MutationDataCollector(GeneralConfiguration configuration, BaseFiler filer) {
-<span class="fc" id="L44">        super(configuration, filer);</span>
-<span class="fc" id="L45">    }</span>
+<span class="fc" id="L45">        super(configuration, filer);</span>
+<span class="fc" id="L46">    }</span>
 
     @SupportsMethod
     @SupportsJava
     public void getMutationDataMetrics(CoverageData data) throws IOException {
 
-<span class="fc" id="L51">        final ExecutorService executor = Executors.newFixedThreadPool(generalConf.getNThreads());</span>
-<span class="fc" id="L52">        CompletionService&lt;Result&gt; pool = new ExecutorCompletionService&lt;&gt;(executor);</span>
+<span class="fc" id="L52">        final ExecutorService executor = Executors.newFixedThreadPool(generalConf.getNThreads());</span>
+<span class="fc" id="L53">        CompletionService&lt;Result&gt; pool = new ExecutorCompletionService&lt;&gt;(executor);</span>
 
 
-<span class="fc bfc" id="L55" title="All 2 branches covered.">        for (Map.Entry&lt;IUnit, Set&lt;IUnit&gt;&gt; entry : data.getCoverageData().entrySet()) {</span>
-<span class="fc" id="L56">            pool.submit(new MutationDataCollectorThread(entry.getKey(), generalConf, fileNameUtils));</span>
-<span class="fc" id="L57">        }</span>
+<span class="fc" id="L56">        Set&lt;String&gt; alreadyAnalyzedTests = new HashSet&lt;&gt;();</span>
+        // We can only get this if we are using the smartsharkfiler
+<span class="pc bpc" id="L58" title="1 of 2 branches missed.">        if(generalConf.getFilerConfiguration().getName().endsWith(&quot;SmartSHARKFiler&quot;)) {</span>
+<span class="nc" id="L59">            SmartSHARKFiler shFiler = (SmartSHARKFiler) filer;</span>
+<span class="nc" id="L60">            alreadyAnalyzedTests.addAll(shFiler.getTestStateWithMutationResults());</span>
+        }
 
-<span class="fc bfc" id="L59" title="All 2 branches covered.">        for (int i=0; i&lt;data.getCoverageData().size(); i++) {</span>
+<span class="fc" id="L63">        int analyzedTests = 0;</span>
+<span class="fc" id="L64">        Map&lt;MutationLocation, String&gt; generatedMutationsAndItsClassification = new ConcurrentHashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">        for (Map.Entry&lt;IUnit, Set&lt;IUnit&gt;&gt; entry : data.getCoverageData().entrySet()) {</span>
+<span class="pc bpc" id="L66" title="3 of 4 branches missed.">            if(alreadyAnalyzedTests.contains(entry.getKey().getFQN()) &amp;&amp; !generalConf.isForceRerun()) {</span>
+<span class="nc" id="L67">                logger.debug(&quot;Test {} already has mutation data...&quot;, entry.getKey().getFQN());</span>
+            } else {
+<span class="fc" id="L69">                analyzedTests++;</span>
+<span class="fc" id="L70">                pool.submit(new MutationDataCollectorThread(entry.getKey(), generalConf, fileNameUtils,</span>
+                        generatedMutationsAndItsClassification));
+            }
+<span class="fc" id="L73">        }</span>
+
+<span class="fc bfc" id="L75" title="All 2 branches covered.">        for (int i=0; i&lt;analyzedTests; i++) {</span>
             try {
-<span class="fc" id="L61">                Result result = pool.take().get();</span>
+<span class="fc" id="L77">                Result result = pool.take().get();</span>
 
                 // Added here as it can be the case that a result could not be produced which would then result
                 // in a null result.
-<span class="pc bpc" id="L65" title="1 of 2 branches missed.">                if(result != null) {</span>
-<span class="fc" id="L66">                    synchronized(this) {</span>
-<span class="fc" id="L67">                        filer.storeResult(result);</span>
-<span class="pc" id="L68">                    }</span>
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">                if(result != null) {</span>
+<span class="fc" id="L82">                    synchronized(this) {</span>
+<span class="fc" id="L83">                        filer.storeResult(result);</span>
+<span class="pc" id="L84">                    }</span>
                 }
-<span class="nc" id="L70">            } catch (InterruptedException | ExecutionException e) {</span>
-<span class="nc" id="L71">                logger.catching(e);</span>
-<span class="fc" id="L72">            }</span>
+<span class="nc" id="L86">            } catch (InterruptedException | ExecutionException e) {</span>
+<span class="nc" id="L87">                logger.catching(e);</span>
+<span class="fc" id="L88">            }</span>
         }
-<span class="fc" id="L74">        executor.shutdown();</span>
-<span class="fc" id="L75">    }</span>
+<span class="fc" id="L90">        executor.shutdown();</span>
+<span class="fc" id="L91">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

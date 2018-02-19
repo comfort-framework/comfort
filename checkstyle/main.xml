@@ -98,6 +98,8 @@
 </file>
 <file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/mutation/MutationExecutionResult.java">
 </file>
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/mutation/MutationLocation.java">
+</file>
 <file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/mutation/executors/IMutationExecutor.java">
 </file>
 <file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/mutation/executors/PITExecutor.java">
