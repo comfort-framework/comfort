@@ -59,6 +59,7 @@ public class BaseMetricCollector extends BaseModel {
                 // where the parameter types are fitting
                 if (shouldMethodBeExecuted(method) && checkIfParameterTypesAreFitting(method, classNamesOfArguments)) {
                     method.invoke(this, data);
+                    return;
                 }
             } catch (IllegalAccessException | InvocationTargetException e) {
                 throw new MetricCollectorException(e.getCause().getMessage());

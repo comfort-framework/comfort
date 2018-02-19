@@ -118,24 +118,15 @@ public class MutationChangeClassifier {
                 case "org.pitest.mutationtest.engine.gregor.mutators.experimental.RemoveIncrementsMutator":
                     op = new RemoveIncrementsOperator();
                     break;
-                case "org.pitest.mutationtest.engine.gregor.mutators.experimental.RemoveSwitchMutator_0":
-                case "org.pitest.mutationtest.engine.gregor.mutators.experimental.RemoveSwitchMutator_1":
-                case "org.pitest.mutationtest.engine.gregor.mutators.experimental.RemoveSwitchMutator_2":
-                case "org.pitest.mutationtest.engine.gregor.mutators.experimental.RemoveSwitchMutator_3":
-                case "org.pitest.mutationtest.engine.gregor.mutators.experimental.RemoveSwitchMutator_4":
-                case "org.pitest.mutationtest.engine.gregor.mutators.experimental.RemoveSwitchMutator_5":
-                case "org.pitest.mutationtest.engine.gregor.mutators.experimental.RemoveSwitchMutator_6":
-                case "org.pitest.mutationtest.engine.gregor.mutators.experimental.RemoveSwitchMutator_7":
-                case "org.pitest.mutationtest.engine.gregor.mutators.experimental.RemoveSwitchMutator_8":
-                case "org.pitest.mutationtest.engine.gregor.mutators.experimental.RemoveSwitchMutator":
-                    return "LOGIC/CONTROL";
                 case "org.pitest.mutationtest.engine.gregor.mutators.experimental.ReturnValuesMutator":
                     return "LOGIC/CONTROL";
                 case "org.pitest.mutationtest.engine.gregor.mutators.experimental.SwitchMutator":
                     return "LOGIC/CONTROL";
                 default:
+                    if(mutationOperator.startsWith("org.pitest.mutationtest.engine.gregor.mutators.experimental.RemoveSwitchMutator")) {
+                        return "LOGIC/CONTROL";
+                    }
                     throw new MutationResultException("Unsupported mutationoperator '"+mutationOperator+"'");
-
             }
 
             // If we do not have a line number we can not change the file to get the classification
