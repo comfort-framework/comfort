@@ -123,7 +123,7 @@ public class MutationChangeClassifier {
                 case "org.pitest.mutationtest.engine.gregor.mutators.experimental.SwitchMutator":
                     return "LOGIC/CONTROL";
                 default:
-                    if(mutationOperator.endsWith("RemoveSwitchMutator")) {
+                    if(mutationOperator.contains("RemoveSwitchMutator")) {
                         return "LOGIC/CONTROL";
                     }
                     throw new MutationResultException("Unsupported mutationoperator '"+mutationOperator+"'");

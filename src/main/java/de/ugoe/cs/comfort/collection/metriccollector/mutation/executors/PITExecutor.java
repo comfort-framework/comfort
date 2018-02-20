@@ -53,7 +53,7 @@ import org.apache.maven.shared.invoker.MavenInvocationException;
  * @author Fabian Trautsch
  */
 public class PITExecutor implements IMutationExecutor {
-    private final Logger logger = LogManager.getLogger(this.getClass().getName());
+    private final static Logger logger = LogManager.getLogger(PITExecutor.class.getName());
 
     private Path pitReportFolder;
 
@@ -184,6 +184,7 @@ public class PITExecutor implements IMutationExecutor {
 
         @Override
         public void consumeLine(String line) {
+            logger.debug(line);
 
             Matcher receivedTestsMatcher = receivedTestsPattern.matcher(line);
             Matcher mutationUnitsMatcher = mutationUnitsPattern.matcher(line);
