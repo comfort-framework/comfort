@@ -82,6 +82,8 @@ public class MutationDataCollector extends BaseMetricCollector {
                     synchronized(this) {
                         filer.storeResult(result);
                     }
+                } else {
+                    logger.info("No result generated...");
                 }
             } catch (InterruptedException | ExecutionException e) {
                 logger.catching(e);
