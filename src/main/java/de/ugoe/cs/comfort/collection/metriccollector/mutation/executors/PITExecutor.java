@@ -53,7 +53,7 @@ import org.apache.maven.shared.invoker.MavenInvocationException;
  * @author Fabian Trautsch
  */
 public class PITExecutor implements IMutationExecutor {
-    private final static Logger logger = LogManager.getLogger(PITExecutor.class.getName());
+    private final static Logger LOGGER = LogManager.getLogger(PITExecutor.class.getName());
 
     private Path pitReportFolder;
     private Path newPomFile;
@@ -95,7 +95,7 @@ public class PITExecutor implements IMutationExecutor {
             // Create new pom with corresponding values
             createNewPom(projectRoot, className, methodName);
 
-            logger.info("Executing Pitest...");
+            LOGGER.info("Executing Pitest...");
 
             // monkeypatching for mybatis-3
             if (Files.exists(Paths.get(projectRoot.toString(), "ibderby"))) {
@@ -133,7 +133,7 @@ public class PITExecutor implements IMutationExecutor {
                 throw new IOException("No mutation units generated!");
             }
 
-            logger.debug("Mutation Execution result: {}", mutationExecutionResult);
+            LOGGER.debug("Mutation Execution result: {}", mutationExecutionResult);
             return mutationExecutionResult;
         } catch (MavenInvocationException e) {
             throw new IOException("Maven execution not successful!");
@@ -153,7 +153,7 @@ public class PITExecutor implements IMutationExecutor {
                 StandardCharsets.UTF_8));
         while ((line = br.readLine()) != null) {
             String[] cols = line.split(",");
-            logger.debug("Result Line: {}", line);
+            LOGGER.debug("Result Line: {}", line);
             String location = cols[1]+"."+cols[3];
             String mutationOperator = cols[2];
             int lineNumber =  Integer.parseInt(cols[4]);
@@ -170,9 +170,9 @@ public class PITExecutor implements IMutationExecutor {
                     );
                     generatedMutationsAndItsClassification.put(mutationLocation, changeClassification);
                 }
-                logger.debug("Got the following change classification {}", changeClassification);
+                LOGGER.debug("Got the following change classification {}", changeClassification);
             } catch (MutationResultException e) {
-                logger.catching(e);
+                LOGGER.catching(e);
             }
 
             mutationResults.add(new Mutation(location, mutationOperator, lineNumber, result, changeClassification));
@@ -191,7 +191,7 @@ public class PITExecutor implements IMutationExecutor {
 
         @Override
         public void consumeLine(String line) {
-            logger.debug(line);
+            LOGGER.debug(line);
 
             Matcher receivedTestsMatcher = receivedTestsPattern.matcher(line);
             Matcher mutationUnitsMatcher = mutationUnitsPattern.matcher(line);
