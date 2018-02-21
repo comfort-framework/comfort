@@ -82,12 +82,14 @@ public class MutationDataCollector extends BaseMetricCollector {
 <span class="fc" id="L82">                    synchronized(this) {</span>
 <span class="fc" id="L83">                        filer.storeResult(result);</span>
 <span class="pc" id="L84">                    }</span>
+                } else {
+<span class="nc" id="L86">                    logger.info(&quot;No result generated...&quot;);</span>
                 }
-<span class="nc" id="L86">            } catch (InterruptedException | ExecutionException e) {</span>
-<span class="nc" id="L87">                logger.catching(e);</span>
-<span class="fc" id="L88">            }</span>
+<span class="nc" id="L88">            } catch (InterruptedException | ExecutionException e) {</span>
+<span class="nc" id="L89">                logger.catching(e);</span>
+<span class="fc" id="L90">            }</span>
         }
-<span class="fc" id="L90">        executor.shutdown();</span>
-<span class="fc" id="L91">    }</span>
+<span class="fc" id="L92">        executor.shutdown();</span>
+<span class="fc" id="L93">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>
