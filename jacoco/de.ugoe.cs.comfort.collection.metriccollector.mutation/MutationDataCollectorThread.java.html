@@ -58,12 +58,12 @@ public class MutationDataCollectorThread implements Callable&lt;Result&gt; {
 <span class="fc" id="L58">        String methodName = parts[parts.length-1];</span>
 <span class="fc" id="L59">        logger.info(&quot;{} - Getting mutation data for {}.{}&quot;, threadName, className, methodName);</span>
 
-        try {
-<span class="fc" id="L62">            Result result = new Result(unit.getFQN(),</span>
-<span class="fc" id="L63">                    fileNameUtils.getPathForIdentifier(unit.getFQN(), generalConf.getMethodLevel()));</span>
+        // Choose correct mutation executor
+<span class="fc" id="L62">        IMutationExecutor mutationExecutor = new PITExecutor();</span>
 
-            // Choose correct mutation executor
-<span class="fc" id="L66">            IMutationExecutor mutationExecutor = new PITExecutor();</span>
+        try {
+<span class="fc" id="L65">            Result result = new Result(unit.getFQN(),</span>
+<span class="fc" id="L66">                    fileNameUtils.getPathForIdentifier(unit.getFQN(), generalConf.getMethodLevel()));</span>
 
 
             // Execute mutation executor -&gt; do mutation testing for className.methodName
@@ -83,13 +83,19 @@ public class MutationDataCollectorThread implements Callable&lt;Result&gt; {
 <span class="fc" id="L83">            result.addMetric(&quot;mut_killMut&quot;, String.valueOf(mutationExecutionResult.getKilledMutations()));</span>
 <span class="fc" id="L84">            result.addMetric(&quot;mut_scoreMut&quot;, String.valueOf(mutationExecutionResult.getMutationScore()));</span>
 
-<span class="fc" id="L86">            return result;</span>
-<span class="nc" id="L87">        } catch (IOException e) {</span>
+<span class="fc" id="L86">            mutationExecutor.cleanup();</span>
+<span class="fc" id="L87">            return result;</span>
+<span class="nc" id="L88">        } catch (IOException e) {</span>
+            try {
+<span class="nc" id="L90">                mutationExecutor.cleanup();</span>
+<span class="nc" id="L91">            } catch (IOException e1) {</span>
+<span class="nc" id="L92">                logger.catching(e1);</span>
+<span class="nc" id="L93">            }</span>
             // If not successful, print error but it is not necessary to cancel here
-<span class="nc" id="L89">            logger.warn(&quot;Error \&quot;{}\&quot; for executing mutation testing for test {}&quot;, e.getMessage(),</span>
-<span class="nc" id="L90">                    unit.getFQN());</span>
+<span class="nc" id="L95">            logger.warn(&quot;Error \&quot;{}\&quot; for executing mutation testing for test {}&quot;, e.getMessage(),</span>
+<span class="nc" id="L96">                    unit.getFQN());</span>
         }
-<span class="nc" id="L92">        return null;</span>
+<span class="nc" id="L98">        return null;</span>
 
     }
 

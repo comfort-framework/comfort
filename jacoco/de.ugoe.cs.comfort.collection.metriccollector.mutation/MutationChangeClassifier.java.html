@@ -123,7 +123,7 @@ import org.apache.logging.log4j.Logger;
                 case &quot;org.pitest.mutationtest.engine.gregor.mutators.experimental.SwitchMutator&quot;:
 <span class="nc" id="L124">                    return &quot;LOGIC/CONTROL&quot;;</span>
                 default:
-<span class="nc bnc" id="L126" title="All 2 branches missed.">                    if(mutationOperator.endsWith(&quot;RemoveSwitchMutator&quot;)) {</span>
+<span class="nc bnc" id="L126" title="All 2 branches missed.">                    if(mutationOperator.contains(&quot;RemoveSwitchMutator&quot;)) {</span>
 <span class="nc" id="L127">                        return &quot;LOGIC/CONTROL&quot;;</span>
                     }
 <span class="nc" id="L129">                    throw new MutationResultException(&quot;Unsupported mutationoperator '&quot;+mutationOperator+&quot;'&quot;);</span>
