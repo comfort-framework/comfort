@@ -193,39 +193,40 @@ public class SmartSHARKFiler extends BaseFiler {
 <span class="fc" id="L193">            dbTestState.getMutationResults().addAll(testState.getMutationResults());</span>
         }
 
-<span class="fc" id="L196">        datastore.save(dbTestState);</span>
-<span class="fc" id="L197">    }</span>
+<span class="fc" id="L196">        logger.info(&quot;Storing test state: {}&quot;, dbTestState);</span>
+<span class="fc" id="L197">        datastore.save(dbTestState);</span>
+<span class="fc" id="L198">    }</span>
 
     private Repository getRepository() throws IOException {
-<span class="nc" id="L200">        return new RepositoryBuilder()</span>
-<span class="nc" id="L201">                .readEnvironment()</span>
-<span class="nc" id="L202">                .findGitDir(generalConf.getProjectDir().toFile())</span>
-<span class="nc" id="L203">                .build();</span>
+<span class="nc" id="L201">        return new RepositoryBuilder()</span>
+<span class="nc" id="L202">                .readEnvironment()</span>
+<span class="nc" id="L203">                .findGitDir(generalConf.getProjectDir().toFile())</span>
+<span class="nc" id="L204">                .build();</span>
     }
 
     private Datastore connectToDatabase(Database databaseConfiguration) {
         // Set up log4j logging
-<span class="fc" id="L208">        MorphiaLoggerFactory.reset();</span>
-<span class="fc" id="L209">        MorphiaLoggerFactory.registerLogger(Log4JLoggerImplFactory.class);</span>
+<span class="fc" id="L209">        MorphiaLoggerFactory.reset();</span>
+<span class="fc" id="L210">        MorphiaLoggerFactory.registerLogger(Log4JLoggerImplFactory.class);</span>
 
         // Map models
-<span class="fc" id="L212">        morphia.mapPackage(&quot;de.ugoe.cs.smartshark.model&quot;);</span>
-<span class="fc" id="L213">        morphia.mapPackage(&quot;de.ugoe.cs.comfort.database.models&quot;);</span>
+<span class="fc" id="L213">        morphia.mapPackage(&quot;de.ugoe.cs.smartshark.model&quot;);</span>
+<span class="fc" id="L214">        morphia.mapPackage(&quot;de.ugoe.cs.comfort.database.models&quot;);</span>
 
-<span class="fc" id="L215">        logger.debug(&quot;Connecting to database...&quot;);</span>
+<span class="fc" id="L216">        logger.debug(&quot;Connecting to database...&quot;);</span>
         // Create database connection
-<span class="fc" id="L217">        MongoClientURI uri = new MongoClientURI(de.ugoe.cs.smartshark.Utils.createMongoDBURI(</span>
-<span class="fc" id="L218">                databaseConfiguration.getUsername(),</span>
-<span class="fc" id="L219">                databaseConfiguration.getPassword(),</span>
-<span class="fc" id="L220">                databaseConfiguration.getHostname(),</span>
-<span class="fc" id="L221">                String.valueOf(databaseConfiguration.getPort()),</span>
-<span class="fc" id="L222">                databaseConfiguration.getAuthenticationDatabase(),</span>
-<span class="fc" id="L223">                databaseConfiguration.getSSL()));</span>
-<span class="fc" id="L224">        MongoClient mongoClient = new MongoClient(uri);</span>
-<span class="fc" id="L225">        final Datastore datastore = morphia.createDatastore(mongoClient, databaseConfiguration.getDatabase());</span>
-<span class="fc" id="L226">        datastore.ensureIndexes();</span>
+<span class="fc" id="L218">        MongoClientURI uri = new MongoClientURI(de.ugoe.cs.smartshark.Utils.createMongoDBURI(</span>
+<span class="fc" id="L219">                databaseConfiguration.getUsername(),</span>
+<span class="fc" id="L220">                databaseConfiguration.getPassword(),</span>
+<span class="fc" id="L221">                databaseConfiguration.getHostname(),</span>
+<span class="fc" id="L222">                String.valueOf(databaseConfiguration.getPort()),</span>
+<span class="fc" id="L223">                databaseConfiguration.getAuthenticationDatabase(),</span>
+<span class="fc" id="L224">                databaseConfiguration.getSSL()));</span>
+<span class="fc" id="L225">        MongoClient mongoClient = new MongoClient(uri);</span>
+<span class="fc" id="L226">        final Datastore datastore = morphia.createDatastore(mongoClient, databaseConfiguration.getDatabase());</span>
+<span class="fc" id="L227">        datastore.ensureIndexes();</span>
 
-<span class="fc" id="L228">        return datastore;</span>
+<span class="fc" id="L229">        return datastore;</span>
     }
 
 }

@@ -86,16 +86,13 @@ public class MutationDataCollectorThread implements Callable&lt;Result&gt; {
 <span class="fc" id="L86">            mutationExecutor.cleanup();</span>
 <span class="fc" id="L87">            return result;</span>
 <span class="nc" id="L88">        } catch (IOException e) {</span>
-            try {
-<span class="nc" id="L90">                mutationExecutor.cleanup();</span>
-<span class="nc" id="L91">            } catch (IOException e1) {</span>
-<span class="nc" id="L92">                logger.catching(e1);</span>
-<span class="nc" id="L93">            }</span>
+<span class="nc" id="L89">            mutationExecutor.cleanup();</span>
+
             // If not successful, print error but it is not necessary to cancel here
-<span class="nc" id="L95">            logger.warn(&quot;Error \&quot;{}\&quot; for executing mutation testing for test {}&quot;, e.getMessage(),</span>
-<span class="nc" id="L96">                    unit.getFQN());</span>
+<span class="nc" id="L92">            logger.warn(&quot;Error \&quot;{}\&quot; for executing mutation testing for test {}&quot;, e.getMessage(),</span>
+<span class="nc" id="L93">                    unit.getFQN());</span>
         }
-<span class="nc" id="L98">        return null;</span>
+<span class="nc" id="L95">        return null;</span>
 
     }
 
