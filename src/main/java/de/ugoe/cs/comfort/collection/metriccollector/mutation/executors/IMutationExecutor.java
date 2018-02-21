@@ -35,6 +35,6 @@ public interface IMutationExecutor {
                                      Map<MutationLocation, String> generatedMutationsAndItsClassification)
             throws IOException;
 
-    void cleanup() throws IOException;
+    void cleanup();
 
 }

@@ -86,11 +86,8 @@ public class MutationDataCollectorThread implements Callable<Result> {
             mutationExecutor.cleanup();
             return result;
         } catch (IOException e) {
-            try {
-                mutationExecutor.cleanup();
-            } catch (IOException e1) {
-                logger.catching(e1);
-            }
+            mutationExecutor.cleanup();
+
             // If not successful, print error but it is not necessary to cancel here
             logger.warn("Error \"{}\" for executing mutation testing for test {}", e.getMessage(),
                     unit.getFQN());

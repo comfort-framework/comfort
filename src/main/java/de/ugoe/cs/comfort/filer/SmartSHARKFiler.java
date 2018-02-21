@@ -193,6 +193,7 @@ public class SmartSHARKFiler extends BaseFiler {
             dbTestState.getMutationResults().addAll(testState.getMutationResults());
         }
 
+        logger.info("Storing test state: {}", dbTestState);
         datastore.save(dbTestState);
     }
 

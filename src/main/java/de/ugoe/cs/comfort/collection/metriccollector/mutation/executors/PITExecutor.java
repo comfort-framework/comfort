@@ -60,7 +60,7 @@ public class PITExecutor implements IMutationExecutor {
 
     private void createNewPom(Path projectRoot, String className, String methodName) throws IOException {
         Path template = Paths.get(projectRoot.toString(), "pom_template.xml");
-        pitReportFolder = Files.createTempDirectory("comfort-");
+        pitReportFolder = Files.createTempDirectory(projectRoot, "comfort-");
 
         // Read template
         String content = new String(Files.readAllBytes(template), StandardCharsets.UTF_8);
@@ -78,12 +78,20 @@ public class PITExecutor implements IMutationExecutor {
         Files.write(newPomFile, resolvedString.getBytes("UTF-8"));
     }
 
-    public void cleanup() throws IOException {
+    public void cleanup() {
         if(Files.exists(pitReportFolder)) {
-            FileUtils.deleteDirectory(pitReportFolder.toFile());
+            try {
+                FileUtils.deleteDirectory(pitReportFolder.toFile());
+            } catch (IOException e) {
+                LOGGER.catching(e);
+            }
         }
 
-        Files.deleteIfExists(newPomFile);
+        try {
+            Files.deleteIfExists(newPomFile);
+        } catch (IOException e) {
+            LOGGER.catching(e);
+        }
     }
 
     @Override
