@@ -56,8 +56,9 @@ public class PITExecutor implements IMutationExecutor {
     private final static Logger logger = LogManager.getLogger(PITExecutor.class.getName());
 
     private Path pitReportFolder;
+    private Path newPomFile;
 
-    private void createNewPom(Path projectRoot, Path newPom, String className, String methodName) throws IOException {
+    private void createNewPom(Path projectRoot, String className, String methodName) throws IOException {
         Path template = Paths.get(projectRoot.toString(), "pom_template.xml");
         pitReportFolder = Files.createTempDirectory("comfort-");
 
@@ -74,17 +75,25 @@ public class PITExecutor implements IMutationExecutor {
         String resolvedString = sub.replace(content);
 
         // Store as pom.xml
-        Files.write(newPom, resolvedString.getBytes("UTF-8"));
+        Files.write(newPomFile, resolvedString.getBytes("UTF-8"));
+    }
+
+    public void cleanup() throws IOException {
+        if(Files.exists(pitReportFolder)) {
+            FileUtils.deleteDirectory(pitReportFolder.toFile());
+        }
+
+        Files.deleteIfExists(newPomFile);
     }
 
     @Override
     public MutationExecutionResult execute(Path projectRoot, String className, String methodName) throws IOException {
         try {
             // Create newPOMFile
-            Path newPomFile = File.createTempFile("comfort-", ".xml", projectRoot.toFile()).toPath();
+            newPomFile = File.createTempFile("comfort-", ".xml", projectRoot.toFile()).toPath();
 
             // Create new pom with corresponding values
-            createNewPom(projectRoot, newPomFile, className, methodName);
+            createNewPom(projectRoot, className, methodName);
 
             logger.info("Executing Pitest...");
 
@@ -106,7 +115,6 @@ public class PITExecutor implements IMutationExecutor {
 
             // Invoke
             InvocationResult result = invoker.execute(request);
-            Files.delete(newPomFile);
 
             // Check if it returned successfully
             if (result.getExitCode() != 0) {
@@ -170,7 +178,6 @@ public class PITExecutor implements IMutationExecutor {
             mutationResults.add(new Mutation(location, mutationOperator, lineNumber, result, changeClassification));
         }
         br.close();
-
         return mutationResults;
     }
 

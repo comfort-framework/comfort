@@ -58,12 +58,12 @@ public class MutationDataCollectorThread implements Callable<Result> {
         String methodName = parts[parts.length-1];
         logger.info("{} - Getting mutation data for {}.{}", threadName, className, methodName);
 
+        // Choose correct mutation executor
+        IMutationExecutor mutationExecutor = new PITExecutor();
+
         try {
             Result result = new Result(unit.getFQN(),
                     fileNameUtils.getPathForIdentifier(unit.getFQN(), generalConf.getMethodLevel()));
-
-            // Choose correct mutation executor
-            IMutationExecutor mutationExecutor = new PITExecutor();
 
 
             // Execute mutation executor -> do mutation testing for className.methodName
@@ -83,8 +83,14 @@ public class MutationDataCollectorThread implements Callable<Result> {
             result.addMetric("mut_killMut", String.valueOf(mutationExecutionResult.getKilledMutations()));
             result.addMetric("mut_scoreMut", String.valueOf(mutationExecutionResult.getMutationScore()));
 
+            mutationExecutor.cleanup();
             return result;
         } catch (IOException e) {
+            try {
+                mutationExecutor.cleanup();
+            } catch (IOException e1) {
+                logger.catching(e1);
+            }
             // If not successful, print error but it is not necessary to cancel here
             logger.warn("Error \"{}\" for executing mutation testing for test {}", e.getMessage(),
                     unit.getFQN());
