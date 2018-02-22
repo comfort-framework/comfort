@@ -40,6 +40,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -89,8 +90,8 @@ public class MutationDataCollector extends BaseMetricCollector {
                 //Blank runnable to evaluate write completion -> little hack as we can not wait for the completion
                 // of the callbacks but only on the completion of the main task of the thread. Therefore, we
                 // create a callback here that is called every time a thread finishes his storing process
-                Runnable callback = () -> {};
-                final ListenableFutureTask<Void> callbackFuture = ListenableFutureTask.create(callback, null);
+                Callable<Void> callback = () -> null;
+                final ListenableFutureTask<Void> callbackFuture = ListenableFutureTask.create(callback);
                 futures.add(callbackFuture);
 
                 // Add callback for the thread so that it stores its results
