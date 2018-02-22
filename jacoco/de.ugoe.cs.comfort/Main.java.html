@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Main.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">comfort</a> &gt; <a href="index.source.html" class="el_package">de.ugoe.cs.comfort</a> &gt; <span class="el_source">Main.java</span></div><h1>Main.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2017 University of Goettingen, Germany
+ * 
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.ugoe.cs.comfort;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import de.ugoe.cs.comfort.collection.filter.BaseFilter;
+import de.ugoe.cs.comfort.collection.loader.BaseLoader;
+import de.ugoe.cs.comfort.collection.metriccollector.BaseMetricCollector;
+import de.ugoe.cs.comfort.configuration.CollectionConfiguration;
+import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
+import de.ugoe.cs.comfort.data.DataSet;
+import de.ugoe.cs.comfort.exception.FilterException;
+import de.ugoe.cs.comfort.exception.LoaderException;
+import de.ugoe.cs.comfort.exception.MetricCollectorException;
+import de.ugoe.cs.comfort.filer.BaseFiler;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.appender.FileAppender;
+import org.apache.logging.log4j.core.config.Configuration;
+import org.apache.logging.log4j.core.layout.PatternLayout;
+
+
+/**
+ * @author Fabian Trautsch
+ */
+<span class="nc" id="L48">public class Main {</span>
+<span class="fc" id="L49">    private static final Logger LOGGER = LogManager.getLogger(Main.class.getName());</span>
+
+    public static void main(String[] args) {
+<span class="pc bpc" id="L52" title="1 of 2 branches missed.">        if(args.length != 1) {</span>
+<span class="nc" id="L53">            System.out.println(&quot;You need to give the location to the config.json as argument!&quot;);</span>
+<span class="nc" id="L54">            System.exit(1);</span>
+        }
+
+        try {
+            // Load configuration
+<span class="fc" id="L59">            GeneralConfiguration config = loadConfiguration(args[0]);</span>
+
+            // SetUp Logging
+<span class="fc" id="L62">            setupLogging(config);</span>
+
+            // Get collections that should be done
+<span class="fc" id="L65">            List&lt;CollectionConfiguration&gt; collections = config.getCollections();</span>
+
+            // Load filer
+<span class="fc" id="L68">            BaseFiler filer = config.getFiler();</span>
+<span class="fc" id="L69">            LOGGER.info(&quot;Using filer {}...&quot;, filer.getClass().getName());</span>
+
+            // Execute each collection
+<span class="fc bfc" id="L72" title="All 2 branches covered.">            for(CollectionConfiguration collection: collections) {</span>
+                try {
+                    // Get data first
+<span class="fc" id="L75">                    BaseLoader loader = collection.getLoader(config);</span>
+<span class="fc" id="L76">                    LOGGER.info(&quot;Using loader {}...&quot;, loader.getClass().getName());</span>
+<span class="fc" id="L77">                    DataSet data = loader.loadData();</span>
+<span class="fc" id="L78">                    LOGGER.info(&quot;Loading data successful...&quot;);</span>
+
+                    // Afterwards, filter the data
+<span class="fc" id="L81">                    List&lt;BaseFilter&gt; filters = collection.getFilter(config);</span>
+<span class="fc bfc" id="L82" title="All 2 branches covered.">                    for (BaseFilter filter : filters) {</span>
+<span class="fc" id="L83">                        LOGGER.info(&quot;Using filter {}...&quot;, filter.getClass().getName());</span>
+<span class="fc" id="L84">                        data = filter.filterData(data);</span>
+<span class="fc" id="L85">                        LOGGER.info(&quot;Filtering successful...&quot;);</span>
+<span class="fc" id="L86">                    }</span>
+
+                    // Then, execute the metric collection
+<span class="fc" id="L89">                    List&lt;BaseMetricCollector&gt; collectors = collection.getMetricCollectors(config, filer);</span>
+<span class="fc bfc" id="L90" title="All 2 branches covered.">                    for (BaseMetricCollector collector : collectors) {</span>
+<span class="fc" id="L91">                        LOGGER.info(&quot;Using collector {}...&quot;, collector.getClass().getName());</span>
+<span class="fc" id="L92">                        collector.collectData(data);</span>
+<span class="fc" id="L93">                        LOGGER.info(&quot;Collection successful...&quot;);</span>
+<span class="fc" id="L94">                    }</span>
+<span class="nc" id="L95">                } catch(LoaderException | FilterException | MetricCollectorException e) {</span>
+<span class="nc" id="L96">                    LOGGER.catching(e);</span>
+<span class="fc" id="L97">                }</span>
+<span class="fc" id="L98">            }</span>
+
+<span class="fc" id="L100">            LOGGER.info(&quot;Execution successful.&quot;);</span>
+
+<span class="nc" id="L102">            System.exit(0);</span>
+
+<span class="fc" id="L104">        } catch (InvocationTargetException | NoSuchMethodException | ClassNotFoundException | IllegalAccessException</span>
+            | InstantiationException | IOException e) {
+<span class="fc" id="L106">            LOGGER.catching(e);</span>
+<span class="nc" id="L107">            System.exit(1);</span>
+<span class="nc" id="L108">        }</span>
+<span class="nc" id="L109">    }</span>
+
+    private static GeneralConfiguration loadConfiguration(String configLocation) throws IOException {
+        // Load config
+<span class="fc" id="L113">        byte[] data  = Files.readAllBytes(Paths.get(configLocation));</span>
+<span class="fc" id="L114">        ObjectMapper mapper = new ObjectMapper();</span>
+<span class="fc" id="L115">        return mapper.readValue(data, GeneralConfiguration.class);</span>
+    }
+
+    private static void setupLogging(GeneralConfiguration configuration) {
+        // Configure logging
+<span class="fc" id="L120">        final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);</span>
+<span class="fc" id="L121">        final Configuration config = ctx.getConfiguration();</span>
+<span class="fc" id="L122">        PatternLayout layout = PatternLayout.newBuilder().withPattern(&quot;%d [%t] %-5p - %msg%n&quot;).build();</span>
+<span class="fc" id="L123">        Appender appender = FileAppender.newBuilder().withFileName(configuration.getLogFile())</span>
+<span class="fc" id="L124">                .withName(&quot;File&quot;).withLayout(layout).build();</span>
+<span class="fc" id="L125">        appender.start();</span>
+<span class="fc" id="L126">        config.addAppender(appender);</span>
+<span class="fc" id="L127">        config.getRootLogger().addAppender(appender, Level.getLevel(configuration.getLogLevel()), null);</span>
+<span class="fc" id="L128">        ctx.updateLoggers();</span>
+<span class="fc" id="L129">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

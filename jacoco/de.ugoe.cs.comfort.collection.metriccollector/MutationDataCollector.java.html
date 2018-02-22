@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MutationDataCollector.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">comfort</a> &gt; <a href="index.source.html" class="el_package">de.ugoe.cs.comfort.collection.metriccollector</a> &gt; <span class="el_source">MutationDataCollector.java</span></div><h1>MutationDataCollector.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2017 University of Goettingen, Germany
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.ugoe.cs.comfort.collection.metriccollector;
+
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.ListenableFutureTask;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
+import de.ugoe.cs.comfort.Utils;
+import de.ugoe.cs.comfort.annotations.SupportsJava;
+import de.ugoe.cs.comfort.annotations.SupportsMethod;
+import de.ugoe.cs.comfort.collection.metriccollector.mutation.MutationDataCollectorThread;
+import de.ugoe.cs.comfort.collection.metriccollector.mutation.MutationLocation;
+import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
+import de.ugoe.cs.comfort.data.CoverageData;
+import de.ugoe.cs.comfort.data.models.IUnit;
+import de.ugoe.cs.comfort.filer.BaseFiler;
+import de.ugoe.cs.comfort.filer.SmartSHARKFiler;
+import de.ugoe.cs.comfort.filer.models.Result;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import javax.annotation.ParametersAreNonnullByDefault;
+
+/**
+ * @author Fabian Trautsch
+ */
+public class MutationDataCollector extends BaseMetricCollector {
+    public MutationDataCollector(GeneralConfiguration configuration, BaseFiler filer) {
+<span class="fc" id="L54">        super(configuration, filer);</span>
+<span class="fc" id="L55">    }</span>
+
+    @SupportsMethod
+    @SupportsJava
+    public void getMutationDataMetrics(CoverageData data) throws IOException {
+<span class="fc" id="L60">        final ListeningExecutorService executor =</span>
+<span class="fc" id="L61">                MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(generalConf.getNThreads()));</span>
+
+<span class="fc" id="L63">        Set&lt;String&gt; alreadyAnalyzedTests = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L64">        Map&lt;MutationLocation, String&gt; generatedMutationsAndItsClassification = new ConcurrentHashMap&lt;&gt;();</span>
+        // We can only get this if we are using the smartsharkfiler
+<span class="pc bpc" id="L66" title="1 of 2 branches missed.">        if(generalConf.getFilerConfiguration().getName().endsWith(&quot;SmartSHARKFiler&quot;)) {</span>
+<span class="nc" id="L67">            SmartSHARKFiler shFiler = (SmartSHARKFiler) filer;</span>
+<span class="nc" id="L68">            alreadyAnalyzedTests.addAll(shFiler.getTestStateWithMutationResults());</span>
+<span class="nc" id="L69">            generatedMutationsAndItsClassification.putAll(shFiler.getMutationsAndClassification());</span>
+        }
+
+        // Get all java files in directory. This is needed later on for the change classification. We need to do
+        // this here, as we need to store the build file in the corresponding directory. If we then delete it
+        // afterwards (or one thread deletes it while another thread is getting all files in the directory) we
+        // will throw an exception
+<span class="fc" id="L76">        Set&lt;Path&gt; javaFiles = Utils.getAllFilesFromProjectForRegex(generalConf.getProjectDir(), &quot;.*\\.java&quot;);</span>
+
+        // Create a list of futures, we add them here so that we can wait for completion
+<span class="fc" id="L79">        List&lt;ListenableFuture&lt;Void&gt;&gt; futures = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L80" title="All 2 branches covered.">        for (Map.Entry&lt;IUnit, Set&lt;IUnit&gt;&gt; entry : data.getCoverageData().entrySet()) {</span>
+            // We skip already analyzed tests
+<span class="pc bpc" id="L82" title="3 of 4 branches missed.">            if(alreadyAnalyzedTests.contains(entry.getKey().getFQN()) &amp;&amp; !generalConf.isForceRerun()) {</span>
+<span class="nc" id="L83">                logger.debug(&quot;Test {} already has mutation data...&quot;, entry.getKey().getFQN());</span>
+            } else {
+                // We create a listenable future here so that we can reuse the thread to store its results
+<span class="fc" id="L86">                ListenableFuture&lt;Result&gt; result = executor.submit(</span>
+<span class="fc" id="L87">                        new MutationDataCollectorThread(entry.getKey(), generalConf, fileNameUtils,</span>
+                                generatedMutationsAndItsClassification, javaFiles));
+
+                //Blank runnable to evaluate write completion -&gt; little hack as we can not wait for the completion
+                // of the callbacks but only on the completion of the main task of the thread. Therefore, we
+                // create a callback here that is called every time a thread finishes his storing process
+<span class="fc" id="L93">                Callable&lt;Void&gt; callback = () -&gt; null;</span>
+<span class="fc" id="L94">                final ListenableFutureTask&lt;Void&gt; callbackFuture = ListenableFutureTask.create(callback);</span>
+<span class="fc" id="L95">                futures.add(callbackFuture);</span>
+
+                // Add callback for the thread so that it stores its results
+<span class="fc" id="L98">                Futures.addCallback(result, new FutureCallback&lt;Result&gt;() {</span>
+                    @Override
+                    @ParametersAreNonnullByDefault
+                    public void onSuccess(Result result) {
+                        try {
+<span class="fc" id="L103">                            filer.storeResult(result);</span>
+<span class="fc" id="L104">                            logger.info(&quot;Stored result for test {}&quot;, entry.getKey().getFQN());</span>
+<span class="nc" id="L105">                        } catch (IOException e) {</span>
+<span class="nc" id="L106">                            logger.catching(e);</span>
+                        } finally {
+<span class="pc" id="L108">                            callbackFuture.run();</span>
+<span class="pc" id="L109">                        }</span>
+<span class="fc" id="L110">                    }</span>
+
+                    @Override
+                    @ParametersAreNonnullByDefault
+                    public void onFailure(Throwable t) {
+<span class="nc" id="L115">                        logger.catching(t);</span>
+<span class="nc" id="L116">                        callbackFuture.run();</span>
+<span class="nc" id="L117">                    }</span>
+<span class="fc" id="L118">                }, MoreExecutors.directExecutor());</span>
+            }
+<span class="fc" id="L120">        }</span>
+
+        // Wait for the completion of all threads
+<span class="fc" id="L123">        ListenableFuture&lt;List&lt;Void&gt;&gt; listFuture = Futures.successfulAsList(futures);</span>
+<span class="fc" id="L124">        logger.info(&quot;Waiting for completion...&quot;);</span>
+        try {
+<span class="fc" id="L126">            listFuture.get();</span>
+<span class="nc" id="L127">        } catch (InterruptedException | ExecutionException e) {</span>
+<span class="nc" id="L128">            logger.catching(e);</span>
+<span class="fc" id="L129">        }</span>
+<span class="fc" id="L130">        executor.shutdown();</span>
+<span class="fc" id="L131">        logger.info(&quot;Done...&quot;);</span>
+<span class="fc" id="L132">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

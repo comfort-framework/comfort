@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LOCAndMcCabeCollector.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">comfort</a> &gt; <a href="index.source.html" class="el_package">de.ugoe.cs.comfort.collection.metriccollector</a> &gt; <span class="el_source">LOCAndMcCabeCollector.java</span></div><h1>LOCAndMcCabeCollector.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2017 University of Goettingen, Germany
+ * 
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.ugoe.cs.comfort.collection.metriccollector;
+
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ast.CompilationUnit;
+import de.ugoe.cs.comfort.annotations.SupportsClass;
+import de.ugoe.cs.comfort.annotations.SupportsJava;
+import de.ugoe.cs.comfort.annotations.SupportsMethod;
+import de.ugoe.cs.comfort.annotations.SupportsPython;
+import de.ugoe.cs.comfort.collection.metriccollector.parsing.ASTClassNode;
+import de.ugoe.cs.comfort.collection.metriccollector.parsing.ASTClassVisitor;
+import de.ugoe.cs.comfort.collection.metriccollector.parsing.ASTMethodNode;
+import de.ugoe.cs.comfort.collection.metriccollector.parsing.ASTMethodVisitor;
+import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
+import de.ugoe.cs.comfort.data.ProjectFiles;
+import de.ugoe.cs.comfort.exception.MetricCollectorException;
+import de.ugoe.cs.comfort.filer.BaseFiler;
+import de.ugoe.cs.comfort.filer.models.Result;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.regex.Pattern;
+
+/**
+ * @author Fabian Trautsch
+ */
+public class LOCAndMcCabeCollector extends BaseMetricCollector {
+
+    public LOCAndMcCabeCollector(GeneralConfiguration configuration, BaseFiler filer) {
+<span class="fc" id="L63">        super(configuration, filer);</span>
+<span class="fc" id="L64">    }</span>
+
+    @SupportsPython
+    @SupportsMethod
+    public void getLOCAndMcCabeForPythonMethod(ProjectFiles projectFiles) throws MetricCollectorException, IOException {
+        // Create process builder
+<span class="fc" id="L70">        ProcessBuilder builder = new ProcessBuilder();</span>
+<span class="fc" id="L71">        builder.directory(generalConf.getProjectDir().toFile());</span>
+
+
+        // We need to create a temporary file as a copy of the existing file, as an execution is not possible
+        // otherwise, if we execute it within a jar
+        File tempFile;
+        File pythonFile;
+        try {
+<span class="fc" id="L79">            tempFile = File.createTempFile(&quot;loc_mccabe_extract_temp&quot;, &quot;.py&quot;);</span>
+<span class="nc" id="L80">        } catch (IOException e) {</span>
+<span class="nc" id="L81">            throw new MetricCollectorException(&quot;Error in creating temporary file:&quot;+e.getMessage());</span>
+<span class="fc" id="L82">        }</span>
+
+<span class="fc" id="L84">        InputStream in = getClass().getResourceAsStream(&quot;/loc_mccabe_extract.py&quot;);</span>
+
+<span class="pc" id="L86">        try (BufferedReader reader = new BufferedReader(new InputStreamReader(in, Charset.forName(&quot;UTF-8&quot;)));</span>
+<span class="fc" id="L87">                OutputStreamWriter fstream =</span>
+                        new OutputStreamWriter(new FileOutputStream(tempFile), StandardCharsets.UTF_8)) {
+<span class="fc" id="L89">            int c = reader.read();</span>
+<span class="fc bfc" id="L90" title="All 2 branches covered.">            while(c!=-1) {</span>
+<span class="fc" id="L91">                fstream.write(c);</span>
+<span class="fc" id="L92">                c = reader.read();</span>
+            }
+<span class="pc bpc" id="L94" title="12 of 16 branches missed.">        } catch(IOException e) {</span>
+<span class="nc" id="L95">            throw new MetricCollectorException(&quot;Error in copying file contents:&quot;+e.getMessage());</span>
+<span class="fc" id="L96">        }</span>
+
+<span class="fc" id="L98">        builder.command(&quot;python3&quot;, tempFile.toString(), generalConf.getProjectDir().toString());</span>
+<span class="fc" id="L99">        filer.storeResults(executeCommandAndGenerateGraph(builder));</span>
+<span class="fc" id="L100">    }</span>
+
+    private Set&lt;Result&gt; executeCommandAndGenerateGraph(ProcessBuilder builder) throws MetricCollectorException {
+<span class="fc" id="L103">        logger.info(&quot;Calling command: {}&quot;, builder.command());</span>
+        int exitCode;
+        Future&lt;Set&lt;Result&gt;&gt; future;
+        try {
+<span class="fc" id="L107">            Process depExtract = builder.start();</span>
+<span class="fc" id="L108">            LOCAndMcCabeOutputParser outputParser =</span>
+<span class="fc" id="L109">                    new LOCAndMcCabeOutputParser(depExtract.getInputStream());</span>
+
+<span class="fc" id="L111">            ExecutorService executor = Executors.newFixedThreadPool(1);</span>
+<span class="fc" id="L112">            future = executor.submit(outputParser);</span>
+<span class="fc" id="L113">            exitCode = depExtract.waitFor();</span>
+<span class="nc" id="L114">        } catch (IOException | InterruptedException e) {</span>
+<span class="nc" id="L115">            throw new MetricCollectorException(&quot;Error in executing loader, while calling &quot;</span>
+<span class="nc" id="L116">                + builder.command().toString()+&quot; :&quot;+e.getMessage());</span>
+<span class="fc" id="L117">        }</span>
+
+        // Check if it returned successfully
+<span class="pc bpc" id="L120" title="1 of 2 branches missed.">        if (exitCode != 0) {</span>
+<span class="nc" id="L121">            throw new MetricCollectorException(&quot;Error in executing loader: Program did not terminate with code 0&quot;);</span>
+        }
+
+        Set&lt;Result&gt; results;
+        try {
+<span class="fc" id="L126">            results = future.get();</span>
+<span class="nc" id="L127">        } catch (InterruptedException | ExecutionException e) {</span>
+<span class="nc" id="L128">            throw new MetricCollectorException(&quot;Error in parsing results: &quot;+e.getMessage());</span>
+<span class="fc" id="L129">        }</span>
+<span class="fc" id="L130">        logger.info(&quot;Execution successful...&quot;);</span>
+<span class="fc" id="L131">        return results;</span>
+    }
+
+    private class LOCAndMcCabeOutputParser implements Callable&lt;Set&lt;Result&gt;&gt; {
+        private InputStream inputStream;
+
+<span class="fc" id="L137">        LOCAndMcCabeOutputParser(InputStream inputStream) {</span>
+<span class="fc" id="L138">            this.inputStream = inputStream;</span>
+<span class="fc" id="L139">        }</span>
+
+        @Override
+        public Set&lt;Result&gt; call() {
+<span class="fc" id="L143">            Set&lt;Result&gt; results = new HashSet&lt;&gt;();</span>
+            try {
+<span class="fc" id="L145">                parseOutput(results);</span>
+<span class="nc" id="L146">            } catch (UnsupportedEncodingException e) {</span>
+<span class="nc" id="L147">                logger.error(&quot;Charset not supported!&quot;);</span>
+<span class="fc" id="L148">            }</span>
+<span class="fc" id="L149">            return results;</span>
+        }
+
+        private void parseOutput(Set&lt;Result&gt; results) throws UnsupportedEncodingException {
+<span class="fc" id="L153">            new BufferedReader(new InputStreamReader(inputStream , &quot;UTF-8&quot;)).lines()</span>
+<span class="fc" id="L154">                    .forEach(outputLine -&gt; {</span>
+<span class="fc" id="L155">                        logger.debug(&quot;Original extractor line: {}&quot;, outputLine);</span>
+<span class="fc" id="L156">                        String[] parts = outputLine.split(Pattern.quote(&quot;::&quot;));</span>
+<span class="fc" id="L157">                        Result result = new Result(parts[1], Paths.get(parts[0]));</span>
+<span class="fc" id="L158">                        result.addMetric(&quot;mc_cabe_sg&quot;, parts[2]);</span>
+<span class="fc" id="L159">                        result.addMetric(&quot;mc_cabe_all&quot;, parts[3]);</span>
+<span class="fc" id="L160">                        result.addMetric(&quot;cloc&quot;, parts[4]);</span>
+<span class="fc" id="L161">                        result.addMetric(&quot;lloc&quot;, parts[5]);</span>
+<span class="fc" id="L162">                        results.add(result);</span>
+<span class="fc" id="L163">                    });</span>
+<span class="fc" id="L164">        }</span>
+    }
+
+
+    @SupportsJava
+    @SupportsClass
+    public void getLOCAndMcCabeForJavaClass(ProjectFiles projectFiles) throws MetricCollectorException {
+        try {
+<span class="fc" id="L172">            Set&lt;Result&gt; results = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L173" title="All 2 branches covered.">            for(Path testFile: projectFiles.getTestFiles()) {</span>
+                // creates a string with the code without blank lines
+<span class="fc" id="L175">                String code = getSourceCodeWithoutBlankLines(testFile);</span>
+
+                // parse it
+<span class="fc" id="L178">                CompilationUnit cu = JavaParser.parse(code);</span>
+
+                // visit and print the methods names
+<span class="fc" id="L181">                ASTClassNode astClassNode = new ASTClassNode();</span>
+<span class="fc" id="L182">                ASTClassVisitor astClassVisitor = new ASTClassVisitor(astClassNode);</span>
+<span class="fc" id="L183">                cu.accept(astClassVisitor, null);</span>
+<span class="fc" id="L184">                logger.debug(&quot;Got the following results from the AST parsing: &quot;+astClassNode);</span>
+
+
+<span class="fc" id="L187">                Path resultPath = Paths.get(testFile.toString()</span>
+<span class="fc" id="L188">                        .replace(generalConf.getProjectDir().toString()+&quot;/&quot;, &quot;&quot;));</span>
+<span class="fc" id="L189">                results.add(createResultWithMetrics(astClassNode.getFQN(), resultPath, null,</span>
+<span class="fc" id="L190">                        astClassNode.getLLOC(), astClassNode.getCLOC()));</span>
+<span class="fc" id="L191">            }</span>
+
+<span class="fc" id="L193">            filer.storeResults(results);</span>
+<span class="nc" id="L194">        } catch (IOException e) {</span>
+<span class="nc" id="L195">            throw new MetricCollectorException(&quot;Could not collect metrics: &quot;+e.getMessage());</span>
+<span class="fc" id="L196">        }</span>
+<span class="fc" id="L197">    }</span>
+
+    @SupportsJava
+    @SupportsMethod
+    public void getLOCAndMcCabeForJavaMethod(ProjectFiles projectFiles) throws MetricCollectorException {
+        try {
+<span class="fc" id="L203">            Set&lt;Result&gt; results = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L204" title="All 2 branches covered.">            for(Path testFile: projectFiles.getTestFiles()) {</span>
+                // creates a string with the code without blank lines
+<span class="fc" id="L206">                String code = getSourceCodeWithoutBlankLines(testFile);</span>
+
+                // parse it
+<span class="fc" id="L209">                CompilationUnit cu = JavaParser.parse(code);</span>
+
+                // visit and print the methods names
+<span class="fc" id="L212">                Set&lt;ASTMethodNode&gt; astResults = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L213">                ASTMethodVisitor astMethodVisitor = new ASTMethodVisitor(astResults);</span>
+<span class="fc" id="L214">                cu.accept(astMethodVisitor, null);</span>
+<span class="fc" id="L215">                logger.debug(&quot;Got the following results from the AST parsing: &quot;+astResults);</span>
+
+<span class="fc" id="L217">                Path resultPath = Paths.get(testFile.toString()</span>
+<span class="fc" id="L218">                        .replace(generalConf.getProjectDir().toString()+&quot;/&quot;, &quot;&quot;));</span>
+
+<span class="fc bfc" id="L220" title="All 2 branches covered.">                for(ASTMethodNode astMethodNode: astResults) {</span>
+<span class="fc" id="L221">                    results.add(createResultWithMetrics(astMethodNode.getFQNWithMethod(), resultPath,</span>
+<span class="fc" id="L222">                            astMethodNode.getMcCC(), astMethodNode.getLLOC(), astMethodNode.getCLOC()));</span>
+<span class="fc" id="L223">                }</span>
+<span class="fc" id="L224">            }</span>
+
+<span class="fc" id="L226">            filer.storeResults(results);</span>
+<span class="nc" id="L227">        } catch (IOException e) {</span>
+<span class="nc" id="L228">            throw new MetricCollectorException(&quot;Could not collect metrics: &quot;+e.getMessage());</span>
+<span class="fc" id="L229">        }</span>
+<span class="fc" id="L230">    }</span>
+
+    private Result createResultWithMetrics(String identifier, Path resultPath, Integer mcCabe,
+                                           Integer lloc, Integer cloc) {
+<span class="fc" id="L234">        Result result = new Result(identifier, resultPath);</span>
+<span class="fc bfc" id="L235" title="All 2 branches covered.">        if(mcCabe != null) {</span>
+<span class="fc" id="L236">            result.addMetric(&quot;mc_cabe&quot;, String.valueOf(mcCabe));</span>
+        }
+
+<span class="fc" id="L239">        result.addMetric(&quot;lloc&quot;, String.valueOf(lloc));</span>
+<span class="fc" id="L240">        result.addMetric(&quot;cloc&quot;, String.valueOf(cloc));</span>
+<span class="fc" id="L241">        return result;</span>
+    }
+
+    private String getSourceCodeWithoutBlankLines(Path sourceCodePath) throws IOException {
+<span class="fc" id="L245">        List&lt;String&gt; allLines = Files.readAllLines(sourceCodePath);</span>
+<span class="fc" id="L246">        StringBuilder code = new StringBuilder();</span>
+<span class="fc bfc" id="L247" title="All 2 branches covered.">        for(String line: allLines) {</span>
+<span class="fc" id="L248">            line = line.trim();</span>
+<span class="fc bfc" id="L249" title="All 2 branches covered.">            if(line.length() &gt; 0) {</span>
+<span class="fc" id="L250">                code.append(line).append(&quot;\n&quot;);</span>
+            }
+<span class="fc" id="L252">        }</span>
+<span class="fc" id="L253">        return code.toString();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MetricClassVisitor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">comfort</a> &gt; <a href="index.source.html" class="el_package">de.ugoe.cs.comfort.collection.metriccollector.parsing</a> &gt; <span class="el_source">MetricClassVisitor.java</span></div><h1>MetricClassVisitor.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2017 University of Goettingen, Germany
+ * 
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.ugoe.cs.comfort.collection.metriccollector.parsing;
+
+import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
+import de.ugoe.cs.comfort.data.ClassFiles;
+import de.ugoe.cs.comfort.filer.models.Result;
+import java.io.FileNotFoundException;
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import org.apache.bcel.classfile.Constant;
+import org.apache.bcel.classfile.ConstantPool;
+import org.apache.bcel.classfile.EmptyVisitor;
+import org.apache.bcel.classfile.JavaClass;
+import org.apache.bcel.classfile.Method;
+import org.apache.bcel.generic.ConstantPoolGen;
+import org.apache.bcel.generic.MethodGen;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+/**
+ * The simplest of class visitors, invokes the method visitor class for each
+ * method found. Based on: http://www.spinellis.gr/sw/ckjm/
+ * @author Fabian Trautsch
+ */
+public class MetricClassVisitor extends EmptyVisitor {
+
+    private JavaClass clazz;
+    private ConstantPoolGen constants;
+    private GeneralConfiguration configuration;
+<span class="fc" id="L47">    private Map&lt;String, Integer&gt; numAssertions = new HashMap&lt;&gt;();</span>
+    private Set&lt;Result&gt; results;
+    private boolean executeOnMethodLevel;
+    private ClassFiles classFiles;
+<span class="fc" id="L51">    private static final Logger LOGGER = LogManager.getLogger(MetricClassVisitor.class.getName());</span>
+
+    public MetricClassVisitor(JavaClass jc, Set&lt;Result&gt; results, GeneralConfiguration configuration,
+<span class="fc" id="L54">                              boolean executeOnMethodLevel, ClassFiles classFiles) {</span>
+<span class="fc" id="L55">        clazz = jc;</span>
+<span class="fc" id="L56">        constants = new ConstantPoolGen(clazz.getConstantPool());</span>
+<span class="fc" id="L57">        this.results = results;</span>
+<span class="fc" id="L58">        this.configuration = configuration;</span>
+<span class="fc" id="L59">        this.executeOnMethodLevel = executeOnMethodLevel;</span>
+<span class="fc" id="L60">        this.classFiles = classFiles;</span>
+<span class="fc" id="L61">    }</span>
+
+    public void visitJavaClass(JavaClass jc) {
+<span class="fc" id="L64">        jc.getConstantPool().accept(this);</span>
+<span class="fc" id="L65">        Method[] methods = jc.getMethods();</span>
+<span class="fc bfc" id="L66" title="All 2 branches covered.">        for (Method method : methods) {</span>
+<span class="fc" id="L67">            method.accept(this);</span>
+        }
+<span class="fc" id="L69">    }</span>
+
+    public void visitConstantPool(ConstantPool constantPool) {
+<span class="fc bfc" id="L72" title="All 2 branches covered.">        for (int i = 0; i &lt; constantPool.getLength(); i++) {</span>
+<span class="fc" id="L73">            Constant constant = constantPool.getConstant(i);</span>
+<span class="fc bfc" id="L74" title="All 2 branches covered.">            if (constant == null) {</span>
+<span class="fc" id="L75">                continue;</span>
+            }
+<span class="fc bfc" id="L77" title="All 2 branches covered.">            if (constant.getTag() == 7) {</span>
+<span class="fc" id="L78">                String referencedClass =</span>
+<span class="fc" id="L79">                        constantPool.constantToString(constant);</span>
+<span class="fc" id="L80">                LOGGER.debug(&quot;Class {} references Class {}&quot;, clazz.getClassName(), referencedClass);</span>
+            }
+        }
+<span class="fc" id="L83">    }</span>
+
+    public void visitMethod(Method method) {
+<span class="fc" id="L86">        MethodGen mg = new MethodGen(method, clazz.getClassName(), constants);</span>
+<span class="fc" id="L87">        MetricMethodVisitor visitor = new MetricMethodVisitor(mg, clazz);</span>
+
+        // Get identifier (class or method level, depending on configuration) and the number of assertions
+        // If class level: just sum up the number of assertions
+<span class="fc" id="L91">        String identifier = getIdentifier(mg);</span>
+<span class="fc" id="L92">        int numberOfAssertions = numAssertions.getOrDefault(identifier, 0);</span>
+<span class="fc" id="L93">        numAssertions.put(identifier, numberOfAssertions+visitor.start());</span>
+<span class="fc" id="L94">    }</span>
+
+    public Map&lt;String, Integer&gt; start() {
+<span class="fc" id="L97">        visitJavaClass(clazz);</span>
+
+        // Store results
+        try {
+<span class="fc bfc" id="L101" title="All 2 branches covered.">            for(Map.Entry&lt;String, Integer&gt; entry: numAssertions.entrySet()) {</span>
+                Path pathToTest;
+<span class="fc bfc" id="L103" title="All 2 branches covered.">                if(executeOnMethodLevel) {</span>
+<span class="fc" id="L104">                    pathToTest = classFiles.getFilenameForMethod(entry.getKey());</span>
+                } else {
+<span class="fc" id="L106">                    pathToTest = classFiles.getFilenameForClass(entry.getKey());</span>
+                }
+<span class="fc" id="L108">                results.add(</span>
+<span class="fc" id="L109">                        new Result(entry.getKey(), pathToTest,&quot;num_asserts&quot;, String.valueOf(entry.getValue()))</span>
+                );
+<span class="fc" id="L111">            }</span>
+<span class="nc" id="L112">        } catch (FileNotFoundException e) {</span>
+<span class="nc" id="L113">            LOGGER.error(&quot;Could not create filename utils!&quot;);</span>
+<span class="fc" id="L114">        }</span>
+<span class="fc" id="L115">        return numAssertions;</span>
+    }
+
+    private String getIdentifier(MethodGen mg) {
+<span class="fc bfc" id="L119" title="All 2 branches covered.">        if(executeOnMethodLevel) {</span>
+<span class="fc" id="L120">            return clazz.getClassName()+&quot;.&quot;+mg.getName();</span>
+        } else {
+<span class="fc" id="L122">            return clazz.getClassName();</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

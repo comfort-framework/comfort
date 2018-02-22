@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CoverageData.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">comfort</a> &gt; <a href="index.source.html" class="el_package">de.ugoe.cs.comfort.data</a> &gt; <span class="el_source">CoverageData.java</span></div><h1>CoverageData.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2017 University of Goettingen, Germany
+ * 
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.ugoe.cs.comfort.data;
+
+import com.google.common.base.MoreObjects;
+import de.ugoe.cs.comfort.data.models.IUnit;
+import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+/**
+ * @author Fabian Trautsch
+ */
+public class CoverageData extends DataSet {
+<span class="fc" id="L32">    private Map&lt;IUnit, Set&lt;IUnit&gt;&gt; covfefeMethodLevel = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L33">    private Map&lt;IUnit, Set&lt;IUnit&gt;&gt; covfefeClassLevel = new HashMap&lt;&gt;();</span>
+
+<span class="fc" id="L35">    public CoverageData() {</span>
+<span class="fc" id="L36">    }</span>
+
+    public void add(IUnit testMethod, Set&lt;IUnit&gt; testedMethods) {
+<span class="fc" id="L39">        covfefeMethodLevel.put(testMethod, testedMethods);</span>
+
+        // As we also need the coverage on class level, we need to cast it here
+        try {
+<span class="fc" id="L43">            IUnit classLevelUnit = (IUnit) testMethod.getClass().getSuperclass()</span>
+<span class="fc" id="L44">                    .getConstructor(String.class, Path.class).newInstance(</span>
+<span class="fc" id="L45">                            testMethod.getFQNOfUnit(), testMethod.getFilePath()</span>
+                    );
+<span class="fc" id="L47">            Set&lt;IUnit&gt; coveredClasses = covfefeClassLevel.getOrDefault(classLevelUnit, new HashSet&lt;&gt;());</span>
+
+<span class="fc bfc" id="L49" title="All 2 branches covered.">            if(testedMethods != null) {</span>
+<span class="fc" id="L50">                coveredClasses.addAll(testedMethods);</span>
+            }
+<span class="fc" id="L52">            covfefeClassLevel.put(classLevelUnit, coveredClasses);</span>
+<span class="nc" id="L53">        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException</span>
+            | InvocationTargetException e) {
+<span class="nc" id="L55">            e.printStackTrace();</span>
+<span class="fc" id="L56">        }</span>
+<span class="fc" id="L57">    }</span>
+
+    @Override
+    public String toString() {
+<span class="nc" id="L61">        return MoreObjects.toStringHelper(this)</span>
+<span class="nc" id="L62">                .add(&quot;coverage&quot;, covfefeMethodLevel)</span>
+<span class="nc" id="L63">                .toString();</span>
+    }
+
+    public Map&lt;IUnit, Set&lt;IUnit&gt;&gt; getCoverageData() {
+<span class="fc" id="L67">        return covfefeMethodLevel;</span>
+    }
+
+    public Map&lt;IUnit, Set&lt;IUnit&gt;&gt; getCoverageDataClassLevel() {
+<span class="fc" id="L71">        return covfefeClassLevel;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

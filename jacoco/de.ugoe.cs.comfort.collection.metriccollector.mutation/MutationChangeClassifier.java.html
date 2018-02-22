@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MutationChangeClassifier.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">comfort</a> &gt; <a href="index.source.html" class="el_package">de.ugoe.cs.comfort.collection.metriccollector.mutation</a> &gt; <span class="el_source">MutationChangeClassifier.java</span></div><h1>MutationChangeClassifier.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2017 University of Goettingen, Germany
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.ugoe.cs.comfort.collection.metriccollector.mutation;
+
+import de.ugoe.cs.BugFixClassifier;
+import de.ugoe.cs.comfort.collection.metriccollector.mutation.operators.BaseOperator;
+import de.ugoe.cs.comfort.collection.metriccollector.mutation.operators.ConditionalsBoundaryOperator;
+import de.ugoe.cs.comfort.collection.metriccollector.mutation.operators.IncrementsOperator;
+import de.ugoe.cs.comfort.collection.metriccollector.mutation.operators.InvertNegativesOperator;
+import de.ugoe.cs.comfort.collection.metriccollector.mutation.operators.MathOperator;
+import de.ugoe.cs.comfort.collection.metriccollector.mutation.operators.NegateConditionalsOperator;
+import de.ugoe.cs.comfort.collection.metriccollector.mutation.operators.RemoveIncrementsOperator;
+import de.ugoe.cs.comfort.exception.MutationOperatorNotFittingException;
+import de.ugoe.cs.comfort.exception.MutationResultException;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.apache.commons.io.FileUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+/**
+ * @author Fabian Trautsch
+ */
+<span class="nc" id="L47">public class MutationChangeClassifier {</span>
+<span class="fc" id="L48">    private static Logger logger = LogManager.getLogger(&quot;MutationChangeClassifier&quot;);</span>
+<span class="fc" id="L49">    private static Pattern dataChangePattern = Pattern.compile(&quot;\\w+\\s\\w+\\s*=\\s*.+&quot;);</span>
+
+    public static String getChangeClassification(Path file, String mutationOperator, int lineNumber)
+            throws MutationResultException {
+        try {
+
+            // Change File based on mutationOperator on LineNumber
+            BaseOperator op;
+<span class="pc bpc" id="L57" title="87 of 99 branches missed.">            switch (mutationOperator) {</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.ArgumentPropagationMutator&quot;:
+<span class="nc" id="L59">                    return &quot;INTERFACE&quot;;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.BooleanFalseReturnValsMutator&quot;:
+<span class="nc" id="L61">                    return &quot;LOGIC/CONTROL&quot;;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.BooleanTrueReturnValsMutator&quot;:
+<span class="nc" id="L63">                    return &quot;LOGIC/CONTROL&quot;;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.ConditionalsBoundaryMutator&quot;:
+<span class="fc" id="L65">                    op = new ConditionalsBoundaryOperator();</span>
+<span class="fc" id="L66">                    break;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.ConstructorCallMutator&quot;:
+<span class="nc" id="L68">                    return &quot;INTERFACE&quot;;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.EmptyObjectReturnValsMutator&quot;:
+<span class="nc" id="L70">                    return &quot;INTERFACE&quot;;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.IncrementsMutator&quot;:
+<span class="nc" id="L72">                    op = new IncrementsOperator();</span>
+<span class="nc" id="L73">                    break;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.InlineConstantMutator&quot;:
+<span class="nc" id="L75">                    return &quot;DATA&quot;;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.InvertNegsMutator&quot;:
+<span class="nc" id="L77">                    op = new InvertNegativesOperator();</span>
+<span class="nc" id="L78">                    break;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.MathMutator&quot;:
+<span class="fc" id="L80">                    op = new MathOperator();</span>
+<span class="fc" id="L81">                    break;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.NegateConditionalsMutator&quot;:
+<span class="fc" id="L83">                    op = new NegateConditionalsOperator();</span>
+<span class="fc" id="L84">                    break;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.NonVoidMethodCallMutator&quot;:
+<span class="nc" id="L86">                    return &quot;INTERFACE&quot;;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.NullReturnValsMutator&quot;:
+<span class="nc" id="L88">                    return &quot;LOGIC/CONTROL&quot;;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.PrimitiveReturnsMutator&quot;:
+<span class="nc" id="L90">                    return &quot;LOGIC/CONTROL&quot;;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_ELSE&quot;:
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_IF&quot;:
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_ORDER_ELSE&quot;:
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_ORDER_IF&quot;:
+<span class="nc" id="L95">                    return &quot;LOGIC/CONTROL&quot;;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.ReturnValsMutator&quot;:
+<span class="fc" id="L97">                    return &quot;LOGIC/CONTROL&quot;;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator&quot;:
+<span class="nc" id="L99">                    return &quot;INTERFACE&quot;;</span>
+
+                    // Experimental Mutators
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.experimental.MemberVariableMutator&quot;:
+<span class="nc" id="L103">                    return &quot;COMPUTATION&quot;;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.experimental.NakedReceiverMutator&quot;:
+<span class="nc" id="L105">                    return &quot;INTERFACE&quot;;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.experimental.RemoveIncrementsMutator&quot;:
+<span class="nc" id="L107">                    op = new RemoveIncrementsOperator();</span>
+<span class="nc" id="L108">                    break;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.experimental.ReturnValuesMutator&quot;:
+<span class="nc" id="L110">                    return &quot;LOGIC/CONTROL&quot;;</span>
+                case &quot;org.pitest.mutationtest.engine.gregor.mutators.experimental.SwitchMutator&quot;:
+<span class="nc" id="L112">                    return &quot;LOGIC/CONTROL&quot;;</span>
+                default:
+<span class="nc bnc" id="L114" title="All 2 branches missed.">                    if(mutationOperator.contains(&quot;RemoveSwitchMutator&quot;)) {</span>
+<span class="nc" id="L115">                        return &quot;LOGIC/CONTROL&quot;;</span>
+                    }
+<span class="nc" id="L117">                    throw new MutationResultException(&quot;Unsupported mutationoperator '&quot;+mutationOperator+&quot;'&quot;);</span>
+            }
+
+            // If we do not have a line number we can not change the file to get the classification
+<span class="pc bpc" id="L121" title="1 of 2 branches missed.">            if(lineNumber == 0) {</span>
+<span class="nc" id="L122">                return null;</span>
+            }
+
+            // Copy files
+<span class="fc" id="L126">            Path changedFile = File.createTempFile(&quot;comfort-&quot;, &quot;-suffix&quot;).toPath();</span>
+<span class="fc" id="L127">            FileUtils.copyFile(file.toFile(), changedFile.toFile());</span>
+
+            // Change file based on used mutationoperator
+<span class="fc" id="L130">            Map&lt;String, Integer&gt; results = new HashMap&lt;&gt;();</span>
+            try {
+<span class="fc" id="L132">                op.initialize(changedFile, lineNumber);</span>
+<span class="fc" id="L133">                op.changeFile();</span>
+
+                // Call bugfixclassifier to get results
+<span class="fc" id="L136">                results = BugFixClassifier.getBugClassifications(file, changedFile);</span>
+<span class="fc" id="L137">            } catch (MutationOperatorNotFittingException e) {</span>
+<span class="fc" id="L138">                logger.debug(&quot;Got error: {}. Falling back to backup method...&quot;, e.getMessage());</span>
+            } finally {
+<span class="pc" id="L140">                Files.delete(changedFile);</span>
+<span class="fc" id="L141">            }</span>
+
+            //Backup method if classificaton was not successful
+<span class="fc bfc" id="L144" title="All 2 branches covered.">            if(results.size() == 0) {</span>
+<span class="fc" id="L145">                return getClassificationBasedOnChangedLineInFile(file, lineNumber);</span>
+            }
+<span class="fc" id="L147">            return Collections.max(results.entrySet(), Comparator.comparingInt(Map.Entry::getValue)).getKey();</span>
+<span class="nc" id="L148">        } catch (IOException e) {</span>
+<span class="nc" id="L149">            throw new MutationResultException(e.getMessage());</span>
+        }
+
+    }
+
+    private static String getClassificationBasedOnChangedLineInFile(Path file, int lineNumber) throws IOException {
+        // Read in File
+<span class="fc" id="L156">        List&lt;String&gt; lines = Files.readAllLines(file);</span>
+
+        // Set normalized line number (because Arrays start at 0 and not 1)
+<span class="fc" id="L159">        int normalizedLineNumber = lineNumber-1;</span>
+
+        // Get line that should be changed
+<span class="fc" id="L162">        String line = lines.get(normalizedLineNumber);</span>
+<span class="fc" id="L163">        logger.debug(&quot;Reading Line: &quot;+line);</span>
+
+        // We need to check if we have a data change
+<span class="fc" id="L166">        Matcher matcher = dataChangePattern.matcher(line);</span>
+
+        // Interface changes can not occur, as they are not mutated by the mutations on which we execute this method
+<span class="fc bfc" id="L169" title="All 4 branches covered.">        if(line.contains(&quot; return&quot;) || line.contains(&quot; if&quot;)</span>
+<span class="fc bfc" id="L170" title="All 4 branches covered.">                || line.contains(&quot; while&quot;) || line.contains(&quot; for&quot;)) {</span>
+<span class="fc" id="L171">            return &quot;LOGIC/CONTROL&quot;;</span>
+<span class="fc bfc" id="L172" title="All 2 branches covered.">        } else if (matcher.find()) {</span>
+<span class="fc" id="L173">            return &quot;DATA&quot;;</span>
+        } else {
+<span class="fc" id="L175">            return &quot;COMPUTATION&quot;;</span>
+        }
+
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

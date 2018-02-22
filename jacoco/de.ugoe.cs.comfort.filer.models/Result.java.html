@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Result.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">comfort</a> &gt; <a href="index.source.html" class="el_package">de.ugoe.cs.comfort.filer.models</a> &gt; <span class="el_source">Result.java</span></div><h1>Result.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2017 University of Goettingen, Germany
+ * 
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.ugoe.cs.comfort.filer.models;
+
+import com.google.common.base.MoreObjects;
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+
+/**
+ * @author Fabian Trautsch
+ */
+public class Result {
+    private String id;
+    private Path pathToFile;
+<span class="pc" id="L35">    private Map&lt;String, String&gt; metrics = new HashMap&lt;&gt;();</span>
+<span class="pc" id="L36">    private Set&lt;Mutation&gt; mutationResults = new HashSet&lt;&gt;();</span>
+
+<span class="fc" id="L38">    public Result(String id, Path pathToFile) {</span>
+<span class="fc" id="L39">        this.id = id;</span>
+<span class="fc" id="L40">        this.pathToFile = pathToFile;</span>
+<span class="fc" id="L41">    }</span>
+
+<span class="nc" id="L43">    public Result(String id) {</span>
+<span class="nc" id="L44">        this.id = id;</span>
+<span class="nc" id="L45">    }</span>
+
+<span class="fc" id="L47">    public Result(String id, Path pathToFile, String metricName, String metricValue) {</span>
+<span class="fc" id="L48">        this.id = id;</span>
+<span class="fc" id="L49">        this.pathToFile = pathToFile;</span>
+<span class="fc" id="L50">        this.addMetric(metricName, metricValue);</span>
+<span class="fc" id="L51">    }</span>
+
+    public String getId() {
+<span class="fc" id="L54">        return id;</span>
+    }
+
+    public void mergeResult(Result resultToMerge) {
+        // We do not need to merge the id, as it is used to define which results can be merged.
+
+<span class="fc" id="L60">        this.pathToFile = resultToMerge.pathToFile;</span>
+<span class="fc" id="L61">        this.metrics.putAll(resultToMerge.metrics);</span>
+<span class="fc" id="L62">        this.mutationResults.addAll(resultToMerge.mutationResults);</span>
+<span class="fc" id="L63">    }</span>
+
+    public void addMutationResults(Set&lt;Mutation&gt; mutationResults) {
+<span class="fc" id="L66">        this.mutationResults = mutationResults;</span>
+<span class="fc" id="L67">    }</span>
+
+    public void addMetric(String name, String value) {
+<span class="fc" id="L70">        this.metrics.put(name, value);</span>
+<span class="fc" id="L71">    }</span>
+
+    public String getMetric(String name) {
+<span class="fc" id="L74">        return this.metrics.get(name);</span>
+    }
+
+    public Set&lt;Mutation&gt; getMutationResults() {
+<span class="fc" id="L78">        return mutationResults;</span>
+    }
+
+    public Path getPathToFile() {
+<span class="fc" id="L82">        return pathToFile;</span>
+    }
+
+    public Map&lt;String, String&gt; getMetrics() {
+<span class="fc" id="L86">        return metrics;</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="fc" id="L91">        return MoreObjects.toStringHelper(this)</span>
+<span class="fc" id="L92">                .add(&quot;id&quot;, id)</span>
+<span class="fc" id="L93">                .add(&quot;path&quot;, pathToFile)</span>
+<span class="fc" id="L94">                .add(&quot;metrics&quot;, metrics)</span>
+<span class="fc" id="L95">                .add(&quot;mutationResults&quot;, mutationResults)</span>
+<span class="fc" id="L96">                .toString();</span>
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+<span class="pc bpc" id="L101" title="1 of 2 branches missed.">        if(!(obj instanceof Result)) {</span>
+<span class="nc" id="L102">            return false;</span>
+        }
+
+<span class="pc bpc" id="L105" title="1 of 2 branches missed.">        if(obj == this) {</span>
+<span class="nc" id="L106">            return true;</span>
+        }
+
+<span class="fc" id="L109">        Result otherNode = (Result) obj;</span>
+<span class="fc" id="L110">        return new EqualsBuilder()</span>
+<span class="fc" id="L111">                .append(id, otherNode.id)</span>
+<span class="fc" id="L112">                .append(pathToFile, otherNode.pathToFile)</span>
+<span class="fc" id="L113">                .append(metrics, otherNode.metrics)</span>
+<span class="fc" id="L114">                .append(mutationResults, otherNode.mutationResults)</span>
+<span class="fc" id="L115">                .isEquals();</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="fc" id="L120">        return new HashCodeBuilder(17, 31)</span>
+<span class="fc" id="L121">                .append(id)</span>
+<span class="fc" id="L122">                .append(pathToFile)</span>
+<span class="fc" id="L123">                .append(metrics)</span>
+<span class="fc" id="L124">                .append(mutationResults)</span>
+<span class="fc" id="L125">                .toHashCode();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

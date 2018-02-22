@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DependencyGraphLoader.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">comfort</a> &gt; <a href="index.source.html" class="el_package">de.ugoe.cs.comfort.collection.loader</a> &gt; <span class="el_source">DependencyGraphLoader.java</span></div><h1>DependencyGraphLoader.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2017 University of Goettingen, Germany
+ * 
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.ugoe.cs.comfort.collection.loader;
+
+import de.ugoe.cs.comfort.FileNameUtils;
+import de.ugoe.cs.comfort.annotations.SupportsJava;
+import de.ugoe.cs.comfort.annotations.SupportsPython;
+import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
+import de.ugoe.cs.comfort.configuration.LoaderConfiguration;
+import de.ugoe.cs.comfort.data.graphs.DependencyGraph;
+import de.ugoe.cs.comfort.data.models.JavaClass;
+import de.ugoe.cs.comfort.data.models.PythonModule;
+import de.ugoe.cs.comfort.exception.LoaderException;
+import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.*;
+
+/**
+ * @author Fabian Trautsch
+ */
+public class DependencyGraphLoader extends BaseLoader {
+    public DependencyGraphLoader(GeneralConfiguration generalConfiguration, LoaderConfiguration loaderConfiguration) {
+<span class="fc" id="L38">        super(generalConfiguration, loaderConfiguration);</span>
+<span class="fc" id="L39">    }</span>
+
+    @SupportsJava
+    public DependencyGraph loadJavaDependencyGraph() throws LoaderException {
+        // Create process builder
+<span class="fc" id="L44">        ProcessBuilder builder = new ProcessBuilder();</span>
+<span class="fc" id="L45">        builder.directory(generalConf.getProjectDir().toFile());</span>
+<span class="fc" id="L46">        builder.command(&quot;jdeps&quot;, &quot;-v&quot;, generalConf.getProjectDir().toString());</span>
+
+<span class="fc" id="L48">        return executeCommandAndGenerateGraph(builder);</span>
+    }
+
+    @SupportsPython
+    public DependencyGraph loadPythonDependencyGraph() throws LoaderException {
+        // Create process builder
+<span class="fc" id="L54">        ProcessBuilder builder = new ProcessBuilder();</span>
+<span class="fc" id="L55">        builder.directory(generalConf.getProjectDir().toFile());</span>
+
+
+        // We need to create a temporary file as a copy of the existing file, as an execution is not possible
+        // otherwise, if we execute it within a jar
+        File tempFile;
+        try {
+<span class="fc" id="L62">            tempFile = File.createTempFile(&quot;dependency_extract_temp&quot;, &quot;.py&quot;);</span>
+<span class="nc" id="L63">        } catch (IOException e) {</span>
+<span class="nc" id="L64">            throw new LoaderException(&quot;Error in creating temporary file:&quot;+e.getMessage());</span>
+<span class="fc" id="L65">        }</span>
+<span class="fc" id="L66">        InputStream in = getClass().getResourceAsStream(&quot;/dependency_extract.py&quot;);</span>
+
+<span class="pc" id="L68">        try (BufferedReader reader = new BufferedReader(new InputStreamReader(in, Charset.forName(&quot;UTF-8&quot;)));</span>
+<span class="fc" id="L69">                OutputStreamWriter fstream =</span>
+                        new OutputStreamWriter(new FileOutputStream(tempFile), StandardCharsets.UTF_8)) {
+<span class="fc" id="L71">            int c = reader.read();</span>
+<span class="fc bfc" id="L72" title="All 2 branches covered.">            while(c!=-1) {</span>
+<span class="fc" id="L73">                fstream.write(c);</span>
+<span class="fc" id="L74">                c = reader.read();</span>
+            }
+<span class="pc bpc" id="L76" title="12 of 16 branches missed.">        } catch(IOException e) {</span>
+<span class="nc" id="L77">            throw new LoaderException(&quot;Error in copying file contents:&quot;+e.getMessage());</span>
+<span class="fc" id="L78">        }</span>
+<span class="fc" id="L79">        builder.command(&quot;python3&quot;, tempFile.toString(), generalConf.getProjectDir().toString());</span>
+
+
+<span class="fc" id="L82">        return executeCommandAndGenerateGraph(builder);</span>
+    }
+
+
+    private DependencyGraph executeCommandAndGenerateGraph(ProcessBuilder builder) throws LoaderException {
+<span class="fc" id="L87">        logger.info(&quot;Calling command: {}&quot;, builder.command());</span>
+        int exitCode;
+        Future&lt;DependencyGraph&gt; future;
+        try {
+<span class="fc" id="L91">            Process depExtract = builder.start();</span>
+<span class="fc" id="L92">            DependencyExtractOutputParser outputParser =</span>
+<span class="fc" id="L93">                    new DependencyExtractOutputParser(depExtract.getInputStream(), generalConf);</span>
+
+<span class="fc" id="L95">            ExecutorService executor = Executors.newFixedThreadPool(1);</span>
+<span class="fc" id="L96">            future = executor.submit(outputParser);</span>
+<span class="fc" id="L97">            exitCode = depExtract.waitFor();</span>
+<span class="fc" id="L98">        } catch (IOException | InterruptedException e) {</span>
+<span class="fc" id="L99">            throw new LoaderException(&quot;Error in executing loader, while calling &quot;</span>
+<span class="fc" id="L100">                    +builder.command().toString()+&quot; :&quot;+e.getMessage());</span>
+<span class="fc" id="L101">        }</span>
+
+        // Check if it returned successfully
+<span class="pc bpc" id="L104" title="1 of 2 branches missed.">        if (exitCode != 0) {</span>
+<span class="nc" id="L105">            throw new LoaderException(&quot;Error in executing loader: Program did not terminate with code 0&quot;);</span>
+        }
+
+        DependencyGraph dependencyGraph;
+        try {
+<span class="fc" id="L110">            dependencyGraph = future.get();</span>
+<span class="nc" id="L111">        } catch (InterruptedException | ExecutionException e) {</span>
+<span class="nc" id="L112">            throw new LoaderException(&quot;Error in parsing results: &quot;+e.getMessage());</span>
+<span class="fc" id="L113">        }</span>
+<span class="fc" id="L114">        logger.info(&quot;Execution successful...&quot;);</span>
+
+<span class="pc bpc" id="L116" title="1 of 2 branches missed.">        if(dependencyGraph.nodes().size() == 0) {</span>
+<span class="nc" id="L117">            throw new LoaderException(&quot;No graph was created. Are there class files for production and test &quot;</span>
+<span class="nc" id="L118">                + &quot;classes available in the tree of: &quot;+generalConf.getProjectDir());</span>
+        }
+
+<span class="fc" id="L121">        return dependencyGraph;</span>
+    }
+
+    private class DependencyExtractOutputParser implements Callable&lt;DependencyGraph&gt; {
+        private InputStream inputStream;
+        private GeneralConfiguration configuration;
+        private FileNameUtils fileNameUtils;
+
+<span class="fc" id="L129">        DependencyExtractOutputParser(InputStream inputStream, GeneralConfiguration configuration) {</span>
+<span class="fc" id="L130">            this.inputStream = inputStream;</span>
+<span class="fc" id="L131">            this.configuration = configuration;</span>
+<span class="fc" id="L132">            this.fileNameUtils = new FileNameUtils(configuration);</span>
+<span class="fc" id="L133">        }</span>
+
+        @Override
+        public DependencyGraph call() {
+<span class="fc" id="L137">            DependencyGraph dependencyGraph = new DependencyGraph();</span>
+            try {
+<span class="fc bfc" id="L139" title="All 2 branches covered.">                if(configuration.getLanguage().equals(&quot;java&quot;)) {</span>
+<span class="fc" id="L140">                    parseJdepsOutput(dependencyGraph);</span>
+                }
+
+<span class="fc bfc" id="L143" title="All 2 branches covered.">                if(configuration.getLanguage().equals(&quot;python&quot;)) {</span>
+<span class="fc" id="L144">                    parseDependencyExtractorOutput(dependencyGraph);</span>
+                }
+<span class="nc" id="L146">            } catch (UnsupportedEncodingException e) {</span>
+<span class="nc" id="L147">                logger.error(&quot;Charset not supported!&quot;);</span>
+<span class="fc" id="L148">            }</span>
+<span class="fc" id="L149">            return dependencyGraph;</span>
+        }
+
+        private PythonModule createPythonModuleNode(String fqn) {
+            try {
+<span class="fc bfc" id="L154" title="All 2 branches covered.">                if(fileNameUtils.isPythonPackage(fqn)) {</span>
+<span class="fc" id="L155">                    return new PythonModule(fqn, &quot;__init__&quot;,</span>
+<span class="fc" id="L156">                            fileNameUtils.getPathForPythonModuleFQN(fqn+&quot;.__init__&quot;));</span>
+                } else {
+<span class="fc" id="L158">                    return new PythonModule(fqn, fileNameUtils.getPathForPythonModuleFQN(fqn));</span>
+                }
+<span class="nc" id="L160">            } catch (FileNotFoundException e) {</span>
+<span class="nc" id="L161">                logger.warn(&quot;Could not find file for PythonModule {}&quot;, fqn);</span>
+            }
+<span class="nc" id="L163">            return new PythonModule(fqn, null);</span>
+        }
+
+        private JavaClass createJavaClassNode(String fqn) {
+            try {
+<span class="fc" id="L168">                return new JavaClass(fqn, this.fileNameUtils.getPathForJavaClassFQN(fqn));</span>
+<span class="fc" id="L169">            } catch (FileNotFoundException e) {</span>
+<span class="fc" id="L170">                logger.warn(&quot;Could not find file for JavaClass {}&quot;, fqn);</span>
+<span class="fc" id="L171">                return new JavaClass(fqn, null);</span>
+            }
+        }
+
+        private void parseDependencyExtractorOutput(DependencyGraph dependencyGraph) throws
+                UnsupportedEncodingException {
+<span class="fc" id="L177">            new BufferedReader(new InputStreamReader(inputStream , &quot;UTF-8&quot;)).lines()</span>
+<span class="fc" id="L178">                    .forEach(dependncyExtractLine -&gt; {</span>
+<span class="fc" id="L179">                        String[] partsOfOutput = dependncyExtractLine.split(&quot;,&quot;);</span>
+<span class="fc" id="L180">                        String moduleThatHasDependency = partsOfOutput[0];</span>
+<span class="fc" id="L181">                        String moduleNameOfDependency = partsOfOutput[1];</span>
+<span class="fc" id="L182">                        logger.debug(&quot;Original extractor line: {}&quot;, dependncyExtractLine);</span>
+<span class="fc" id="L183">                        logger.debug(&quot;Parsed: {} has dependency on {}&quot;, moduleThatHasDependency,</span>
+                                moduleNameOfDependency);
+
+<span class="fc" id="L186">                        PythonModule moduleHasDependency = this.createPythonModuleNode(moduleThatHasDependency);</span>
+<span class="fc" id="L187">                        PythonModule moduleDependency = this.createPythonModuleNode(moduleNameOfDependency);</span>
+<span class="fc" id="L188">                        dependencyGraph.putEdge(moduleHasDependency, moduleDependency);</span>
+<span class="fc" id="L189">                    });</span>
+<span class="fc" id="L190">        }</span>
+
+        private void parseJdepsOutput(DependencyGraph dependencyGraph) throws UnsupportedEncodingException {
+<span class="fc" id="L193">            new BufferedReader(new InputStreamReader(inputStream , &quot;UTF-8&quot;)).lines()</span>
+<span class="fc" id="L194">                    .forEach(jdepsOutputLine -&gt; {</span>
+<span class="fc bfc" id="L195" title="All 2 branches covered.">                        if(jdepsOutputLine.startsWith(&quot;   &quot;)) {</span>
+<span class="fc" id="L196">                            String[] partsOfOutput = jdepsOutputLine.split(&quot;-&gt;&quot;);</span>
+<span class="fc" id="L197">                            String classNameThatHasDependency = partsOfOutput[0].trim();</span>
+<span class="fc" id="L198">                            String classNameOfDependency = partsOfOutput[1].trim().split(&quot; &quot;)[0];</span>
+<span class="fc" id="L199">                            logger.debug(&quot;Original jdeps line: {}&quot;, jdepsOutputLine);</span>
+<span class="fc" id="L200">                            logger.debug(&quot;Parsed: {} has dependency on {}&quot;, classNameThatHasDependency,</span>
+                                    classNameOfDependency);
+
+<span class="fc" id="L203">                            JavaClass classThatHasDependency = this.createJavaClassNode(classNameThatHasDependency);</span>
+<span class="fc" id="L204">                            JavaClass classThatIsDependency = this.createJavaClassNode(classNameOfDependency);</span>
+<span class="fc" id="L205">                            dependencyGraph.putEdge(classThatHasDependency, classThatIsDependency);</span>
+
+                        }
+
+<span class="fc" id="L209">                    });</span>
+<span class="fc" id="L210">        }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

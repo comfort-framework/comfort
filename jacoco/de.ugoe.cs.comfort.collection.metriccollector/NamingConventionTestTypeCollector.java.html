@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>NamingConventionTestTypeCollector.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">comfort</a> &gt; <a href="index.source.html" class="el_package">de.ugoe.cs.comfort.collection.metriccollector</a> &gt; <span class="el_source">NamingConventionTestTypeCollector.java</span></div><h1>NamingConventionTestTypeCollector.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2017 University of Goettingen, Germany
+ * 
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.ugoe.cs.comfort.collection.metriccollector;
+
+import com.google.common.io.Files;
+import de.ugoe.cs.comfort.annotations.SupportsClass;
+import de.ugoe.cs.comfort.annotations.SupportsJava;
+import de.ugoe.cs.comfort.annotations.SupportsMethod;
+import de.ugoe.cs.comfort.annotations.SupportsPython;
+import de.ugoe.cs.comfort.collection.loader.ProjectFilesLoader;
+import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
+import de.ugoe.cs.comfort.data.CoverageData;
+import de.ugoe.cs.comfort.data.ProjectFiles;
+import de.ugoe.cs.comfort.data.models.IUnit;
+import de.ugoe.cs.comfort.exception.LoaderException;
+import de.ugoe.cs.comfort.filer.BaseFiler;
+import de.ugoe.cs.comfort.filer.models.Result;
+import de.ugoe.cs.smartshark.model.Project;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+/**
+ * @author Fabian Trautsch
+ */
+public class NamingConventionTestTypeCollector extends BaseMetricCollector {
+
+    public NamingConventionTestTypeCollector(GeneralConfiguration configuration, BaseFiler filer) {
+<span class="fc" id="L51">        super(configuration, filer);</span>
+<span class="fc" id="L52">    }</span>
+
+    @SupportsPython
+    @SupportsJava
+    @SupportsClass
+    public void createResults(ProjectFiles projectFiles) throws IOException {
+        // Get all code files without tests in a list for comparison later on
+<span class="fc" id="L59">        List&lt;String&gt; codeFileNamesWithoutTests = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L60">        projectFiles.getCodeFilesWithoutTestFiles().forEach(</span>
+                codeFilePath -&gt;
+<span class="fc" id="L62">                    codeFileNamesWithoutTests.add(Files.getNameWithoutExtension(codeFilePath.toString()).toLowerCase())</span>
+        );
+<span class="fc" id="L64">        logger.debug(&quot;Found the following java code filenames: {}&quot;, codeFileNamesWithoutTests);</span>
+
+        // Create filer map
+<span class="fc" id="L67">        Set&lt;Result&gt; result = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">        for(Path testFile: projectFiles.getTestFiles()) {</span>
+<span class="fc" id="L69">            result.add(classifyTestFile(testFile.toString(), testFile, codeFileNamesWithoutTests, &quot;files_nc&quot;));</span>
+<span class="fc" id="L70">        }</span>
+
+<span class="fc" id="L72">        logger.debug(&quot;Got the following classification results: {}&quot;, result);</span>
+<span class="fc" id="L73">        filer.storeResults(result);</span>
+<span class="fc" id="L74">    }</span>
+
+    @SupportsPython
+    @SupportsJava
+    @SupportsMethod
+    public void createResults(CoverageData coverageData) {
+        try {
+            // Create filer map
+<span class="fc" id="L82">            Set&lt;Result&gt; result = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L83" title="All 2 branches covered.">            for(Map.Entry&lt;IUnit, Set&lt;IUnit&gt;&gt; unit: coverageData.getCoverageData().entrySet()) {</span>
+<span class="fc" id="L84">                List&lt;String&gt; coveredUnits = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L85" title="All 2 branches covered.">                for(IUnit coveredUnit: unit.getValue()) {</span>
+<span class="fc" id="L86">                    String[] fqnParts = coveredUnit.getFQNOfUnit().split(&quot;\\.&quot;);</span>
+<span class="fc" id="L87">                    String className = fqnParts[fqnParts.length-1];</span>
+<span class="fc" id="L88">                    coveredUnits.add(className.toLowerCase());</span>
+<span class="fc" id="L89">                }</span>
+<span class="fc" id="L90">                Path testPath = fileNameUtils.getPathForIdentifier(unit.getKey().getFQN(),</span>
+<span class="fc" id="L91">                        generalConf.getMethodLevel());</span>
+<span class="fc" id="L92">                result.add(classifyTestFile(unit.getKey().getFQN(), testPath, coveredUnits, &quot;cov_nc&quot;));</span>
+<span class="fc" id="L93">            }</span>
+
+<span class="fc" id="L95">            logger.debug(&quot;Got the following classification results: {}&quot;, result);</span>
+<span class="fc" id="L96">            filer.storeResults(result);</span>
+<span class="nc" id="L97">        } catch (IOException e) {</span>
+<span class="nc" id="L98">            logger.catching(e);</span>
+<span class="fc" id="L99">        }</span>
+<span class="fc" id="L100">    }</span>
+
+    private Result classifyTestFile(String id, Path testFile, List&lt;String&gt; codeFileNamesWithoutTests, String metric) {
+<span class="fc" id="L103">        Result result = new Result(id, testFile);</span>
+<span class="fc bfc" id="L104" title="All 2 branches covered.">        if(isIntegrationTest(testFile)) {</span>
+<span class="fc" id="L105">            result.addMetric(metric, TestType.INTEGRATION.name());</span>
+<span class="fc bfc" id="L106" title="All 2 branches covered.">        } else if(isUnitTest(testFile, codeFileNamesWithoutTests)) {</span>
+<span class="fc" id="L107">            result.addMetric(metric, TestType.UNIT.name());</span>
+        } else {
+<span class="fc" id="L109">            logger.warn(&quot;Could not classify {}.&quot;, testFile);</span>
+<span class="fc" id="L110">            result.addMetric(metric, TestType.UNKNOWN.name());</span>
+        }
+
+<span class="fc" id="L113">        return result;</span>
+    }
+
+    private Boolean isIntegrationTest(Path testFilePath) {
+        // List of patterns to check
+<span class="fc" id="L118">        String[] filenamePatterns = new String[]{&quot;IT&quot;, &quot;Integration&quot;, &quot;integration&quot;, &quot;IntegrationTest&quot;};</span>
+<span class="fc" id="L119">        String[] pathPatterns = new String[]{&quot;IT&quot;, &quot;Integration&quot;, &quot;integration&quot;};</span>
+
+        // If any of the filename patterns is in the filename, we suspect it is an integration test
+<span class="fc" id="L122">        String testFileName = Files.getNameWithoutExtension(testFilePath.toString());</span>
+<span class="fc bfc" id="L123" title="All 2 branches covered.">        if(Arrays.stream(filenamePatterns).parallel().anyMatch(testFileName::contains)) {</span>
+<span class="fc" id="L124">            return true;</span>
+        }
+
+        // If IT, Integration, integration is in filepath, we suspect it is an integration test
+<span class="pc bpc" id="L128" title="1 of 2 branches missed.">        if(testFilePath.getNameCount() &gt; 1) {</span>
+<span class="fc" id="L129">            String testFilePathWithoutFileName = testFilePath.subpath(0, testFilePath.getNameCount() - 1).toString();</span>
+<span class="fc bfc" id="L130" title="All 2 branches covered.">            if (Arrays.stream(pathPatterns).parallel().anyMatch(testFilePathWithoutFileName::contains)) {</span>
+<span class="fc" id="L131">                return true;</span>
+            }
+        }
+
+<span class="fc" id="L135">        return false;</span>
+    }
+
+    private Boolean isUnitTest(Path testFilePath, List&lt;String&gt; codeFileNamesWithoutTests) {
+        // List of patterns to check
+<span class="fc" id="L140">        String[] pathPatterns = new String[]{&quot;unit&quot;, &quot;Unit&quot;, &quot;UnitTest&quot;, &quot;unitTest&quot;, &quot;unittest&quot;, &quot;unittests&quot;};</span>
+
+        // If the name of a code file is in the test, we suspect it is an unit test
+        // We filter out every other code file, where the name of it is not in the test case filename
+<span class="fc" id="L144">        String lowerCaseFilename = Files.getNameWithoutExtension(testFilePath.toString()).toLowerCase();</span>
+
+<span class="fc" id="L146">        List&lt;String&gt; filteredCodeFileNames = codeFileNamesWithoutTests.stream()</span>
+<span class="fc bfc" id="L147" title="All 4 branches covered.">                .filter(name -&gt; lowerCaseFilename.equals(name + &quot;test&quot;) || lowerCaseFilename.equals(&quot;test&quot; + name)</span>
+<span class="pc bpc" id="L148" title="2 of 4 branches missed.">                    || lowerCaseFilename.equals(name + &quot;_test&quot;) || lowerCaseFilename.equals(&quot;test_&quot; + name)</span>
+<span class="pc bpc" id="L149" title="2 of 4 branches missed.">                    || lowerCaseFilename.equals(name + &quot;_tests&quot;) || lowerCaseFilename.equals(&quot;tests_&quot; + name))</span>
+<span class="fc" id="L150">                .collect(Collectors.toList());</span>
+
+<span class="fc bfc" id="L152" title="All 2 branches covered.">        if (filteredCodeFileNames.size() &gt;= 1) {</span>
+<span class="fc" id="L153">            String mostProbableMatch = Collections.max(filteredCodeFileNames, Comparator.comparing(String::length));</span>
+<span class="fc" id="L154">            logger.debug(&quot;{} is matching the following code files: {}. Most probable match: {}&quot;,</span>
+<span class="fc" id="L155">                    Files.getNameWithoutExtension(testFilePath.toString()), filteredCodeFileNames, mostProbableMatch);</span>
+<span class="fc" id="L156">            return true;</span>
+        }
+
+        // If the path contains the word unit,
+<span class="pc bpc" id="L160" title="1 of 2 branches missed.">        if(testFilePath.getNameCount() &gt; 1) {</span>
+<span class="fc" id="L161">            String testFilePathWithoutFileName = testFilePath.subpath(0, testFilePath.getNameCount() - 1).toString();</span>
+<span class="fc bfc" id="L162" title="All 2 branches covered.">            if (Arrays.stream(pathPatterns).parallel().anyMatch(testFilePathWithoutFileName::contains)) {</span>
+<span class="fc" id="L163">                return true;</span>
+            }
+        }
+
+<span class="fc" id="L167">        return false;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

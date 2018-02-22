@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>NumAssertionCollector.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">comfort</a> &gt; <a href="index.source.html" class="el_package">de.ugoe.cs.comfort.collection.metriccollector</a> &gt; <span class="el_source">NumAssertionCollector.java</span></div><h1>NumAssertionCollector.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2017 University of Goettingen, Germany
+ * 
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.ugoe.cs.comfort.collection.metriccollector;
+
+import de.ugoe.cs.comfort.annotations.SupportsClass;
+import de.ugoe.cs.comfort.annotations.SupportsJava;
+import de.ugoe.cs.comfort.annotations.SupportsMethod;
+import de.ugoe.cs.comfort.annotations.SupportsPython;
+import de.ugoe.cs.comfort.collection.metriccollector.parsing.MetricClassVisitor;
+import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
+import de.ugoe.cs.comfort.data.ClassFiles;
+import de.ugoe.cs.comfort.data.graphs.CallEdge;
+import de.ugoe.cs.comfort.data.graphs.CallGraph;
+import de.ugoe.cs.comfort.data.models.IUnit;
+import de.ugoe.cs.comfort.exception.MetricCollectorException;
+import de.ugoe.cs.comfort.filer.BaseFiler;
+import de.ugoe.cs.comfort.filer.models.Result;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import org.apache.bcel.classfile.ClassParser;
+
+/**
+ * @author Fabian Trautsch
+ */
+public class NumAssertionCollector extends BaseMetricCollector {
+    public NumAssertionCollector(GeneralConfiguration configuration, BaseFiler filer) {
+<span class="fc" id="L45">        super(configuration, filer);</span>
+<span class="fc" id="L46">    }</span>
+
+    @SupportsMethod
+    @SupportsClass
+    @SupportsJava
+    public void getNumberOfAssertionsForJava(ClassFiles classFiles) throws MetricCollectorException {
+        ClassParser cp;
+<span class="fc" id="L53">        Set&lt;Path&gt; testClassFiles = classFiles.getTestFiles();</span>
+
+        try {
+<span class="fc" id="L56">            Set&lt;Result&gt; results = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L57" title="All 2 branches covered.">            for(Path classFilePath: testClassFiles) {</span>
+<span class="fc" id="L58">                cp = new ClassParser(classFilePath.toString());</span>
+<span class="fc" id="L59">                MetricClassVisitor visitor = new MetricClassVisitor(cp.parse(), results, generalConf,</span>
+<span class="fc" id="L60">                        generalConf.getMethodLevel(), classFiles);</span>
+<span class="fc" id="L61">                visitor.start();</span>
+<span class="fc" id="L62">            }</span>
+<span class="fc" id="L63">            filer.storeResults(results);</span>
+<span class="nc" id="L64">        } catch (IOException e) {</span>
+<span class="nc" id="L65">            throw new MetricCollectorException(&quot;Error in executing NumAssertionCollector: &quot;+e.getMessage());</span>
+<span class="fc" id="L66">        }</span>
+<span class="fc" id="L67">    }</span>
+
+    @SupportsMethod
+    @SupportsJava
+    @SupportsPython
+    public void getNumberOfAssertionsForCallGraph(CallGraph callGraph) throws IOException {
+<span class="fc" id="L73">        Map&lt;String, Result&gt; allResults = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L74" title="All 2 branches covered.">        for(IUnit testNode : callGraph.getTestNodes()) {</span>
+
+<span class="fc" id="L76">            Result result = allResults.getOrDefault(testNode.getFQN(),</span>
+<span class="fc" id="L77">                    new Result(testNode.getFQN(), testNode.getFilePath(), &quot;num_asserts&quot;, &quot;0&quot;));</span>
+<span class="fc" id="L78">            Integer numAsserts = Integer.parseInt(result.getMetric(&quot;num_asserts&quot;));</span>
+
+<span class="fc bfc" id="L80" title="All 2 branches covered.">            for(CallEdge directlyConnectedEdge : callGraph.outEdges(testNode)) {</span>
+<span class="fc bfc" id="L81" title="All 2 branches covered.">                if(directlyConnectedEdge.getCallee().getFQN().contains(&quot;assert&quot;)) {</span>
+<span class="fc" id="L82">                    numAsserts++;</span>
+                }
+<span class="fc" id="L84">            }</span>
+<span class="fc" id="L85">            result.addMetric(&quot;num_asserts&quot;, String.valueOf(numAsserts));</span>
+<span class="fc" id="L86">            allResults.put(testNode.getFQN(), result);</span>
+<span class="fc" id="L87">        }</span>
+
+<span class="fc" id="L89">        Set&lt;Result&gt; results = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L90">        results.addAll(allResults.values());</span>
+<span class="fc" id="L91">        filer.storeResults(results);</span>
+<span class="fc" id="L92">    }</span>
+
+    @SupportsClass
+    @SupportsJava
+    @SupportsPython
+    public void getNumberOfAssertionsForCallGraphOnClassLevel(CallGraph callGraph) throws IOException {
+<span class="fc" id="L98">        Map&lt;String, Result&gt; allResults = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L99" title="All 2 branches covered.">        for(IUnit testNode : callGraph.getTestNodes()) {</span>
+
+<span class="fc" id="L101">            Result result = allResults.getOrDefault(testNode.getFQNOfUnit(),</span>
+<span class="fc" id="L102">                    new Result(testNode.getFQNOfUnit(), testNode.getFilePath(), &quot;num_asserts&quot;, &quot;0&quot;));</span>
+<span class="fc" id="L103">            Integer numAsserts = Integer.parseInt(result.getMetric(&quot;num_asserts&quot;));</span>
+
+<span class="fc bfc" id="L105" title="All 2 branches covered.">            for(CallEdge directlyConnectedEdge : callGraph.outEdges(testNode)) {</span>
+<span class="fc bfc" id="L106" title="All 2 branches covered.">                if(directlyConnectedEdge.getCallee().getFQN().contains(&quot;assert&quot;)) {</span>
+<span class="fc" id="L107">                    numAsserts++;</span>
+                }
+<span class="fc" id="L109">            }</span>
+
+<span class="fc" id="L111">            result.addMetric(&quot;num_asserts&quot;, String.valueOf(numAsserts));</span>
+<span class="fc" id="L112">            allResults.put(testNode.getFQNOfUnit(), result);</span>
+<span class="fc" id="L113">        }</span>
+
+<span class="fc" id="L115">        Set&lt;Result&gt; results = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L116">        results.addAll(allResults.values());</span>
+<span class="fc" id="L117">        filer.storeResults(results);</span>
+<span class="fc" id="L118">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SameProjectFilter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">comfort</a> &gt; <a href="index.source.html" class="el_package">de.ugoe.cs.comfort.collection.filter</a> &gt; <span class="el_source">SameProjectFilter.java</span></div><h1>SameProjectFilter.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2017 University of Goettingen, Germany
+ * 
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.ugoe.cs.comfort.collection.filter;
+
+import de.ugoe.cs.comfort.annotations.SupportsJava;
+import de.ugoe.cs.comfort.annotations.SupportsPython;
+import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
+import de.ugoe.cs.comfort.data.graphs.CallGraph;
+import de.ugoe.cs.comfort.data.graphs.DependencyGraph;
+
+/**
+ * @author Fabian Trautsch
+ */
+public class SameProjectFilter extends BaseFilter {
+
+    public SameProjectFilter(GeneralConfiguration generalConfiguration) {
+<span class="fc" id="L31">        super(generalConfiguration);</span>
+<span class="fc" id="L32">    }</span>
+
+    @SupportsJava
+    @SupportsPython
+    public DependencyGraph filterDependencyGraph(DependencyGraph dependencyGraph) {
+<span class="fc" id="L37">        DependencyGraph filteredDepedencyGraph = dependencyGraph.getCopyOfGraph();</span>
+
+        // Go through all nodes and check if the node has a file path, if not it is not project related
+<span class="fc" id="L40">        dependencyGraph.nodes().forEach(node -&gt; {</span>
+<span class="fc bfc" id="L41" title="All 2 branches covered.">            if(node.getFilePath() == null) {</span>
+<span class="fc" id="L42">                logger.debug(&quot;Removing the following node: {}&quot;, node);</span>
+<span class="fc" id="L43">                filteredDepedencyGraph.removeNode(node);</span>
+            }
+<span class="fc" id="L45">        });</span>
+
+<span class="fc" id="L47">        filteredDepedencyGraph.cleanGraphOfNodesThatAreSingle();</span>
+
+<span class="fc" id="L49">        return filteredDepedencyGraph;</span>
+    }
+
+    @SupportsJava
+    @SupportsPython
+    public CallGraph filterCallGraph(CallGraph callGraph) {
+<span class="fc" id="L55">        CallGraph filteredCallGraph = callGraph.getCopyOfGraph();</span>
+
+        // Go through all nodes and check if the class can be found in the project folder
+<span class="fc" id="L58">        callGraph.nodes().forEach(node -&gt; {</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">            if(node.getFilePath() == null) {</span>
+<span class="fc" id="L60">                logger.debug(&quot;Removing the node: {}&quot;, node);</span>
+<span class="fc" id="L61">                filteredCallGraph.removeNode(node);</span>
+            }
+<span class="fc" id="L63">        });</span>
+
+        // Remove all nodes that do not have any edges left
+<span class="fc" id="L66">        filteredCallGraph.cleanGraphOfNodesThatAreSingle();</span>
+
+<span class="fc" id="L68">        return filteredCallGraph;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

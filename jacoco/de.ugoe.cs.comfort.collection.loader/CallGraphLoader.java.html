@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CallGraphLoader.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">comfort</a> &gt; <a href="index.source.html" class="el_package">de.ugoe.cs.comfort.collection.loader</a> &gt; <span class="el_source">CallGraphLoader.java</span></div><h1>CallGraphLoader.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2017 University of Goettingen, Germany
+ * 
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.ugoe.cs.comfort.collection.loader;
+
+import de.ugoe.cs.comfort.FileNameUtils;
+import de.ugoe.cs.comfort.Utils;
+import de.ugoe.cs.comfort.annotations.SupportsJava;
+import de.ugoe.cs.comfort.annotations.SupportsPython;
+import de.ugoe.cs.comfort.collection.loader.callgraph.ClassVisitor;
+import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
+import de.ugoe.cs.comfort.configuration.LoaderConfiguration;
+import de.ugoe.cs.comfort.data.graphs.CallEdge;
+import de.ugoe.cs.comfort.data.graphs.CallGraph;
+import de.ugoe.cs.comfort.data.graphs.CallType;
+import de.ugoe.cs.comfort.data.models.PythonMethod;
+import de.ugoe.cs.comfort.exception.LoaderException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.apache.bcel.classfile.ClassParser;
+
+/**
+ * @author Fabian Trautsch
+ */
+public class CallGraphLoader extends BaseLoader {
+
+    public CallGraphLoader(GeneralConfiguration generalConfiguration, LoaderConfiguration loaderConfiguration) {
+<span class="fc" id="L46">        super(generalConfiguration, loaderConfiguration);</span>
+<span class="fc" id="L47">    }</span>
+
+    @SupportsJava
+    public CallGraph loadJavaCallGraph() throws LoaderException {
+<span class="fc" id="L51">        logger.info(&quot;Parsing class files...&quot;);</span>
+        ClassParser cp;
+        Set&lt;Path&gt; classFiles;
+        try {
+<span class="fc" id="L55">            classFiles = Utils.getAllFilesFromProjectForRegex(generalConf.getProjectDir(), &quot;.*\\.class&quot;);</span>
+<span class="fc" id="L56">        } catch (IOException e) {</span>
+<span class="fc" id="L57">            throw new LoaderException(&quot;Could not read project directory: &quot;+generalConf.getProjectDir());</span>
+<span class="fc" id="L58">        }</span>
+
+<span class="pc bpc" id="L60" title="1 of 2 branches missed.">        if(classFiles.size() == 0) {</span>
+<span class="nc" id="L61">            throw new LoaderException(&quot;No class files found at path &quot;+generalConf.getProjectDir()+&quot; have you &quot;</span>
+                + &quot;compiled the project already?&quot;);
+        }
+<span class="fc" id="L64">        logger.info(&quot;Building call graph network...&quot;);</span>
+<span class="fc" id="L65">        CallGraph callGraph = new CallGraph();</span>
+        try {
+<span class="fc" id="L67">            FileNameUtils fileNameUtils = new FileNameUtils(generalConf);</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">            for(Path classFilePath: classFiles) {</span>
+<span class="fc" id="L69">                cp = new ClassParser(classFilePath.toString());</span>
+<span class="fc" id="L70">                ClassVisitor visitor = new ClassVisitor(cp.parse(), callGraph, fileNameUtils);</span>
+<span class="fc" id="L71">                visitor.start();</span>
+<span class="fc" id="L72">            }</span>
+<span class="nc" id="L73">        } catch (IOException e) {</span>
+<span class="nc" id="L74">            throw new LoaderException(&quot;Error in executing CallGraphLoader: &quot;+e.getMessage());</span>
+<span class="fc" id="L75">        }</span>
+
+<span class="fc" id="L77">        logger.info(&quot;Finished extracting call graph.&quot;);</span>
+<span class="fc" id="L78">        return callGraph;</span>
+    }
+
+    @SupportsPython
+    public CallGraph loadPythonCallGraph() throws LoaderException {
+<span class="fc" id="L83">        String regexToDeleteAllParanthesis = &quot;\\s*\\([^\\)]*\\)\\s*&quot;;</span>
+<span class="fc" id="L84">        Pattern pattern = Pattern.compile(regexToDeleteAllParanthesis);</span>
+
+<span class="fc" id="L86">        FileNameUtils fileNameUtils = new FileNameUtils(generalConf);</span>
+<span class="fc" id="L87">        Map&lt;String, Integer&gt; callsFromMethod = new HashMap&lt;&gt;();</span>
+        try {
+<span class="fc" id="L89">            List&lt;String&gt; fileLines = Files.readAllLines(loaderConf.getCallGraphLocation());</span>
+<span class="fc" id="L90">            logger.info(&quot;Building call graph network...&quot;);</span>
+
+<span class="fc" id="L92">            CallGraph callGraph = new CallGraph();</span>
+<span class="fc bfc" id="L93" title="All 2 branches covered.">            for(String line : fileLines) {</span>
+<span class="fc" id="L94">                String[] lineParts = line.split(&quot;\\;&quot;);</span>
+<span class="fc" id="L95">                String caller = lineParts[0].split(&quot;\\,&quot;)[0];</span>
+<span class="fc" id="L96">                Path callerPath = Paths.get(lineParts[0].split(&quot;\\,&quot;)[1]);</span>
+<span class="fc" id="L97">                String callee = lineParts[1].split(&quot;\\,&quot;)[0];</span>
+<span class="fc" id="L98">                Path calleePath = Paths.get(lineParts[1].split(&quot;\\,&quot;)[1]);</span>
+
+<span class="fc" id="L100">                Matcher matcherCaller = pattern.matcher(caller);</span>
+<span class="fc" id="L101">                caller = matcherCaller.replaceAll(&quot;&quot;);</span>
+<span class="fc" id="L102">                Matcher matcherCallee = pattern.matcher(callee);</span>
+<span class="fc" id="L103">                callee = matcherCallee.replaceAll(&quot;&quot;);</span>
+
+<span class="fc" id="L105">                Integer callerCallNumber = callsFromMethod.getOrDefault(caller, 0);</span>
+<span class="fc" id="L106">                callsFromMethod.put(caller, callerCallNumber+1);</span>
+
+                // Get Python method from string
+<span class="fc" id="L109">                PythonMethod pyCaller = getPythonMethodForCallString(caller);</span>
+                // Set correct path
+<span class="fc" id="L111">                pyCaller.setFileName(fileNameUtils.getPathForPythonModuleFQN(pyCaller.getFQNOfUnit()));</span>
+
+<span class="fc" id="L113">                PythonMethod pyCallee = getPythonMethodForCallString(callee);</span>
+<span class="fc" id="L114">                pyCallee.setFileName(fileNameUtils.getPathForPythonModuleFQN(pyCallee.getFQNOfUnit()));</span>
+
+<span class="fc" id="L116">                callGraph.addEdge(new CallEdge(CallType.INVOKE_PYTHON, callerCallNumber, pyCaller, pyCallee));</span>
+<span class="fc" id="L117">                logger.debug(&quot;{} calls {}...&quot;, pyCaller, pyCallee);</span>
+
+
+<span class="fc" id="L120">            }</span>
+<span class="fc" id="L121">            logger.info(&quot;Finished extracting call graph.&quot;);</span>
+<span class="fc" id="L122">            return callGraph;</span>
+<span class="nc" id="L123">        } catch (IOException e) {</span>
+<span class="nc" id="L124">            throw new LoaderException(e.getMessage());</span>
+        }
+    }
+
+    private PythonMethod getPythonMethodForCallString(String callString) {
+        // input: tests.data.demo:Demo.bar
+        // Result: tests.data = package, demo = module, Demo = namespace, bar = method
+<span class="fc" id="L131">        String[] parts = callString.split(&quot;\\:&quot;);</span>
+<span class="fc" id="L132">        String packageAndModule = parts[0];</span>
+<span class="fc" id="L133">        String nameSpaceAndMethod = parts[1];</span>
+
+<span class="fc" id="L135">        String[] packageAndModuleParts = packageAndModule.split(&quot;\\.&quot;);</span>
+<span class="fc" id="L136">        String module = packageAndModuleParts[packageAndModuleParts.length-1];</span>
+<span class="fc" id="L137">        String pPackage = String.join(&quot;.&quot;, Arrays.copyOfRange(packageAndModuleParts,</span>
+                0, packageAndModuleParts.length-1));
+
+<span class="fc" id="L140">        String[] nameSpaceAndMethodParts = nameSpaceAndMethod.split(&quot;\\.&quot;);</span>
+<span class="fc" id="L141">        String method = nameSpaceAndMethodParts[nameSpaceAndMethodParts.length-1];</span>
+<span class="fc" id="L142">        String namespace = String.join(&quot;.&quot;, Arrays.copyOfRange(nameSpaceAndMethodParts,</span>
+                0, nameSpaceAndMethodParts.length-1));
+
+<span class="fc bfc" id="L145" title="All 2 branches covered.">        if(namespace.equals(&quot;&quot;)) {</span>
+<span class="fc" id="L146">            namespace = null;</span>
+        }
+
+<span class="pc bpc" id="L149" title="1 of 2 branches missed.">        if(pPackage.equals(&quot;&quot;)) {</span>
+<span class="nc" id="L150">            pPackage = null;</span>
+        }
+
+<span class="fc" id="L153">        return new PythonMethod(pPackage, module, namespace, method, null);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GeneralConfiguration.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">comfort</a> &gt; <a href="index.source.html" class="el_package">de.ugoe.cs.comfort.configuration</a> &gt; <span class="el_source">GeneralConfiguration.java</span></div><h1>GeneralConfiguration.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2017 University of Goettingen, Germany
+ * 
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.ugoe.cs.comfort.configuration;
+
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects;
+import de.ugoe.cs.comfort.filer.BaseFiler;
+import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+
+
+/**
+ * @author Fabian Trautsch
+ */
+<span class="fc" id="L33">public class GeneralConfiguration {</span>
+    private Path projectDir;
+<span class="fc" id="L35">    private String projectName = &quot;default&quot;;</span>
+<span class="fc" id="L36">    private String language = &quot;java&quot;;</span>
+<span class="fc" id="L37">    private String logLevel = &quot;DEBUG&quot;;</span>
+<span class="fc" id="L38">    private String logFile = &quot;/tmp/comfort.out&quot;;</span>
+
+<span class="fc" id="L40">    @JsonProperty(&quot;nThreads&quot;)</span>
+    private int nThreads = 1;
+
+<span class="fc" id="L43">    private boolean methodLevel = false;</span>
+
+<span class="fc" id="L45">    @JsonProperty(&quot;collections&quot;)</span>
+    private List&lt;CollectionConfiguration&gt; collections = new ArrayList&lt;&gt;();
+
+<span class="fc" id="L48">    @JsonProperty(&quot;filer&quot;)</span>
+    private FilerConfiguration filerConfiguration = new FilerConfiguration();
+
+    @JsonGetter(&quot;filer&quot;)
+    public FilerConfiguration getFilerConfiguration() {
+<span class="fc" id="L53">        return filerConfiguration;</span>
+    }
+
+    public void setFilerConfiguration(FilerConfiguration filerConfiguration) {
+<span class="fc" id="L57">        this.filerConfiguration = filerConfiguration;</span>
+<span class="fc" id="L58">    }</span>
+
+    @JsonGetter(&quot;collections&quot;)
+    public List&lt;CollectionConfiguration&gt; getCollections() {
+<span class="fc" id="L62">        return collections;</span>
+    }
+
+<span class="fc" id="L65">    @JsonProperty(&quot;forceRerun&quot;)</span>
+    private boolean forceRerun = false;
+
+    public boolean isForceRerun() {
+<span class="nc" id="L69">        return forceRerun;</span>
+    }
+
+    public void setForceRerun(boolean forceRerun) {
+<span class="nc" id="L73">        this.forceRerun = forceRerun;</span>
+<span class="nc" id="L74">    }</span>
+
+    public void setMethodLevel(boolean methodLevel) {
+<span class="fc" id="L77">        this.methodLevel = methodLevel;</span>
+<span class="fc" id="L78">    }</span>
+
+    public boolean getMethodLevel() {
+<span class="fc" id="L81">        return methodLevel;</span>
+    }
+
+    public void setProjectDir(String projectDir) {
+<span class="fc" id="L85">        this.projectDir = Paths.get(projectDir);</span>
+<span class="fc" id="L86">    }</span>
+
+    public Path getProjectDir() {
+<span class="fc" id="L89">        return this.projectDir;</span>
+    }
+
+    public String getProjectName() {
+<span class="nc" id="L93">        return projectName;</span>
+    }
+
+    public void setProjectName(String projectName) {
+<span class="fc" id="L97">        this.projectName = projectName;</span>
+<span class="fc" id="L98">    }</span>
+
+    public String getLanguage() {
+<span class="fc" id="L101">        return language.toLowerCase();</span>
+    }
+
+    public void setLanguage(String language) {
+<span class="fc" id="L105">        this.language = language;</span>
+<span class="fc" id="L106">    }</span>
+
+    public void setLogLevel(String logLevel) {
+<span class="nc" id="L109">        this.logLevel = logLevel;</span>
+<span class="nc" id="L110">    }</span>
+
+    public String getLogLevel() {
+<span class="fc" id="L113">        return logLevel;</span>
+    }
+
+    public void setLogFile(String logFile) {
+<span class="nc" id="L117">        this.logFile = logFile;</span>
+<span class="nc" id="L118">    }</span>
+
+    public String getLogFile() {
+<span class="fc" id="L121">        return logFile;</span>
+    }
+
+    public int getNThreads() {
+<span class="fc" id="L125">        return nThreads;</span>
+    }
+
+    public void setNThreads(int nThreads) {
+<span class="fc" id="L129">        this.nThreads = nThreads;</span>
+<span class="fc" id="L130">    }</span>
+
+    public BaseFiler getFiler() throws ClassNotFoundException, IllegalAccessException,
+            InstantiationException, NoSuchMethodException, InvocationTargetException {
+<span class="fc" id="L134">        return (BaseFiler) Class.forName(&quot;de.ugoe.cs.comfort.filer.&quot; + this.filerConfiguration.getName())</span>
+<span class="fc" id="L135">                .getConstructor(GeneralConfiguration.class, FilerConfiguration.class)</span>
+<span class="fc" id="L136">                .newInstance(this, filerConfiguration);</span>
+    }
+
+    public String toString() {
+<span class="nc" id="L140">        return MoreObjects.toStringHelper(this)</span>
+<span class="nc" id="L141">                .add(&quot;projectDir&quot;, projectDir)</span>
+<span class="nc" id="L142">                .add(&quot;filerConfiguration&quot;, filerConfiguration)</span>
+<span class="nc" id="L143">                .toString();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

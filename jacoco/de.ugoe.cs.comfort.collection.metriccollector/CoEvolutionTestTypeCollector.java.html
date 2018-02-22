@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CoEvolutionTestTypeCollector.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">comfort</a> &gt; <a href="index.source.html" class="el_package">de.ugoe.cs.comfort.collection.metriccollector</a> &gt; <span class="el_source">CoEvolutionTestTypeCollector.java</span></div><h1>CoEvolutionTestTypeCollector.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2017 University of Goettingen, Germany
+ * 
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.ugoe.cs.comfort.collection.metriccollector;
+
+import com.google.common.collect.ImmutableMultiset;
+import com.google.common.collect.Multisets;
+import de.ugoe.cs.comfort.annotations.SupportsClass;
+import de.ugoe.cs.comfort.annotations.SupportsJava;
+import de.ugoe.cs.comfort.annotations.SupportsPython;
+import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
+import de.ugoe.cs.comfort.data.ChangeSet;
+import de.ugoe.cs.comfort.filer.BaseFiler;
+import de.ugoe.cs.comfort.filer.models.Result;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * @author Fabian Trautsch
+ */
+public class CoEvolutionTestTypeCollector extends BaseMetricCollector {
+    // TODO: Take as configuration parameter, maybe also for detecting integration tests
+<span class="fc" id="L38">    private static final Integer DIFFERENCE = 1;</span>
+
+    public CoEvolutionTestTypeCollector(GeneralConfiguration configuration, BaseFiler filer) {
+<span class="fc" id="L41">        super(configuration, filer);</span>
+<span class="fc" id="L42">    }</span>
+
+    @SupportsJava
+    @SupportsPython
+    @SupportsClass
+    public void createResults(ChangeSet changeSet) throws IOException {
+        // Create filer map
+<span class="fc" id="L49">        Set&lt;Result&gt; result = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L50" title="All 2 branches covered.">        for(Path testFile: changeSet.getTestFiles()) {</span>
+<span class="fc" id="L51">            ImmutableMultiset&lt;Path&gt; sortedChangeSet = Multisets</span>
+<span class="fc" id="L52">                    .copyHighestCountFirst(changeSet.getChangedWithFiles(testFile));</span>
+<span class="fc" id="L53">            result.add(classifyTestFile(testFile, sortedChangeSet));</span>
+<span class="fc" id="L54">        }</span>
+
+<span class="fc" id="L56">        filer.storeResults(result);</span>
+<span class="fc" id="L57">    }</span>
+
+    private Result classifyTestFile(Path testFile, ImmutableMultiset&lt;Path&gt; changeSetOfTestFile) {
+<span class="fc" id="L60">        Result result = new Result(testFile.toString(), testFile);</span>
+<span class="fc bfc" id="L61" title="All 2 branches covered.">        if(changeSetOfTestFile.isEmpty()) {</span>
+<span class="fc" id="L62">            logger.warn(&quot;Could not classify {}, as changeset is empty.&quot;, testFile);</span>
+<span class="fc" id="L63">            result.addMetric(&quot;change_coevo&quot;, TestType.UNKNOWN.name());</span>
+<span class="fc" id="L64">            return result;</span>
+        }
+
+        // If it is only one element that was changed together with the test, we classify it as a unit test
+<span class="fc bfc" id="L68" title="All 2 branches covered.">        if(changeSetOfTestFile.elementSet().size() == 1) {</span>
+<span class="fc" id="L69">            logger.debug(&quot;{} is a unit test because of the following change set: {}.&quot;, testFile, changeSetOfTestFile);</span>
+<span class="fc" id="L70">            result.addMetric(&quot;change_coevo&quot;, TestType.UNIT.name());</span>
+<span class="fc" id="L71">            return result;</span>
+        }
+
+        // If the difference between the number of changes that the test file had together with the most often
+        // changed item and the second most often changed item (that were changed together with the test) is
+        // bigger than DIFFERENCE, we define the test as unit test
+<span class="fc" id="L77">        Integer firstItemCount = changeSetOfTestFile.entrySet().asList().get(0).getCount();</span>
+<span class="fc" id="L78">        Integer secondItemCount = changeSetOfTestFile.entrySet().asList().get(1).getCount();</span>
+<span class="fc bfc" id="L79" title="All 2 branches covered.">        if((firstItemCount - secondItemCount) &gt;= DIFFERENCE) {</span>
+<span class="fc" id="L80">            logger.debug(&quot;{} is a unit test because of the following change set: {}.&quot;, testFile, changeSetOfTestFile);</span>
+<span class="fc" id="L81">            result.addMetric(&quot;change_coevo&quot;, TestType.UNIT.name());</span>
+<span class="fc" id="L82">            return result;</span>
+        }
+
+        // Otherwise, we do not know what to do
+<span class="fc" id="L86">        logger.warn(&quot;Could not classify {}.&quot;, testFile);</span>
+<span class="fc" id="L87">        result.addMetric(&quot;change_coevo&quot;, TestType.UNKNOWN.name());</span>
+<span class="fc" id="L88">        return result;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

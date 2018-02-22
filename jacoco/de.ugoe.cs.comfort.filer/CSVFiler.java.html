@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CSVFiler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">comfort</a> &gt; <a href="index.source.html" class="el_package">de.ugoe.cs.comfort.filer</a> &gt; <span class="el_source">CSVFiler.java</span></div><h1>CSVFiler.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2017 University of Goettingen, Germany
+ * 
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.ugoe.cs.comfort.filer;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+import de.ugoe.cs.comfort.configuration.FilerConfiguration;
+import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
+import de.ugoe.cs.comfort.filer.models.Mutation;
+import de.ugoe.cs.comfort.filer.models.Result;
+import de.ugoe.cs.comfort.filer.models.ResultSet;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+/**
+ * @author Fabian Trautsch
+ */
+public class CSVFiler extends BaseFiler {
+
+    public CSVFiler(GeneralConfiguration generalConfiguration, FilerConfiguration filerConfiguration) {
+<span class="fc" id="L43">        super(generalConfiguration, filerConfiguration);</span>
+<span class="fc" id="L44">    }</span>
+
+    @Override
+    public synchronized void storeResults(Set&lt;Result&gt; results) throws IOException {
+<span class="fc" id="L48">        resultSet.addResults(results);</span>
+
+        // Store as CSV
+<span class="fc" id="L51">        storeResultsAsCSV();</span>
+<span class="fc" id="L52">    }</span>
+
+    @Override
+    public synchronized void storeResult(Result result) throws IOException {
+        // Merge with result with the same id -&gt; add to result set
+<span class="fc" id="L57">        resultSet.addResults(new HashSet&lt;Result&gt;(){</span>
+            {
+<span class="fc" id="L59">                add(result);</span>
+<span class="fc" id="L60">            }</span>
+        });
+
+        // Store result
+<span class="fc" id="L64">        storeResultsAsCSV();</span>
+<span class="fc" id="L65">    }</span>
+
+    private void clearCSVFile() throws IOException {
+<span class="fc bfc" id="L68" title="All 2 branches covered.">        if(Files.exists(Paths.get(filerConfiguration.getMetricsCSVPath()))) {</span>
+<span class="fc" id="L69">            Files.delete(Paths.get(filerConfiguration.getMetricsCSVPath()));</span>
+        }
+<span class="fc" id="L71">    }</span>
+
+    private void storeResultsAsCSV() throws IOException {
+<span class="fc" id="L74">        clearCSVFile();</span>
+
+<span class="fc" id="L76">        List&lt;Result&gt; sortedResultsById = new ArrayList&lt;&gt;(resultSet.getResults());</span>
+<span class="fc" id="L77">        sortedResultsById.sort(Comparator.comparing(Result::getId));</span>
+
+        // Create metrics csv
+<span class="fc" id="L80">        List&lt;String&gt; metricHeaders = getHeadersForMetricsCSVFile(resultSet);</span>
+<span class="fc" id="L81">        String resultsAsCSV = String.join(&quot;,&quot;, metricHeaders)+&quot;\n&quot;;</span>
+
+<span class="fc" id="L83">        resultsAsCSV += sortedResultsById.stream()</span>
+<span class="fc" id="L84">                .map(result -&gt; toMetricsCSVRow(result, metricHeaders))</span>
+<span class="fc" id="L85">                .collect(Collectors.joining(System.getProperty(&quot;line.separator&quot;)));</span>
+
+<span class="fc" id="L87">        Files.write(Paths.get(filerConfiguration.getMetricsCSVPath()),</span>
+<span class="fc" id="L88">                resultsAsCSV.getBytes(UTF_8));</span>
+
+        // Create mutation csv
+<span class="fc bfc" id="L91" title="All 2 branches covered.">        if(filerConfiguration.getMutationCSVPath() != null) {</span>
+<span class="fc" id="L92">            List&lt;String&gt; mutationHeaders = getHeadersForMutationsCSVFile(resultSet);</span>
+<span class="fc" id="L93">            resultsAsCSV = String.join(&quot;,&quot;, mutationHeaders) + &quot;\n&quot;;</span>
+<span class="fc" id="L94">            resultsAsCSV += sortedResultsById.stream()</span>
+<span class="fc" id="L95">                    .map(result -&gt; toMutationCSVRow(result, mutationHeaders))</span>
+<span class="fc" id="L96">                    .flatMap(Collection::stream)</span>
+<span class="fc" id="L97">                    .collect(Collectors.joining(System.getProperty(&quot;line.separator&quot;)));</span>
+
+
+<span class="fc" id="L100">            Files.write(Paths.get(filerConfiguration.getMutationCSVPath()),</span>
+<span class="fc" id="L101">                    resultsAsCSV.getBytes(UTF_8));</span>
+        }
+<span class="fc" id="L103">    }</span>
+
+    private List&lt;String&gt; toMutationCSVRow(Result result, List&lt;String&gt; headers) {
+<span class="fc" id="L106">        List&lt;String&gt; csvRows = new ArrayList&lt;&gt;();</span>
+        StringBuilder csvRow;
+
+<span class="fc" id="L109">        List&lt;Mutation&gt; sortedMutationResultsByLineNumber = new ArrayList&lt;&gt;(result.getMutationResults());</span>
+<span class="fc" id="L110">        sortedMutationResultsByLineNumber.sort(Comparator.comparing(Mutation::getLineNumber));</span>
+
+<span class="fc bfc" id="L112" title="All 2 branches covered.">        for(Mutation mutationResult: sortedMutationResultsByLineNumber) {</span>
+<span class="fc" id="L113">            csvRow  = new StringBuilder();</span>
+<span class="fc" id="L114">            csvRow.append(result.getId()).append(&quot;,&quot;);</span>
+<span class="fc" id="L115">            csvRow.append(result.getPathToFile()).append(&quot;,&quot;);</span>
+<span class="fc" id="L116">            csvRow.append(mutationResult.getLocation()).append(&quot;,&quot;);</span>
+<span class="fc" id="L117">            csvRow.append(mutationResult.getMType()).append(&quot;,&quot;);</span>
+<span class="fc" id="L118">            csvRow.append(mutationResult.getLineNumber()).append(&quot;,&quot;);</span>
+<span class="fc" id="L119">            csvRow.append(mutationResult.getResult()).append(&quot;,&quot;);</span>
+
+<span class="fc bfc" id="L121" title="All 2 branches covered.">            if(mutationResult.getClassification() != null) {</span>
+<span class="fc" id="L122">                csvRow.append(mutationResult.getClassification());</span>
+            }
+<span class="fc" id="L124">            csvRow.append(System.getProperty(&quot;line.separator&quot;));</span>
+
+<span class="fc" id="L126">            csvRows.add(csvRow.toString().substring(0, csvRow.toString().length()</span>
+<span class="fc" id="L127">                    - System.getProperty(&quot;line.separator&quot;).length()));</span>
+<span class="fc" id="L128">        }</span>
+<span class="fc" id="L129">        return csvRows;</span>
+    }
+
+    private List&lt;String&gt; getHeadersForMetricsCSVFile(ResultSet results) {
+<span class="fc" id="L133">        List&lt;String&gt; headers = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L134">        headers.add(&quot;id&quot;);</span>
+<span class="fc" id="L135">        headers.add(&quot;path&quot;);</span>
+
+<span class="fc" id="L137">        Set&lt;String&gt; metricHeaders = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L138" title="All 2 branches covered.">        for(Result result : results.getResults()) {</span>
+<span class="fc" id="L139">            metricHeaders.addAll(result.getMetrics().keySet());</span>
+<span class="fc" id="L140">        }</span>
+<span class="fc" id="L141">        headers.addAll(metricHeaders);</span>
+<span class="fc" id="L142">        return headers;</span>
+    }
+
+    private String toMetricsCSVRow(Result result, List&lt;String&gt; headers) {
+<span class="fc" id="L146">        StringBuilder csvRow = new StringBuilder();</span>
+<span class="fc bfc" id="L147" title="All 2 branches covered.">        for(String header: headers) {</span>
+<span class="pc bpc" id="L148" title="2 of 10 branches missed.">            switch (header) {</span>
+                case &quot;id&quot;:
+<span class="fc" id="L150">                    csvRow.append(result.getId());</span>
+<span class="fc" id="L151">                    break;</span>
+                case &quot;path&quot;:
+<span class="fc" id="L153">                    csvRow.append(result.getPathToFile());</span>
+<span class="fc" id="L154">                    break;</span>
+                default:
+<span class="fc" id="L156">                    csvRow.append(result.getMetrics().get(header));</span>
+                    break;
+            }
+<span class="fc" id="L159">            csvRow.append(&quot;,&quot;);</span>
+<span class="fc" id="L160">        }</span>
+
+<span class="fc" id="L162">        return csvRow.toString().substring(0, csvRow.toString().length() - 1);</span>
+    }
+
+    private List&lt;String&gt; getHeadersForMutationsCSVFile(ResultSet results) {
+<span class="fc" id="L166">        List&lt;String&gt; headers = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L167">        headers.add(&quot;id&quot;);</span>
+<span class="fc" id="L168">        headers.add(&quot;path&quot;);</span>
+<span class="fc" id="L169">        headers.add(&quot;location&quot;);</span>
+<span class="fc" id="L170">        headers.add(&quot;m_type&quot;);</span>
+<span class="fc" id="L171">        headers.add(&quot;line_number&quot;);</span>
+<span class="fc" id="L172">        headers.add(&quot;result&quot;);</span>
+<span class="fc" id="L173">        return headers;</span>
+    }
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

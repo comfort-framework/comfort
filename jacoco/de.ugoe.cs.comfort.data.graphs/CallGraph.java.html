@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CallGraph.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">comfort</a> &gt; <a href="index.source.html" class="el_package">de.ugoe.cs.comfort.data.graphs</a> &gt; <span class="el_source">CallGraph.java</span></div><h1>CallGraph.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2017 University of Goettingen, Germany
+ * 
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.ugoe.cs.comfort.data.graphs;
+
+import com.google.common.base.MoreObjects;
+import com.google.common.graph.*;
+import de.ugoe.cs.comfort.Utils;
+import de.ugoe.cs.comfort.data.DataSet;
+import de.ugoe.cs.comfort.data.models.IUnit;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+
+/**
+ * @author Fabian Trautsch
+ */
+public class CallGraph extends DataSet implements MutableNetwork&lt;IUnit, CallEdge&gt;, IGraph {
+
+    private final MutableNetwork&lt;IUnit, CallEdge&gt; graph;
+
+<span class="fc" id="L41">    public CallGraph() {</span>
+<span class="fc" id="L42">        graph = NetworkBuilder.directed().allowsSelfLoops(true).allowsParallelEdges(true).build();</span>
+<span class="fc" id="L43">    }</span>
+
+    public CallGraph getCopyOfGraph() {
+<span class="fc" id="L46">        CallGraph clonedGraph = new CallGraph();</span>
+<span class="fc" id="L47">        edges().forEach(clonedGraph::addEdge);</span>
+<span class="fc" id="L48">        return clonedGraph;</span>
+    }
+
+    public Set&lt;IUnit&gt; getTestNodes() {
+<span class="fc" id="L52">        Set&lt;IUnit&gt; testNodes = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L53" title="All 2 branches covered.">        for(IUnit node: this.nodes()) {</span>
+<span class="fc bfc" id="L54" title="All 2 branches covered.">            if(Utils.isTestBasedOnFQN(node.getFQN())) {</span>
+<span class="fc" id="L55">                testNodes.add(node);</span>
+            }
+<span class="fc" id="L57">        }</span>
+<span class="fc" id="L58">        return testNodes;</span>
+    }
+
+    public Set&lt;IUnit&gt; getProductionNodes() {
+<span class="fc" id="L62">        Set&lt;IUnit&gt; productionNodes = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L63" title="All 2 branches covered.">        for(IUnit node: this.nodes()) {</span>
+<span class="fc bfc" id="L64" title="All 2 branches covered.">            if(!Utils.isTestBasedOnFQN(node.getFQNOfUnit())) {</span>
+<span class="fc" id="L65">                productionNodes.add(node);</span>
+            }
+<span class="fc" id="L67">        }</span>
+<span class="fc" id="L68">        return productionNodes;</span>
+    }
+
+    @Override
+    @ParametersAreNonnullByDefault
+    public boolean addNode(IUnit node) {
+<span class="nc" id="L74">        return graph.addNode(node);</span>
+    }
+
+    @Override
+    @ParametersAreNonnullByDefault
+    public boolean addEdge(IUnit nodeU, IUnit nodeV, CallEdge edge) {
+<span class="nc" id="L80">        return graph.addEdge(nodeU, nodeV, edge);</span>
+    }
+
+    public boolean addEdge(CallEdge edge) {
+<span class="fc" id="L84">        return graph.addEdge(edge.getCaller(), edge.getCallee(), edge);</span>
+    }
+
+    @Override
+    @ParametersAreNonnullByDefault
+    public boolean removeNode(IUnit node) {
+<span class="fc" id="L90">        return graph.removeNode(node);</span>
+    }
+
+    @Override
+    @ParametersAreNonnullByDefault
+    public boolean removeEdge(CallEdge edge) {
+<span class="fc" id="L96">        return graph.removeEdge(edge);</span>
+    }
+
+    @Override
+    public Set&lt;IUnit&gt; nodes() {
+<span class="fc" id="L101">        return graph.nodes();</span>
+    }
+
+    @Override
+    public Set&lt;CallEdge&gt; edges() {
+<span class="fc" id="L106">        return graph.edges();</span>
+    }
+
+    @Override
+    public Graph&lt;IUnit&gt; asGraph() {
+<span class="nc" id="L111">        return graph.asGraph();</span>
+    }
+
+    @Override
+    public boolean isDirected() {
+<span class="fc" id="L116">        return graph.isDirected();</span>
+    }
+
+    @Override
+    public boolean allowsParallelEdges() {
+<span class="nc" id="L121">        return graph.allowsParallelEdges();</span>
+    }
+
+    @Override
+    public boolean allowsSelfLoops() {
+<span class="nc" id="L126">        return graph.allowsSelfLoops();</span>
+    }
+
+    @Override
+    public ElementOrder&lt;IUnit&gt; nodeOrder() {
+<span class="nc" id="L131">        return graph.nodeOrder();</span>
+    }
+
+    @Override
+    public ElementOrder&lt;CallEdge&gt; edgeOrder() {
+<span class="nc" id="L136">        return graph.edgeOrder();</span>
+    }
+
+    @Override
+    @ParametersAreNonnullByDefault
+    public Set&lt;IUnit&gt; adjacentNodes(IUnit node) {
+<span class="fc" id="L142">        return graph.adjacentNodes(node);</span>
+    }
+
+    @Override
+    @ParametersAreNonnullByDefault
+    public Set&lt;IUnit&gt; predecessors(IUnit node) {
+<span class="nc" id="L148">        return graph.predecessors(node);</span>
+    }
+
+    @Override
+    @ParametersAreNonnullByDefault
+    public Set&lt;IUnit&gt; successors(IUnit node) {
+<span class="fc" id="L154">        return graph.successors(node);</span>
+    }
+
+    @Override
+    @ParametersAreNonnullByDefault
+    public Set&lt;CallEdge&gt; incidentEdges(IUnit node) {
+<span class="nc" id="L160">        return graph.incidentEdges(node);</span>
+    }
+
+    @Override
+    @ParametersAreNonnullByDefault
+    public Set&lt;CallEdge&gt; inEdges(IUnit node) {
+<span class="nc" id="L166">        return graph.inEdges(node);</span>
+    }
+
+    @Override
+    @ParametersAreNonnullByDefault
+    public Set&lt;CallEdge&gt; outEdges(IUnit node) {
+<span class="fc" id="L172">        return graph.outEdges(node);</span>
+    }
+
+    @Override
+    @ParametersAreNonnullByDefault
+    public int degree(IUnit node) {
+<span class="nc" id="L178">        return graph.degree(node);</span>
+    }
+
+    @Override
+    @ParametersAreNonnullByDefault
+    public int inDegree(IUnit node) {
+<span class="nc" id="L184">        return graph.inDegree(node);</span>
+    }
+
+    @Override
+    @ParametersAreNonnullByDefault
+    public int outDegree(IUnit node) {
+<span class="nc" id="L190">        return graph.outDegree(node);</span>
+    }
+
+    @Override
+    @ParametersAreNonnullByDefault
+    public EndpointPair&lt;IUnit&gt; incidentNodes(CallEdge edge) {
+<span class="nc" id="L196">        return graph.incidentNodes(edge);</span>
+    }
+
+    @Override
+    @ParametersAreNonnullByDefault
+    public Set&lt;CallEdge&gt; adjacentEdges(CallEdge edge) {
+<span class="nc" id="L202">        return graph.adjacentEdges(edge);</span>
+    }
+
+    @Override
+    @ParametersAreNonnullByDefault
+    public Set&lt;CallEdge&gt; edgesConnecting(IUnit nodeU, IUnit nodeV) {
+<span class="nc" id="L208">        return graph.edgesConnecting(nodeU, nodeV);</span>
+    }
+
+    @Override
+    @ParametersAreNonnullByDefault
+    public Optional&lt;CallEdge&gt; edgeConnecting(IUnit nodeU, IUnit nodeV) {
+<span class="nc" id="L214">        return graph.edgeConnecting(nodeU, nodeV);</span>
+    }
+
+    @Nullable
+    @Override
+    @ParametersAreNonnullByDefault
+    public CallEdge edgeConnectingOrNull(IUnit nodeU, IUnit nodeV) {
+<span class="nc" id="L221">        return graph.edgeConnectingOrNull(nodeU, nodeV);</span>
+    }
+
+    @Override
+    @ParametersAreNonnullByDefault
+    public boolean hasEdgeConnecting(IUnit nodeU, IUnit nodeV) {
+<span class="nc" id="L227">        return graph.hasEdgeConnecting(nodeU, nodeV);</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="nc" id="L232">        return new HashCodeBuilder(17, 31)</span>
+<span class="nc" id="L233">                .append(graph)</span>
+<span class="nc" id="L234">                .toHashCode();</span>
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+<span class="pc bpc" id="L239" title="1 of 2 branches missed.">        if(obj == this) {</span>
+<span class="nc" id="L240">            return true;</span>
+        }
+
+<span class="pc bpc" id="L243" title="1 of 2 branches missed.">        if (!(obj instanceof CallGraph)) {</span>
+<span class="nc" id="L244">            return false;</span>
+        }
+<span class="fc" id="L246">        CallGraph other = (CallGraph) obj;</span>
+
+<span class="pc bpc" id="L248" title="1 of 2 branches missed.">        return isDirected() == other.isDirected()</span>
+<span class="pc bpc" id="L249" title="1 of 2 branches missed.">                &amp;&amp; nodes().equals(other.nodes())</span>
+<span class="pc bpc" id="L250" title="1 of 2 branches missed.">                &amp;&amp; edges().equals(other.edges());</span>
+    }
+
+    public void cleanGraphOfNodesThatAreSingle() {
+<span class="fc" id="L254">        Set&lt;IUnit&gt; nodesToRemove = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L255">        this.nodes().forEach(node -&gt; {</span>
+<span class="fc bfc" id="L256" title="All 2 branches covered.">            if(this.adjacentNodes(node).size() == 0) {</span>
+<span class="fc" id="L257">                nodesToRemove.add(node);</span>
+            }
+<span class="fc" id="L259">        });</span>
+<span class="fc" id="L260">        nodesToRemove.forEach(this::removeNode);</span>
+<span class="fc" id="L261">    }</span>
+
+    public void printGraphToFileInDotFormat(Path outputPath) throws IOException{
+<span class="nc" id="L264">        List&lt;String&gt; lines = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L265">        lines.add(&quot;digraph callgraph {&quot;);</span>
+<span class="nc bnc" id="L266" title="All 2 branches missed.">        for(CallEdge edge: graph.edges()) {</span>
+<span class="nc" id="L267">            lines.add(&quot;\&quot;&quot; + edge.getCaller() + &quot;\&quot; -&gt; \&quot;&quot; + edge.getCallee() + &quot;\&quot; [ label = \&quot;&quot;</span>
+<span class="nc" id="L268">                    + edge.getOrderNumber() +&quot;\&quot; ];&quot;);</span>
+<span class="nc" id="L269">        }</span>
+<span class="nc" id="L270">        lines.add(&quot;}&quot;);</span>
+<span class="nc" id="L271">        Files.write(outputPath, lines);</span>
+<span class="nc" id="L272">    }</span>
+
+
+    public DependencyGraph getDependencyGraphRepresentation() {
+<span class="fc" id="L276">        DependencyGraph dependencyGraph = new DependencyGraph();</span>
+
+<span class="fc" id="L278">        this.edges().forEach(</span>
+                callEdge -&gt; {
+                    try {
+<span class="fc" id="L281">                        IUnit sourceNode = (IUnit) callEdge.getCaller().getClass().getSuperclass()</span>
+<span class="fc" id="L282">                                .getConstructor(String.class, Path.class).newInstance(</span>
+<span class="fc" id="L283">                                        callEdge.getCaller().getFQNOfUnit(), callEdge.getCaller().getFilePath());</span>
+<span class="fc" id="L284">                        IUnit targetNode = (IUnit) callEdge.getCallee().getClass().getSuperclass()</span>
+<span class="fc" id="L285">                                .getConstructor(String.class, Path.class).newInstance(</span>
+<span class="fc" id="L286">                                        callEdge.getCallee().getFQNOfUnit(), callEdge.getCallee().getFilePath());</span>
+<span class="fc" id="L287">                        dependencyGraph.putEdge(sourceNode, targetNode);</span>
+<span class="nc" id="L288">                    } catch (InstantiationException | IllegalAccessException | NoSuchMethodException</span>
+                        | InvocationTargetException e) {
+<span class="nc" id="L290">                        e.printStackTrace();</span>
+<span class="nc" id="L291">                        System.exit(1);</span>
+<span class="fc" id="L292">                    }</span>
+<span class="fc" id="L293">                }</span>
+        );
+
+<span class="fc" id="L296">        return dependencyGraph;</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="nc" id="L301">        return MoreObjects.toStringHelper(this)</span>
+<span class="nc" id="L302">                .add(&quot;Edges&quot;, edges())</span>
+<span class="nc" id="L303">                .add(&quot;Nodes&quot;, nodes())</span>
+<span class="nc" id="L304">                .toString();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

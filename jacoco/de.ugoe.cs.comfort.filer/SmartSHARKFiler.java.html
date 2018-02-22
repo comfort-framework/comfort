@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SmartSHARKFiler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">comfort</a> &gt; <a href="index.source.html" class="el_package">de.ugoe.cs.comfort.filer</a> &gt; <span class="el_source">SmartSHARKFiler.java</span></div><h1>SmartSHARKFiler.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2017 University of Goettingen, Germany
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.ugoe.cs.comfort.filer;
+
+import com.github.danielfelgar.morphia.Log4JLoggerImplFactory;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+import de.ugoe.cs.comfort.collection.metriccollector.mutation.MutationLocation;
+import de.ugoe.cs.comfort.configuration.Database;
+import de.ugoe.cs.comfort.configuration.FilerConfiguration;
+import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
+import de.ugoe.cs.comfort.filer.models.Mutation;
+import de.ugoe.cs.comfort.filer.models.Result;
+import de.ugoe.cs.smartshark.model.Commit;
+import de.ugoe.cs.smartshark.model.File;
+import de.ugoe.cs.smartshark.model.MutationResult;
+import de.ugoe.cs.smartshark.model.TestState;
+import de.ugoe.cs.smartshark.model.VCSSystem;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import org.bson.types.ObjectId;
+import org.eclipse.jgit.lib.Constants;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.lib.RepositoryBuilder;
+import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.Morphia;
+import org.mongodb.morphia.logging.MorphiaLoggerFactory;
+
+/**
+ * @author Fabian Trautsch
+ */
+public class SmartSHARKFiler extends BaseFiler {
+<span class="pc" id="L54">    private final Morphia morphia = new Morphia();</span>
+    private Datastore datastore;
+    private ObjectId commitId;
+<span class="pc" id="L57">    private Map&lt;Path, ObjectId&gt; files = new HashMap&lt;&gt;();</span>
+<span class="pc" id="L58">    private Map&lt;MutationLocation, ObjectId&gt; storedMutations = new HashMap&lt;&gt;();</span>
+<span class="pc" id="L59">    private Map&lt;MutationLocation, String&gt; mutationClassification = new HashMap&lt;&gt;();</span>
+
+    // For testing purpose
+    public SmartSHARKFiler(GeneralConfiguration generalConfiguration, FilerConfiguration filerConfiguration,
+                           ObjectId commitId, Map&lt;Path, ObjectId&gt; files) {
+<span class="fc" id="L64">        super(generalConfiguration, filerConfiguration);</span>
+
+        // Connect to database
+<span class="fc" id="L67">        datastore = connectToDatabase(filerConfiguration.getDatabase());</span>
+<span class="fc" id="L68">        this.commitId = commitId;</span>
+<span class="fc" id="L69">        this.files = files;</span>
+<span class="fc" id="L70">    }</span>
+
+    public SmartSHARKFiler(GeneralConfiguration generalConfiguration, FilerConfiguration filerConfiguration)
+            throws IOException {
+<span class="nc" id="L74">        super(generalConfiguration, filerConfiguration);</span>
+
+        // Connect to database
+<span class="nc" id="L77">        datastore = connectToDatabase(filerConfiguration.getDatabase());</span>
+
+<span class="nc" id="L79">        Repository repo = getRepository();</span>
+
+        // Get VCS System
+<span class="nc" id="L82">        String vcsSystemUrl = repo.getConfig().getString(&quot;remote&quot;, &quot;origin&quot;, &quot;url&quot;);</span>
+<span class="nc" id="L83">        List&lt;String&gt; possibleVCSSystemValues = new ArrayList&lt;String&gt;(){{</span>
+<span class="nc" id="L84">                add(vcsSystemUrl);</span>
+<span class="nc" id="L85">                add(vcsSystemUrl+&quot;/&quot;);</span>
+<span class="nc" id="L86">            }</span>
+        };
+
+<span class="nc" id="L89">        ObjectId vcsSystemId = datastore.createQuery(VCSSystem.class)</span>
+<span class="nc" id="L90">                .field(&quot;url&quot;).in(possibleVCSSystemValues).get().getId();</span>
+
+        // Get commit id via jgit
+<span class="nc" id="L93">        commitId = datastore.createQuery(Commit.class)</span>
+<span class="nc" id="L94">                .field(&quot;vcs_system_id&quot;).equal(vcsSystemId)</span>
+<span class="nc" id="L95">                .field(&quot;revision_hash&quot;).equal(repo.resolve(Constants.HEAD).getName())</span>
+<span class="nc" id="L96">                .get().getId();</span>
+
+        // Get all files for this vcs system in a map (Map&lt;String path, ObjectId oid&gt;)
+<span class="nc" id="L99">        datastore.createQuery(File.class)</span>
+<span class="nc" id="L100">                .field(&quot;vcs_system_id&quot;).equal(vcsSystemId)</span>
+<span class="nc" id="L101">                .asList().forEach(</span>
+<span class="nc" id="L102">                    file -&gt; files.put(Paths.get(file.getPath()), file.getId())</span>
+            );
+
+<span class="nc" id="L105">        datastore.createQuery(de.ugoe.cs.smartshark.model.Mutation.class)</span>
+<span class="nc" id="L106">                .asList().forEach(</span>
+                        mutation -&gt;  {
+<span class="nc" id="L108">                            MutationLocation ml = new MutationLocation(mutation.getMType(), mutation.getLocation(),</span>
+<span class="nc" id="L109">                                    mutation.getLineNumber());</span>
+<span class="nc" id="L110">                            storedMutations.put(ml, mutation.getId());</span>
+<span class="nc" id="L111">                            mutationClassification.put(ml, mutation.getClassification());</span>
+<span class="nc" id="L112">                        }</span>
+
+            );
+<span class="nc" id="L115">    }</span>
+
+
+    @Override
+    public synchronized void storeResults(Set&lt;Result&gt; results) {
+<span class="fc" id="L120">        resultSet.addResults(results);</span>
+
+<span class="fc" id="L122">        storeResultsInSmartSHARKDatabase();</span>
+<span class="fc" id="L123">    }</span>
+
+    @Override
+    public synchronized void storeResult(Result result) {
+<span class="pc bpc" id="L127" title="1 of 2 branches missed.">        if(result == null) {</span>
+<span class="nc" id="L128">            return;</span>
+        }
+        // Merge with other results
+<span class="fc" id="L131">        resultSet.addResult(result);</span>
+
+<span class="fc" id="L133">        storeResultsInSmartSHARKDatabase();</span>
+<span class="fc" id="L134">    }</span>
+
+    private void storeResultsInSmartSHARKDatabase() {
+        // Go through all results -&gt; create a test state and store it
+<span class="fc bfc" id="L138" title="All 2 branches covered.">        for(Result result: resultSet.getResults()) {</span>
+<span class="fc" id="L139">            ObjectId fileId = files.get(result.getPathToFile());</span>
+
+            // Create mutation results
+<span class="fc" id="L142">            Set&lt;MutationResult&gt; mutationResults = createMutationResults(result);</span>
+
+<span class="fc" id="L144">            TestState testState = new TestState(result.getId(), result.getMetrics(), fileId, commitId, mutationResults);</span>
+<span class="fc" id="L145">            storeTestState(testState);</span>
+<span class="fc" id="L146">        }</span>
+
+<span class="fc" id="L148">    }</span>
+
+    public Set&lt;String&gt; getTestStateWithMutationResults() {
+<span class="nc" id="L151">        Set&lt;String&gt; testStatesWithMutationResults = new HashSet&lt;&gt;();</span>
+
+<span class="nc" id="L153">        datastore.createQuery(TestState.class)</span>
+<span class="nc" id="L154">                .field(&quot;commit_id&quot;).equal(commitId)</span>
+<span class="nc" id="L155">                .field(&quot;mutation_res&quot;).exists()</span>
+<span class="nc" id="L156">                .field(&quot;mutation_res&quot;).notEqual(null)</span>
+<span class="nc" id="L157">                .project(&quot;name&quot;, true)</span>
+<span class="nc" id="L158">                .forEach(</span>
+                        testState -&gt;  {
+<span class="nc" id="L160">                            testStatesWithMutationResults.add(testState.getName());</span>
+<span class="nc" id="L161">                        }</span>
+            );
+
+
+<span class="nc" id="L165">        return testStatesWithMutationResults;</span>
+    }
+
+    private Set&lt;MutationResult&gt; createMutationResults(Result result) {
+<span class="fc" id="L169">        Set&lt;MutationResult&gt; mutationResults = new HashSet&lt;&gt;();</span>
+
+<span class="fc bfc" id="L171" title="All 2 branches covered.">        for(Mutation mutation: result.getMutationResults()) {</span>
+<span class="fc" id="L172">            ObjectId mutationId = getOrCreateMutation(mutation);</span>
+<span class="fc" id="L173">            mutationResults.add(new MutationResult(mutationId, mutation.getResult()));</span>
+<span class="fc" id="L174">        }</span>
+<span class="fc" id="L175">        return mutationResults;</span>
+    }
+
+    private ObjectId getOrCreateMutation(Mutation mutation) {
+<span class="fc" id="L179">        MutationLocation mutationLocation = new MutationLocation(mutation.getMType(),</span>
+<span class="fc" id="L180">                mutation.getLocation(), mutation.getLineNumber());</span>
+<span class="fc" id="L181">        ObjectId mutationId = storedMutations.getOrDefault(mutationLocation, null);</span>
+
+<span class="fc bfc" id="L183" title="All 2 branches covered.">        if(mutationId == null) {</span>
+<span class="fc" id="L184">            de.ugoe.cs.smartshark.model.Mutation dbMutation = new de.ugoe.cs.smartshark.model.Mutation(</span>
+<span class="fc" id="L185">                    mutation.getLocation(), mutation.getMType(), mutation.getLineNumber(), mutation.getClassification()</span>
+            );
+<span class="fc" id="L187">            datastore.save(dbMutation);</span>
+<span class="fc" id="L188">            storedMutations.put(mutationLocation, dbMutation.getId());</span>
+<span class="fc" id="L189">            mutationId = dbMutation.getId();</span>
+        }
+
+<span class="fc" id="L192">        return mutationId;</span>
+    }
+
+    private void storeTestState(TestState testState) {
+<span class="fc" id="L196">        TestState dbTestState = datastore.createQuery(TestState.class)</span>
+<span class="fc" id="L197">                .field(&quot;name&quot;).equal(testState.getName())</span>
+<span class="fc" id="L198">                .field(&quot;commit_id&quot;).equal(testState.getCommitId())</span>
+<span class="fc" id="L199">                .get();</span>
+
+<span class="fc bfc" id="L201" title="All 2 branches covered.">        if(dbTestState == null) {</span>
+<span class="fc" id="L202">            dbTestState = new TestState();</span>
+<span class="fc" id="L203">            dbTestState.setName(testState.getName());</span>
+<span class="fc" id="L204">            dbTestState.setCommitId(testState.getCommitId());</span>
+<span class="fc" id="L205">            dbTestState.setFileId(testState.getFileId());</span>
+        }
+
+<span class="fc" id="L208">        dbTestState.getMetrics().putAll(testState.getMetrics());</span>
+
+<span class="fc bfc" id="L210" title="All 2 branches covered.">        if(testState.getMutationResults().size() != 0) {</span>
+<span class="fc" id="L211">            dbTestState.getMutationResults().addAll(testState.getMutationResults());</span>
+        }
+
+<span class="fc" id="L214">        datastore.save(dbTestState);</span>
+<span class="fc" id="L215">    }</span>
+
+    private Repository getRepository() throws IOException {
+<span class="nc" id="L218">        return new RepositoryBuilder()</span>
+<span class="nc" id="L219">                .readEnvironment()</span>
+<span class="nc" id="L220">                .findGitDir(generalConf.getProjectDir().toFile())</span>
+<span class="nc" id="L221">                .build();</span>
+    }
+
+    private Datastore connectToDatabase(Database databaseConfiguration) {
+        // Set up log4j logging
+<span class="fc" id="L226">        MorphiaLoggerFactory.reset();</span>
+<span class="fc" id="L227">        MorphiaLoggerFactory.registerLogger(Log4JLoggerImplFactory.class);</span>
+
+        // Map models
+<span class="fc" id="L230">        morphia.mapPackage(&quot;de.ugoe.cs.smartshark.model&quot;);</span>
+<span class="fc" id="L231">        morphia.mapPackage(&quot;de.ugoe.cs.comfort.database.models&quot;);</span>
+
+<span class="fc" id="L233">        logger.debug(&quot;Connecting to database...&quot;);</span>
+        // Create database connection
+<span class="fc" id="L235">        MongoClientURI uri = new MongoClientURI(de.ugoe.cs.smartshark.Utils.createMongoDBURI(</span>
+<span class="fc" id="L236">                databaseConfiguration.getUsername(),</span>
+<span class="fc" id="L237">                databaseConfiguration.getPassword(),</span>
+<span class="fc" id="L238">                databaseConfiguration.getHostname(),</span>
+<span class="fc" id="L239">                String.valueOf(databaseConfiguration.getPort()),</span>
+<span class="fc" id="L240">                databaseConfiguration.getAuthenticationDatabase(),</span>
+<span class="fc" id="L241">                databaseConfiguration.getSSL()));</span>
+<span class="fc" id="L242">        MongoClient mongoClient = new MongoClient(uri);</span>
+<span class="fc" id="L243">        final Datastore datastore = morphia.createDatastore(mongoClient, databaseConfiguration.getDatabase());</span>
+<span class="fc" id="L244">        datastore.ensureIndexes();</span>
+
+<span class="fc" id="L246">        return datastore;</span>
+    }
+
+    public Map&lt;MutationLocation, String&gt; getMutationsAndClassification() {
+<span class="nc" id="L250">        return mutationClassification;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>
