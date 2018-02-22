@@ -41,7 +41,9 @@ script:
   - ./gradlew check
   - ./gradlew jacocoTestReport
 
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
+after_script:
   - ./gradlew javadoc
   - ./.utility/push_javadoc_to_gh_pages.sh
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
