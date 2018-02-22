@@ -21,7 +21,6 @@ import de.ugoe.cs.comfort.collection.metriccollector.mutation.MutationExecutionR
 import de.ugoe.cs.comfort.collection.metriccollector.mutation.MutationLocation;
 import de.ugoe.cs.comfort.exception.MutationResultException;
 import de.ugoe.cs.comfort.filer.models.Mutation;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -65,10 +64,16 @@ public class PITExecutor implements IMutationExecutor {
         this.javaFiles = javaFiles;
     }
 
-    @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     private void createNewPom(Path projectRoot, String className, String methodName) throws IOException {
-        Path template = Paths.get(projectRoot.toString(), "pom_template.xml");
-        pitReportFolder = Files.createTempDirectory(projectRoot.getParent(), "comfort-");
+        Path template;
+        Path parent = projectRoot.getParent();
+        if(parent != null) {
+            template = Paths.get(projectRoot.toString(), "pom_template.xml");
+            pitReportFolder = Files.createTempDirectory(parent, "comfort-");
+        } else {
+            throw new IOException("Could not create pit reports folder");
+        }
+
 
         // Read template
         String content = new String(Files.readAllBytes(template), StandardCharsets.UTF_8);
