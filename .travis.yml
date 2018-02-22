@@ -40,10 +40,9 @@ before_script:
 script:
   - ./gradlew check
   - ./gradlew jacocoTestReport
-
-after_script:
-  - ./gradlew javadoc
-  - ./.utility/push_javadoc_to_gh_pages.sh
+  - cat $TRAVIS_BUILD_DIR/build/reports/findbugs/main.html
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+  - ./gradlew javadoc
+  - ./.utility/push_javadoc_to_gh_pages.sh
