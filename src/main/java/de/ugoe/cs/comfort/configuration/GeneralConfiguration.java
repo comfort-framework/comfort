@@ -25,16 +25,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 
 /**
  * @author Fabian Trautsch
  */
 public class GeneralConfiguration {
-    private static final Logger LOGGER = LogManager.getLogger(GeneralConfiguration.class.getName());
-
     private Path projectDir;
     private String projectName = "default";
     private String language = "java";
@@ -135,11 +131,9 @@ public class GeneralConfiguration {
 
     public BaseFiler getFiler() throws ClassNotFoundException, IllegalAccessException,
             InstantiationException, NoSuchMethodException, InvocationTargetException {
-        BaseFiler filer = (BaseFiler) Class.forName("de.ugoe.cs.comfort.filer." + this.filerConfiguration.getName())
+        return (BaseFiler) Class.forName("de.ugoe.cs.comfort.filer." + this.filerConfiguration.getName())
                 .getConstructor(GeneralConfiguration.class, FilerConfiguration.class)
                 .newInstance(this, filerConfiguration);
-        LOGGER.info("Using filer {}...", filer.getClass().getCanonicalName());
-        return filer;
     }
 
     public String toString() {

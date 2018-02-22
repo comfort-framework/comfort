@@ -19,6 +19,7 @@ package de.ugoe.cs.comfort.filer;
 import com.github.danielfelgar.morphia.Log4JLoggerImplFactory;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
+import de.ugoe.cs.comfort.collection.metriccollector.mutation.MutationLocation;
 import de.ugoe.cs.comfort.configuration.Database;
 import de.ugoe.cs.comfort.configuration.FilerConfiguration;
 import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
@@ -54,6 +55,8 @@ public class SmartSHARKFiler extends BaseFiler {
     private Datastore datastore;
     private ObjectId commitId;
     private Map<Path, ObjectId> files = new HashMap<>();
+    private Map<MutationLocation, ObjectId> storedMutations = new HashMap<>();
+    private Map<MutationLocation, String> mutationClassification = new HashMap<>();
 
     // For testing purpose
     public SmartSHARKFiler(GeneralConfiguration generalConfiguration, FilerConfiguration filerConfiguration,
@@ -98,25 +101,39 @@ public class SmartSHARKFiler extends BaseFiler {
                 .asList().forEach(
                     file -> files.put(Paths.get(file.getPath()), file.getId())
             );
+
+        datastore.createQuery(de.ugoe.cs.smartshark.model.Mutation.class)
+                .asList().forEach(
+                        mutation ->  {
+                            MutationLocation ml = new MutationLocation(mutation.getMType(), mutation.getLocation(),
+                                    mutation.getLineNumber());
+                            storedMutations.put(ml, mutation.getId());
+                            mutationClassification.put(ml, mutation.getClassification());
+                        }
+
+            );
     }
 
 
     @Override
-    public void storeResults(Set<Result> results) {
+    public synchronized void storeResults(Set<Result> results) {
         resultSet.addResults(results);
 
         storeResultsInSmartSHARKDatabase();
     }
 
     @Override
-    public void storeResult(Result result) {
+    public synchronized void storeResult(Result result) {
+        if(result == null) {
+            return;
+        }
         // Merge with other results
         resultSet.addResult(result);
 
         storeResultsInSmartSHARKDatabase();
     }
 
-    public void storeResultsInSmartSHARKDatabase() {
+    private void storeResultsInSmartSHARKDatabase() {
         // Go through all results -> create a test state and store it
         for(Result result: resultSet.getResults()) {
             ObjectId fileId = files.get(result.getPathToFile());
@@ -139,7 +156,9 @@ public class SmartSHARKFiler extends BaseFiler {
                 .field("mutation_res").notEqual(null)
                 .project("name", true)
                 .forEach(
-                        testState -> testStatesWithMutationResults.add(testState.getName())
+                        testState ->  {
+                            testStatesWithMutationResults.add(testState.getName());
+                        }
             );
 
 
@@ -148,30 +167,29 @@ public class SmartSHARKFiler extends BaseFiler {
 
     private Set<MutationResult> createMutationResults(Result result) {
         Set<MutationResult> mutationResults = new HashSet<>();
+
         for(Mutation mutation: result.getMutationResults()) {
             ObjectId mutationId = getOrCreateMutation(mutation);
             mutationResults.add(new MutationResult(mutationId, mutation.getResult()));
         }
-
         return mutationResults;
     }
 
     private ObjectId getOrCreateMutation(Mutation mutation) {
-        de.ugoe.cs.smartshark.model.Mutation dbMutation;
-        dbMutation = datastore.createQuery(de.ugoe.cs.smartshark.model.Mutation.class)
-                .field("location").equal(mutation.getLocation())
-                .field("m_type").equal(mutation.getMType())
-                .field("l_num").equal(mutation.getLineNumber())
-                .get();
+        MutationLocation mutationLocation = new MutationLocation(mutation.getMType(),
+                mutation.getLocation(), mutation.getLineNumber());
+        ObjectId mutationId = storedMutations.getOrDefault(mutationLocation, null);
 
-        if (dbMutation == null) {
-            dbMutation = new de.ugoe.cs.smartshark.model.Mutation(
+        if(mutationId == null) {
+            de.ugoe.cs.smartshark.model.Mutation dbMutation = new de.ugoe.cs.smartshark.model.Mutation(
                     mutation.getLocation(), mutation.getMType(), mutation.getLineNumber(), mutation.getClassification()
             );
             datastore.save(dbMutation);
+            storedMutations.put(mutationLocation, dbMutation.getId());
+            mutationId = dbMutation.getId();
         }
 
-        return dbMutation.getId();
+        return mutationId;
     }
 
     private void storeTestState(TestState testState) {
@@ -193,7 +211,6 @@ public class SmartSHARKFiler extends BaseFiler {
             dbTestState.getMutationResults().addAll(testState.getMutationResults());
         }
 
-        logger.info("Storing test state: {}", dbTestState);
         datastore.save(dbTestState);
     }
 
@@ -229,4 +246,7 @@ public class SmartSHARKFiler extends BaseFiler {
         return datastore;
     }
 
+    public Map<MutationLocation, String> getMutationsAndClassification() {
+        return mutationClassification;
+    }
 }

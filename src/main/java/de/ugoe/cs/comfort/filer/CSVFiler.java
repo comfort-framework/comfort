@@ -23,7 +23,6 @@ import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
 import de.ugoe.cs.comfort.filer.models.Mutation;
 import de.ugoe.cs.comfort.filer.models.Result;
 import de.ugoe.cs.comfort.filer.models.ResultSet;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -45,7 +44,7 @@ public class CSVFiler extends BaseFiler {
     }
 
     @Override
-    public void storeResults(Set<Result> results) throws IOException {
+    public synchronized void storeResults(Set<Result> results) throws IOException {
         resultSet.addResults(results);
 
         // Store as CSV
@@ -53,7 +52,7 @@ public class CSVFiler extends BaseFiler {
     }
 
     @Override
-    public void storeResult(Result result) throws IOException {
+    public synchronized void storeResult(Result result) throws IOException {
         // Merge with result with the same id -> add to result set
         resultSet.addResults(new HashSet<Result>(){
             {

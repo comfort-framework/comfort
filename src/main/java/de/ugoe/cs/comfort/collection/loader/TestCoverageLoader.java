@@ -29,10 +29,21 @@ import de.ugoe.cs.comfort.collection.loader.testcoverage.JacocoReportReader;
 import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
 import de.ugoe.cs.comfort.configuration.LoaderConfiguration;
 import de.ugoe.cs.comfort.data.CoverageData;
-import de.ugoe.cs.comfort.data.models.*;
+import de.ugoe.cs.comfort.data.models.IUnit;
+import de.ugoe.cs.comfort.data.models.JavaMethod;
+import de.ugoe.cs.comfort.data.models.PythonCoverageLoaderTestMethod;
+import de.ugoe.cs.comfort.data.models.PythonCoveragerloaderTestedMethod;
+import de.ugoe.cs.comfort.data.models.PythonMethod;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.apache.bcel.generic.Type;
 import org.jacoco.core.analysis.CoverageBuilder;
 import org.jacoco.core.analysis.IClassCoverage;
@@ -103,38 +114,61 @@ public class TestCoverageLoader extends BaseLoader {
         // Create coverage data
         CoverageData covData = new CoverageData();
 
+        final ExecutorService executor = Executors.newFixedThreadPool(generalConf.getNThreads());
+        CountDownLatch latch = new CountDownLatch(visitor.getSessions().entrySet().size());
+
         // Go through each session and parse the data. Only include sessions that have a name
         for(Map.Entry<String, ExecutionDataStore> entry: visitor.getSessions().entrySet()) {
-            String sessionId = entry.getKey();
+            executor.submit(() -> {
+                try {
+                    String sessionId = entry.getKey();
 
-            // If it does not have a session id, we do not know which test was executed
-            if(!sessionId.isEmpty() && sessionId.contains("%%")) {
-                logger.info("Analyzing Session {}...", entry.getKey());
+                    // If it does not have a session id, we do not know which test was executed
+                    if(!sessionId.isEmpty() && sessionId.contains("%%")) {
+                        logger.info("Analyzing Session {}...", entry.getKey());
 
-                // Create test class & method
-                String fqnOfTest = sessionId.split("%%")[0];
-                String methodName = sessionId.split("%%")[1];
-                logger.debug("Created the following TestMethod: {}", fqnOfTest+"."+methodName);
+                        // Create test class & method
+                        String fqnOfTest = sessionId.split("%%")[0];
+                        String methodName = sessionId.split("%%")[1];
+                        logger.debug("Created the following TestMethod: {}", fqnOfTest+"."+methodName);
 
 
-                // Read the execution data
-                ExecutionDataStore data = entry.getValue();
+                        // Read the execution data
+                        ExecutionDataStore data = entry.getValue();
 
-                // Analyze the files, where all class files in the project dir are looked at
-                CoverageBuilder covfefe = reader.analyzeFiles(data, Utils.getAllFilesFromProjectForRegex(
-                        generalConf.getProjectDir(), ".*\\.class"));
+                        // Analyze the files, where all class files in the project dir are looked at
 
-                // Parse the class coverage data
-                Set<IUnit> testedMethods = parseClassCoverageDataForJavaTestMethod(fqnOfTest, covfefe);
-                IUnit testMethod = new JavaMethod(fqnOfTest, methodName, new ArrayList<>(),
-                        fileNameUtils.getPathForJavaClassFQN(fqnOfTest));
+                        CoverageBuilder covfefe = reader.analyzeFiles(data, Utils.getAllFilesFromProjectForRegex(
+                                generalConf.getProjectDir(), ".*\\.class"));
 
-                covData.add(testMethod, testedMethods);
-                if(testedMethods.size() == 0) {
-                    logger.warn("Could not find tested methods!");
+                        // Parse the class coverage data
+                        Set<IUnit> testedMethods = parseClassCoverageDataForJavaTestMethod(fqnOfTest, covfefe);
+                        IUnit testMethod = new JavaMethod(fqnOfTest, methodName, new ArrayList<>(),
+                                fileNameUtils.getPathForJavaClassFQN(fqnOfTest));
+
+                        covData.add(testMethod, testedMethods);
+                        if(testedMethods.size() == 0) {
+                            logger.warn("Could not find tested methods!");
+                        }
+
+
+                    }
+                } catch (IOException e) {
+                    logger.catching(e);
+                } finally {
+                    latch.countDown();
                 }
 
-            }
+            });
+        }
+
+
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            logger.catching(e);
+        } finally {
+            executor.shutdown();
         }
         return covData;
     }

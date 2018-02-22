@@ -16,6 +16,10 @@
 
 package de.ugoe.cs.comfort.collection.loader;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import de.ugoe.cs.comfort.BaseTest;
 import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
 import de.ugoe.cs.comfort.configuration.LoaderConfiguration;
@@ -23,14 +27,15 @@ import de.ugoe.cs.comfort.data.CoverageData;
 import de.ugoe.cs.comfort.data.models.IUnit;
 import de.ugoe.cs.comfort.data.models.JavaClass;
 import de.ugoe.cs.comfort.data.models.PythonMethod;
-import org.junit.Before;
-import org.junit.Test;
-
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.*;
-
-import static org.junit.Assert.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Fabian Trautsch
@@ -152,7 +157,17 @@ public class TestCoverageLoaderTest extends BaseTest {
     }
 
     @Test
-    public void testJavaCoverageLoader() {
+    public void testJavaCoverageLoaderSingleThread() {
+        testJavaCoverageLoader();
+    }
+
+    @Test
+    public void testJavaCoverageLoaderMultiThread() {
+        javaConfiguration.setNThreads(4);
+        testJavaCoverageLoader();
+    }
+
+    private void testJavaCoverageLoader() {
 
         // Expected data (CCallsSubClassMethodTest)
         Set<IUnit> testCallToSubClassMethodTestedMethods = new HashSet<>();

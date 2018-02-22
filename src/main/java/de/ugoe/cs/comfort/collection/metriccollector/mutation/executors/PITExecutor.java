@@ -21,6 +21,7 @@ import de.ugoe.cs.comfort.collection.metriccollector.mutation.MutationExecutionR
 import de.ugoe.cs.comfort.collection.metriccollector.mutation.MutationLocation;
 import de.ugoe.cs.comfort.exception.MutationResultException;
 import de.ugoe.cs.comfort.filer.models.Mutation;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -54,13 +55,20 @@ import org.apache.maven.shared.invoker.MavenInvocationException;
  */
 public class PITExecutor implements IMutationExecutor {
     private final static Logger LOGGER = LogManager.getLogger(PITExecutor.class.getName());
+    private Set<Path> javaFiles;
 
     private Path pitReportFolder;
     private Path newPomFile;
 
+
+    public PITExecutor(Set<Path> javaFiles) {
+        this.javaFiles = javaFiles;
+    }
+
+    @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     private void createNewPom(Path projectRoot, String className, String methodName) throws IOException {
         Path template = Paths.get(projectRoot.toString(), "pom_template.xml");
-        pitReportFolder = Files.createTempDirectory(projectRoot, "comfort-");
+        pitReportFolder = Files.createTempDirectory(projectRoot.getParent(), "comfort-");
 
         // Read template
         String content = new String(Files.readAllBytes(template), StandardCharsets.UTF_8);
@@ -79,7 +87,7 @@ public class PITExecutor implements IMutationExecutor {
     }
 
     public void cleanup() {
-        if(Files.exists(pitReportFolder)) {
+        if (Files.exists(pitReportFolder)) {
             try {
                 FileUtils.deleteDirectory(pitReportFolder.toFile());
             } catch (IOException e) {
@@ -174,12 +182,13 @@ public class PITExecutor implements IMutationExecutor {
             try {
                 if(changeClassification == null) {
                     changeClassification = MutationChangeClassifier.getChangeClassification(
-                            projectRoot, cols[0], mutationOperator, lineNumber
+                            findFileBasedOnName(cols[0]), mutationOperator, lineNumber
                     );
                     generatedMutationsAndItsClassification.put(mutationLocation, changeClassification);
                 }
                 LOGGER.debug("Got the following change classification {}", changeClassification);
             } catch (MutationResultException e) {
+                changeClassification = "OTHER";
                 LOGGER.catching(e);
             }
 
@@ -187,6 +196,17 @@ public class PITExecutor implements IMutationExecutor {
         }
         br.close();
         return mutationResults;
+    }
+
+
+    private Path findFileBasedOnName(String name) throws MutationResultException {
+        for(Path javaFile : javaFiles) {
+            if(javaFile.toString().endsWith("/"+name)) {
+                return javaFile;
+            }
+        }
+
+        throw new MutationResultException("File "+name+" not found!");
     }
 
     private static class PITExecutionOutputParser implements InvocationOutputHandler {

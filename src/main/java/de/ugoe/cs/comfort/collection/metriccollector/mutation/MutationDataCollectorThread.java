@@ -24,6 +24,7 @@ import de.ugoe.cs.comfort.data.models.IUnit;
 import de.ugoe.cs.comfort.filer.models.Mutation;
 import de.ugoe.cs.comfort.filer.models.Result;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -40,15 +41,19 @@ public class MutationDataCollectorThread implements Callable<Result> {
     private final Logger logger = LogManager.getLogger(this.getClass().getName());
     private final String threadName = Thread.currentThread().getName();
 
+
     private Map<MutationLocation, String> generatedMutationsAndItsClassification;
+    private Set<Path> javaFiles;
 
     public MutationDataCollectorThread(IUnit unit, GeneralConfiguration generalConfiguration,
                                        FileNameUtils fileNameUtils,
-                                       Map<MutationLocation, String> generatedMutationsAndItsClassification) {
+                                       Map<MutationLocation, String> generatedMutationsAndItsClassification,
+                                       Set<Path> javaFiles) {
         this.unit = unit;
         this.generalConf = generalConfiguration;
         this.fileNameUtils = fileNameUtils;
         this.generatedMutationsAndItsClassification = generatedMutationsAndItsClassification;
+        this.javaFiles = javaFiles;
     }
 
     @Override
@@ -59,7 +64,7 @@ public class MutationDataCollectorThread implements Callable<Result> {
         logger.info("{} - Getting mutation data for {}.{}", threadName, className, methodName);
 
         // Choose correct mutation executor
-        IMutationExecutor mutationExecutor = new PITExecutor();
+        IMutationExecutor mutationExecutor = new PITExecutor(javaFiles);
 
         try {
             Result result = new Result(unit.getFQN(),
@@ -83,17 +88,16 @@ public class MutationDataCollectorThread implements Callable<Result> {
             result.addMetric("mut_killMut", String.valueOf(mutationExecutionResult.getKilledMutations()));
             result.addMetric("mut_scoreMut", String.valueOf(mutationExecutionResult.getMutationScore()));
 
-            mutationExecutor.cleanup();
             return result;
         } catch (IOException e) {
-            mutationExecutor.cleanup();
 
             // If not successful, print error but it is not necessary to cancel here
             logger.warn("Error \"{}\" for executing mutation testing for test {}", e.getMessage(),
                     unit.getFQN());
+            return null;
+        } finally {
+            mutationExecutor.cleanup();
         }
-        return null;
-
     }
 
 

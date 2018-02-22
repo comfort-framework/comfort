@@ -42,8 +42,7 @@ public class MutationChangeClassifierTest extends BaseTest {
         try {
             for(int i=DC_START; i<=DC_END; i++) {
                 String classification = MutationChangeClassifier.getChangeClassification(
-                        Paths.get(getPathToResource("mutationChangeClassifierData")),
-                        "DataChanges.java",
+                        Paths.get(getPathToResource("mutationChangeClassifierData/DataChanges.java")),
                         "org.pitest.mutationtest.engine.gregor.mutators.ConditionalsBoundaryMutator",
                         i
                 );
@@ -63,8 +62,7 @@ public class MutationChangeClassifierTest extends BaseTest {
         try {
             for(int i=LC_START; i<=LC_END; i++) {
                 String classification = MutationChangeClassifier.getChangeClassification(
-                        Paths.get(getPathToResource("mutationChangeClassifierData")),
-                        "LogicControlChanges.java",
+                        Paths.get(getPathToResource("mutationChangeClassifierData/LogicControlChanges.java")),
                         "org.pitest.mutationtest.engine.gregor.mutators.ConditionalsBoundaryMutator",
                         i
                 );
@@ -84,8 +82,7 @@ public class MutationChangeClassifierTest extends BaseTest {
         try {
             for(int i=CC_START; i<=CC_END; i++) {
                 String classification = MutationChangeClassifier.getChangeClassification(
-                        Paths.get(getPathToResource("mutationChangeClassifierData")),
-                        "ComputationChanges.java",
+                        Paths.get(getPathToResource("mutationChangeClassifierData/ComputationChanges.java")),
                         "org.pitest.mutationtest.engine.gregor.mutators.ConditionalsBoundaryMutator",
                         i
                 );
@@ -152,13 +149,11 @@ public class MutationChangeClassifierTest extends BaseTest {
     public void checkTwoLinesIfTest() {
         try {
             String classification1 = MutationChangeClassifier.getChangeClassification(
-                    Paths.get(getPathToResource("mutationChangeClassifierData")),
-                    "SpecialCases.java",
+                    Paths.get(getPathToResource("mutationChangeClassifierData/SpecialCases.java")),
                     "org.pitest.mutationtest.engine.gregor.mutators.NegateConditionalsMutator",
                     3);
             String classification2 = MutationChangeClassifier.getChangeClassification(
-                    Paths.get(getPathToResource("mutationChangeClassifierData")),
-                    "SpecialCases.java",
+                    Paths.get(getPathToResource("mutationChangeClassifierData/SpecialCases.java")),
                     "org.pitest.mutationtest.engine.gregor.mutators.NegateConditionalsMutator",
                     4);
             assertEquals("Classification not correct", "LOGIC/CONTROL", classification1);

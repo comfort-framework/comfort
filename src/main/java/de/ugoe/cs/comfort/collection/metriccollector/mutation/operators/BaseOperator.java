@@ -53,7 +53,7 @@ public abstract class BaseOperator {
 
         // Get line that should be changed
         line = lines.get(normalizedLineNumber);
-        logger.info("Reading Line: "+line);
+        logger.debug("Reading Line: "+line);
     }
 
     void storeChangedLine(String newLine) throws IOException {

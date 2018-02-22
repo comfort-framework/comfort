@@ -17,7 +17,6 @@
 package de.ugoe.cs.comfort.collection.metriccollector.mutation;
 
 import de.ugoe.cs.BugFixClassifier;
-import de.ugoe.cs.comfort.Utils;
 import de.ugoe.cs.comfort.collection.metriccollector.mutation.operators.BaseOperator;
 import de.ugoe.cs.comfort.collection.metriccollector.mutation.operators.ConditionalsBoundaryOperator;
 import de.ugoe.cs.comfort.collection.metriccollector.mutation.operators.IncrementsOperator;
@@ -36,7 +35,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
@@ -50,17 +48,7 @@ public class MutationChangeClassifier {
     private static Logger logger = LogManager.getLogger("MutationChangeClassifier");
     private static Pattern dataChangePattern = Pattern.compile("\\w+\\s\\w+\\s*=\\s*.+");
 
-    private static Path findFileBasedOnName(Path projectDir, String name) throws IOException {
-        Set<Path> foundFiles = Utils.getAllFilesFromProjectForRegex(projectDir, name + "$");
-        if(foundFiles.size() > 1) {
-            throw new IOException("More than one file with name "+name+" found in project directory!");
-        } else {
-            return foundFiles.iterator().next();
-        }
-    }
-
-    public static String getChangeClassification(Path projectDir, String fileName,
-                                                 String mutationOperator, int lineNumber)
+    public static String getChangeClassification(Path file, String mutationOperator, int lineNumber)
             throws MutationResultException {
         try {
 
@@ -134,9 +122,6 @@ public class MutationChangeClassifier {
                 return null;
             }
 
-            // Get  filename
-            Path file = findFileBasedOnName(projectDir, fileName);
-
             // Copy files
             Path changedFile = File.createTempFile("comfort-", "-suffix").toPath();
             FileUtils.copyFile(file.toFile(), changedFile.toFile());
@@ -151,9 +136,9 @@ public class MutationChangeClassifier {
                 results = BugFixClassifier.getBugClassifications(file, changedFile);
             } catch (MutationOperatorNotFittingException e) {
                 logger.debug("Got error: {}. Falling back to backup method...", e.getMessage());
+            } finally {
+                Files.delete(changedFile);
             }
-
-            Files.delete(changedFile);
 
             //Backup method if classificaton was not successful
             if(results.size() == 0) {
