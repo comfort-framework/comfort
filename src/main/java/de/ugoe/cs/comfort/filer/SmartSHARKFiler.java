@@ -119,32 +119,30 @@ public class SmartSHARKFiler extends BaseFiler {
     public synchronized void storeResults(Set<Result> results) {
         resultSet.addResults(results);
 
-        storeResultsInSmartSHARKDatabase();
+        // Go through all results -> create a test state and store it
+        for(Result result: resultSet.getResults()) {
+            storeResult(result);
+        }
     }
 
+    /**
+     * Stores the result in the database. The result is NOT merged
+     * with earlier results!
+     * @param result result of the metriccollector execution
+     */
     @Override
     public synchronized void storeResult(Result result) {
         if(result == null) {
             return;
         }
-        // Merge with other results
-        resultSet.addResult(result);
 
-        storeResultsInSmartSHARKDatabase();
-    }
+        ObjectId fileId = files.get(result.getPathToFile());
 
-    private void storeResultsInSmartSHARKDatabase() {
-        // Go through all results -> create a test state and store it
-        for(Result result: resultSet.getResults()) {
-            ObjectId fileId = files.get(result.getPathToFile());
+        // Create mutation results
+        Set<MutationResult> mutationResults = createMutationResults(result);
 
-            // Create mutation results
-            Set<MutationResult> mutationResults = createMutationResults(result);
-
-            TestState testState = new TestState(result.getId(), result.getMetrics(), fileId, commitId, mutationResults);
-            storeTestState(testState);
-        }
-
+        TestState testState = new TestState(result.getId(), result.getMetrics(), fileId, commitId, mutationResults);
+        storeTestState(testState);
     }
 
     public Set<String> getTestStateWithMutationResults() {
