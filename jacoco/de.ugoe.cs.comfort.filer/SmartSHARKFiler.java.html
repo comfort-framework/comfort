@@ -119,135 +119,133 @@ public class SmartSHARKFiler extends BaseFiler {
     public synchronized void storeResults(Set&lt;Result&gt; results) {
 <span class="fc" id="L120">        resultSet.addResults(results);</span>
 
-<span class="fc" id="L122">        storeResultsInSmartSHARKDatabase();</span>
-<span class="fc" id="L123">    }</span>
+        // Go through all results -&gt; create a test state and store it
+<span class="fc bfc" id="L123" title="All 2 branches covered.">        for(Result result: resultSet.getResults()) {</span>
+<span class="fc" id="L124">            storeResult(result);</span>
+<span class="fc" id="L125">        }</span>
+<span class="fc" id="L126">    }</span>
 
+    /**
+     * Stores the result in the database. The result is NOT merged
+     * with earlier results!
+     * @param result result of the metriccollector execution
+     */
     @Override
     public synchronized void storeResult(Result result) {
-<span class="pc bpc" id="L127" title="1 of 2 branches missed.">        if(result == null) {</span>
-<span class="nc" id="L128">            return;</span>
+<span class="pc bpc" id="L135" title="1 of 2 branches missed.">        if(result == null) {</span>
+<span class="nc" id="L136">            return;</span>
         }
-        // Merge with other results
-<span class="fc" id="L131">        resultSet.addResult(result);</span>
 
-<span class="fc" id="L133">        storeResultsInSmartSHARKDatabase();</span>
-<span class="fc" id="L134">    }</span>
+<span class="fc" id="L139">        ObjectId fileId = files.get(result.getPathToFile());</span>
 
-    private void storeResultsInSmartSHARKDatabase() {
-        // Go through all results -&gt; create a test state and store it
-<span class="fc bfc" id="L138" title="All 2 branches covered.">        for(Result result: resultSet.getResults()) {</span>
-<span class="fc" id="L139">            ObjectId fileId = files.get(result.getPathToFile());</span>
+        // Create mutation results
+<span class="fc" id="L142">        Set&lt;MutationResult&gt; mutationResults = createMutationResults(result);</span>
 
-            // Create mutation results
-<span class="fc" id="L142">            Set&lt;MutationResult&gt; mutationResults = createMutationResults(result);</span>
-
-<span class="fc" id="L144">            TestState testState = new TestState(result.getId(), result.getMetrics(), fileId, commitId, mutationResults);</span>
-<span class="fc" id="L145">            storeTestState(testState);</span>
-<span class="fc" id="L146">        }</span>
-
-<span class="fc" id="L148">    }</span>
+<span class="fc" id="L144">        TestState testState = new TestState(result.getId(), result.getMetrics(), fileId, commitId, mutationResults);</span>
+<span class="fc" id="L145">        storeTestState(testState);</span>
+<span class="fc" id="L146">    }</span>
 
     public Set&lt;String&gt; getTestStateWithMutationResults() {
-<span class="nc" id="L151">        Set&lt;String&gt; testStatesWithMutationResults = new HashSet&lt;&gt;();</span>
+<span class="nc" id="L149">        Set&lt;String&gt; testStatesWithMutationResults = new HashSet&lt;&gt;();</span>
 
-<span class="nc" id="L153">        datastore.createQuery(TestState.class)</span>
-<span class="nc" id="L154">                .field(&quot;commit_id&quot;).equal(commitId)</span>
-<span class="nc" id="L155">                .field(&quot;mutation_res&quot;).exists()</span>
-<span class="nc" id="L156">                .field(&quot;mutation_res&quot;).notEqual(null)</span>
-<span class="nc" id="L157">                .project(&quot;name&quot;, true)</span>
-<span class="nc" id="L158">                .forEach(</span>
+<span class="nc" id="L151">        datastore.createQuery(TestState.class)</span>
+<span class="nc" id="L152">                .field(&quot;commit_id&quot;).equal(commitId)</span>
+<span class="nc" id="L153">                .field(&quot;mutation_res&quot;).exists()</span>
+<span class="nc" id="L154">                .field(&quot;mutation_res&quot;).notEqual(null)</span>
+<span class="nc" id="L155">                .project(&quot;name&quot;, true)</span>
+<span class="nc" id="L156">                .forEach(</span>
                         testState -&gt;  {
-<span class="nc" id="L160">                            testStatesWithMutationResults.add(testState.getName());</span>
-<span class="nc" id="L161">                        }</span>
+<span class="nc" id="L158">                            testStatesWithMutationResults.add(testState.getName());</span>
+<span class="nc" id="L159">                        }</span>
             );
 
 
-<span class="nc" id="L165">        return testStatesWithMutationResults;</span>
+<span class="nc" id="L163">        return testStatesWithMutationResults;</span>
     }
 
     private Set&lt;MutationResult&gt; createMutationResults(Result result) {
-<span class="fc" id="L169">        Set&lt;MutationResult&gt; mutationResults = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L167">        Set&lt;MutationResult&gt; mutationResults = new HashSet&lt;&gt;();</span>
 
-<span class="fc bfc" id="L171" title="All 2 branches covered.">        for(Mutation mutation: result.getMutationResults()) {</span>
-<span class="fc" id="L172">            ObjectId mutationId = getOrCreateMutation(mutation);</span>
-<span class="fc" id="L173">            mutationResults.add(new MutationResult(mutationId, mutation.getResult()));</span>
-<span class="fc" id="L174">        }</span>
-<span class="fc" id="L175">        return mutationResults;</span>
+<span class="fc bfc" id="L169" title="All 2 branches covered.">        for(Mutation mutation: result.getMutationResults()) {</span>
+<span class="fc" id="L170">            ObjectId mutationId = getOrCreateMutation(mutation);</span>
+<span class="fc" id="L171">            mutationResults.add(new MutationResult(mutationId, mutation.getResult()));</span>
+<span class="fc" id="L172">        }</span>
+<span class="fc" id="L173">        return mutationResults;</span>
     }
 
     private ObjectId getOrCreateMutation(Mutation mutation) {
-<span class="fc" id="L179">        MutationLocation mutationLocation = new MutationLocation(mutation.getMType(),</span>
-<span class="fc" id="L180">                mutation.getLocation(), mutation.getLineNumber());</span>
-<span class="fc" id="L181">        ObjectId mutationId = storedMutations.getOrDefault(mutationLocation, null);</span>
+<span class="fc" id="L177">        MutationLocation mutationLocation = new MutationLocation(mutation.getMType(),</span>
+<span class="fc" id="L178">                mutation.getLocation(), mutation.getLineNumber());</span>
+<span class="fc" id="L179">        ObjectId mutationId = storedMutations.getOrDefault(mutationLocation, null);</span>
 
-<span class="fc bfc" id="L183" title="All 2 branches covered.">        if(mutationId == null) {</span>
-<span class="fc" id="L184">            de.ugoe.cs.smartshark.model.Mutation dbMutation = new de.ugoe.cs.smartshark.model.Mutation(</span>
-<span class="fc" id="L185">                    mutation.getLocation(), mutation.getMType(), mutation.getLineNumber(), mutation.getClassification()</span>
+<span class="fc bfc" id="L181" title="All 2 branches covered.">        if(mutationId == null) {</span>
+<span class="fc" id="L182">            de.ugoe.cs.smartshark.model.Mutation dbMutation = new de.ugoe.cs.smartshark.model.Mutation(</span>
+<span class="fc" id="L183">                    mutation.getLocation(), mutation.getMType(), mutation.getLineNumber(), mutation.getClassification()</span>
             );
-<span class="fc" id="L187">            datastore.save(dbMutation);</span>
-<span class="fc" id="L188">            storedMutations.put(mutationLocation, dbMutation.getId());</span>
-<span class="fc" id="L189">            mutationId = dbMutation.getId();</span>
+<span class="fc" id="L185">            datastore.save(dbMutation);</span>
+<span class="fc" id="L186">            storedMutations.put(mutationLocation, dbMutation.getId());</span>
+<span class="fc" id="L187">            mutationId = dbMutation.getId();</span>
         }
 
-<span class="fc" id="L192">        return mutationId;</span>
+<span class="fc" id="L190">        return mutationId;</span>
     }
 
     private void storeTestState(TestState testState) {
-<span class="fc" id="L196">        TestState dbTestState = datastore.createQuery(TestState.class)</span>
-<span class="fc" id="L197">                .field(&quot;name&quot;).equal(testState.getName())</span>
-<span class="fc" id="L198">                .field(&quot;commit_id&quot;).equal(testState.getCommitId())</span>
-<span class="fc" id="L199">                .get();</span>
+<span class="fc" id="L194">        TestState dbTestState = datastore.createQuery(TestState.class)</span>
+<span class="fc" id="L195">                .field(&quot;name&quot;).equal(testState.getName())</span>
+<span class="fc" id="L196">                .field(&quot;commit_id&quot;).equal(testState.getCommitId())</span>
+<span class="fc" id="L197">                .get();</span>
 
-<span class="fc bfc" id="L201" title="All 2 branches covered.">        if(dbTestState == null) {</span>
-<span class="fc" id="L202">            dbTestState = new TestState();</span>
-<span class="fc" id="L203">            dbTestState.setName(testState.getName());</span>
-<span class="fc" id="L204">            dbTestState.setCommitId(testState.getCommitId());</span>
-<span class="fc" id="L205">            dbTestState.setFileId(testState.getFileId());</span>
+<span class="fc bfc" id="L199" title="All 2 branches covered.">        if(dbTestState == null) {</span>
+<span class="fc" id="L200">            dbTestState = new TestState();</span>
+<span class="fc" id="L201">            dbTestState.setName(testState.getName());</span>
+<span class="fc" id="L202">            dbTestState.setCommitId(testState.getCommitId());</span>
+<span class="fc" id="L203">            dbTestState.setFileId(testState.getFileId());</span>
         }
 
-<span class="fc" id="L208">        dbTestState.getMetrics().putAll(testState.getMetrics());</span>
+<span class="fc" id="L206">        dbTestState.getMetrics().putAll(testState.getMetrics());</span>
 
-<span class="fc bfc" id="L210" title="All 2 branches covered.">        if(testState.getMutationResults().size() != 0) {</span>
-<span class="fc" id="L211">            dbTestState.getMutationResults().addAll(testState.getMutationResults());</span>
+<span class="fc bfc" id="L208" title="All 2 branches covered.">        if(testState.getMutationResults().size() != 0) {</span>
+<span class="fc" id="L209">            dbTestState.getMutationResults().addAll(testState.getMutationResults());</span>
         }
 
-<span class="fc" id="L214">        datastore.save(dbTestState);</span>
-<span class="fc" id="L215">    }</span>
+<span class="fc" id="L212">        datastore.save(dbTestState);</span>
+<span class="fc" id="L213">    }</span>
 
     private Repository getRepository() throws IOException {
-<span class="nc" id="L218">        return new RepositoryBuilder()</span>
-<span class="nc" id="L219">                .readEnvironment()</span>
-<span class="nc" id="L220">                .findGitDir(generalConf.getProjectDir().toFile())</span>
-<span class="nc" id="L221">                .build();</span>
+<span class="nc" id="L216">        return new RepositoryBuilder()</span>
+<span class="nc" id="L217">                .readEnvironment()</span>
+<span class="nc" id="L218">                .findGitDir(generalConf.getProjectDir().toFile())</span>
+<span class="nc" id="L219">                .build();</span>
     }
 
     private Datastore connectToDatabase(Database databaseConfiguration) {
         // Set up log4j logging
-<span class="fc" id="L226">        MorphiaLoggerFactory.reset();</span>
-<span class="fc" id="L227">        MorphiaLoggerFactory.registerLogger(Log4JLoggerImplFactory.class);</span>
+<span class="fc" id="L224">        MorphiaLoggerFactory.reset();</span>
+<span class="fc" id="L225">        MorphiaLoggerFactory.registerLogger(Log4JLoggerImplFactory.class);</span>
 
         // Map models
-<span class="fc" id="L230">        morphia.mapPackage(&quot;de.ugoe.cs.smartshark.model&quot;);</span>
-<span class="fc" id="L231">        morphia.mapPackage(&quot;de.ugoe.cs.comfort.database.models&quot;);</span>
+<span class="fc" id="L228">        morphia.mapPackage(&quot;de.ugoe.cs.smartshark.model&quot;);</span>
+<span class="fc" id="L229">        morphia.mapPackage(&quot;de.ugoe.cs.comfort.database.models&quot;);</span>
 
-<span class="fc" id="L233">        logger.debug(&quot;Connecting to database...&quot;);</span>
+<span class="fc" id="L231">        logger.debug(&quot;Connecting to database...&quot;);</span>
         // Create database connection
-<span class="fc" id="L235">        MongoClientURI uri = new MongoClientURI(de.ugoe.cs.smartshark.Utils.createMongoDBURI(</span>
-<span class="fc" id="L236">                databaseConfiguration.getUsername(),</span>
-<span class="fc" id="L237">                databaseConfiguration.getPassword(),</span>
-<span class="fc" id="L238">                databaseConfiguration.getHostname(),</span>
-<span class="fc" id="L239">                String.valueOf(databaseConfiguration.getPort()),</span>
-<span class="fc" id="L240">                databaseConfiguration.getAuthenticationDatabase(),</span>
-<span class="fc" id="L241">                databaseConfiguration.getSSL()));</span>
-<span class="fc" id="L242">        MongoClient mongoClient = new MongoClient(uri);</span>
-<span class="fc" id="L243">        final Datastore datastore = morphia.createDatastore(mongoClient, databaseConfiguration.getDatabase());</span>
-<span class="fc" id="L244">        datastore.ensureIndexes();</span>
+<span class="fc" id="L233">        MongoClientURI uri = new MongoClientURI(de.ugoe.cs.smartshark.Utils.createMongoDBURI(</span>
+<span class="fc" id="L234">                databaseConfiguration.getUsername(),</span>
+<span class="fc" id="L235">                databaseConfiguration.getPassword(),</span>
+<span class="fc" id="L236">                databaseConfiguration.getHostname(),</span>
+<span class="fc" id="L237">                String.valueOf(databaseConfiguration.getPort()),</span>
+<span class="fc" id="L238">                databaseConfiguration.getAuthenticationDatabase(),</span>
+<span class="fc" id="L239">                databaseConfiguration.getSSL()));</span>
+<span class="fc" id="L240">        MongoClient mongoClient = new MongoClient(uri);</span>
+<span class="fc" id="L241">        final Datastore datastore = morphia.createDatastore(mongoClient, databaseConfiguration.getDatabase());</span>
+<span class="fc" id="L242">        datastore.ensureIndexes();</span>
 
-<span class="fc" id="L246">        return datastore;</span>
+<span class="fc" id="L244">        return datastore;</span>
     }
 
     public Map&lt;MutationLocation, String&gt; getMutationsAndClassification() {
-<span class="nc" id="L250">        return mutationClassification;</span>
+<span class="nc" id="L248">        return mutationClassification;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>
