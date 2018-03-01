@@ -187,7 +187,7 @@ public class PITExecutor implements IMutationExecutor {
             try {
                 if(changeClassification == null) {
                     changeClassification = MutationChangeClassifier.getChangeClassification(
-                            findFileBasedOnName(cols[0]), mutationOperator, lineNumber
+                            findFileBasedOnName(cols[1]), mutationOperator, lineNumber
                     );
                     generatedMutationsAndItsClassification.put(mutationLocation, changeClassification);
                 }
@@ -205,8 +205,9 @@ public class PITExecutor implements IMutationExecutor {
 
 
     private Path findFileBasedOnName(String name) throws MutationResultException {
+        String nameWithoutSubClass = name.split("\\$")[0];
         for(Path javaFile : javaFiles) {
-            if(javaFile.toString().endsWith("/"+name)) {
+            if(javaFile.toString().endsWith("/"+nameWithoutSubClass.replaceAll("\\.", "/")+".java")) {
                 return javaFile;
             }
         }
