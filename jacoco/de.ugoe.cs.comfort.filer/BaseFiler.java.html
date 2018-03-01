@@ -39,6 +39,13 @@ public abstract class BaseFiler extends BaseModel {
 
     public abstract void storeResults(Set&lt;Result&gt; results) throws IOException;
 
+    /**
+     *
+     * Stores the result in the database. The result is NOT merged
+     * with earlier results!
+     * @param result result of the metriccollector execution
+     * @throws IOException thrown if there is a problem with storing the result
+     */
     public abstract void storeResult(Result result) throws IOException;
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

@@ -187,7 +187,7 @@ public class PITExecutor implements IMutationExecutor {
             try {
 <span class="fc bfc" id="L188" title="All 2 branches covered.">                if(changeClassification == null) {</span>
 <span class="fc" id="L189">                    changeClassification = MutationChangeClassifier.getChangeClassification(</span>
-<span class="fc" id="L190">                            findFileBasedOnName(cols[0]), mutationOperator, lineNumber</span>
+<span class="fc" id="L190">                            findFileBasedOnName(cols[1]), mutationOperator, lineNumber</span>
                     );
 <span class="fc" id="L192">                    generatedMutationsAndItsClassification.put(mutationLocation, changeClassification);</span>
                 }
@@ -205,53 +205,54 @@ public class PITExecutor implements IMutationExecutor {
 
 
     private Path findFileBasedOnName(String name) throws MutationResultException {
-<span class="pc bpc" id="L208" title="1 of 2 branches missed.">        for(Path javaFile : javaFiles) {</span>
-<span class="fc bfc" id="L209" title="All 2 branches covered.">            if(javaFile.toString().endsWith(&quot;/&quot;+name)) {</span>
-<span class="fc" id="L210">                return javaFile;</span>
+<span class="fc" id="L208">        String nameWithoutSubClass = name.split(&quot;\\$&quot;)[0];</span>
+<span class="pc bpc" id="L209" title="1 of 2 branches missed.">        for(Path javaFile : javaFiles) {</span>
+<span class="fc bfc" id="L210" title="All 2 branches covered.">            if(javaFile.toString().endsWith(&quot;/&quot;+nameWithoutSubClass.replaceAll(&quot;\\.&quot;, &quot;/&quot;)+&quot;.java&quot;)) {</span>
+<span class="fc" id="L211">                return javaFile;</span>
             }
-<span class="fc" id="L212">        }</span>
+<span class="fc" id="L213">        }</span>
 
-<span class="nc" id="L214">        throw new MutationResultException(&quot;File &quot;+name+&quot; not found!&quot;);</span>
+<span class="nc" id="L215">        throw new MutationResultException(&quot;File &quot;+name+&quot; not found!&quot;);</span>
     }
 
-<span class="fc" id="L217">    private static class PITExecutionOutputParser implements InvocationOutputHandler {</span>
-<span class="fc" id="L218">        MutationExecutionResult mutationExecutionResult = new MutationExecutionResult();</span>
+<span class="fc" id="L218">    private static class PITExecutionOutputParser implements InvocationOutputHandler {</span>
+<span class="fc" id="L219">        MutationExecutionResult mutationExecutionResult = new MutationExecutionResult();</span>
 
-<span class="fc" id="L220">        Pattern receivedTestsPattern = Pattern.compile(&quot;(\\S*)(\\d*) tests received&quot;);</span>
-<span class="fc" id="L221">        Pattern mutationUnitsPattern = Pattern.compile(&quot;(\\S*)(\\d*) mutation test units&quot;);</span>
-<span class="fc" id="L222">        Pattern executionTimePattern = Pattern.compile(&quot;(\\S*) Completed in (\\d*) seconds&quot;);</span>
-<span class="fc" id="L223">        Pattern mutationScorePattern = Pattern.compile(&quot;(\\S*) Generated (\\d*) mutations Killed (\\d*) \\((\\d*)%\\)&quot;);</span>
+<span class="fc" id="L221">        Pattern receivedTestsPattern = Pattern.compile(&quot;(\\S*)(\\d*) tests received&quot;);</span>
+<span class="fc" id="L222">        Pattern mutationUnitsPattern = Pattern.compile(&quot;(\\S*)(\\d*) mutation test units&quot;);</span>
+<span class="fc" id="L223">        Pattern executionTimePattern = Pattern.compile(&quot;(\\S*) Completed in (\\d*) seconds&quot;);</span>
+<span class="fc" id="L224">        Pattern mutationScorePattern = Pattern.compile(&quot;(\\S*) Generated (\\d*) mutations Killed (\\d*) \\((\\d*)%\\)&quot;);</span>
 
         @Override
         public void consumeLine(String line) {
-<span class="fc" id="L227">            LOGGER.debug(line);</span>
+<span class="fc" id="L228">            LOGGER.debug(line);</span>
 
-<span class="fc" id="L229">            Matcher receivedTestsMatcher = receivedTestsPattern.matcher(line);</span>
-<span class="fc" id="L230">            Matcher mutationUnitsMatcher = mutationUnitsPattern.matcher(line);</span>
-<span class="fc" id="L231">            Matcher executionTimeMatcher = executionTimePattern.matcher(line);</span>
-<span class="fc" id="L232">            Matcher mutationScoreMatcher = mutationScorePattern.matcher(line);</span>
+<span class="fc" id="L230">            Matcher receivedTestsMatcher = receivedTestsPattern.matcher(line);</span>
+<span class="fc" id="L231">            Matcher mutationUnitsMatcher = mutationUnitsPattern.matcher(line);</span>
+<span class="fc" id="L232">            Matcher executionTimeMatcher = executionTimePattern.matcher(line);</span>
+<span class="fc" id="L233">            Matcher mutationScoreMatcher = mutationScorePattern.matcher(line);</span>
 
-<span class="fc bfc" id="L234" title="All 2 branches covered.">            if(receivedTestsMatcher.find()) {</span>
-<span class="fc" id="L235">                mutationExecutionResult.setNumTests(Integer.parseInt(receivedTestsMatcher.group(1)));</span>
+<span class="fc bfc" id="L235" title="All 2 branches covered.">            if(receivedTestsMatcher.find()) {</span>
+<span class="fc" id="L236">                mutationExecutionResult.setNumTests(Integer.parseInt(receivedTestsMatcher.group(1)));</span>
             }
 
-<span class="fc bfc" id="L238" title="All 2 branches covered.">            if(mutationUnitsMatcher.find()) {</span>
-<span class="fc" id="L239">                mutationExecutionResult.setNumMutationUnits(Integer.parseInt(mutationUnitsMatcher.group(1)));</span>
+<span class="fc bfc" id="L239" title="All 2 branches covered.">            if(mutationUnitsMatcher.find()) {</span>
+<span class="fc" id="L240">                mutationExecutionResult.setNumMutationUnits(Integer.parseInt(mutationUnitsMatcher.group(1)));</span>
             }
 
-<span class="fc bfc" id="L242" title="All 2 branches covered.">            if(executionTimeMatcher.find()) {</span>
-<span class="fc" id="L243">                mutationExecutionResult.setExecutionTime(Integer.parseInt(executionTimeMatcher.group(2)));</span>
+<span class="fc bfc" id="L243" title="All 2 branches covered.">            if(executionTimeMatcher.find()) {</span>
+<span class="fc" id="L244">                mutationExecutionResult.setExecutionTime(Integer.parseInt(executionTimeMatcher.group(2)));</span>
             }
 
-<span class="fc bfc" id="L246" title="All 2 branches covered.">            if(mutationScoreMatcher.find()) {</span>
-<span class="fc" id="L247">                mutationExecutionResult.setGeneratedMutations(Integer.parseInt(mutationScoreMatcher.group(2)));</span>
-<span class="fc" id="L248">                mutationExecutionResult.setKilledMutations(Integer.parseInt(mutationScoreMatcher.group(3)));</span>
-<span class="fc" id="L249">                mutationExecutionResult.setMutationScore(Integer.parseInt(mutationScoreMatcher.group(4)));</span>
+<span class="fc bfc" id="L247" title="All 2 branches covered.">            if(mutationScoreMatcher.find()) {</span>
+<span class="fc" id="L248">                mutationExecutionResult.setGeneratedMutations(Integer.parseInt(mutationScoreMatcher.group(2)));</span>
+<span class="fc" id="L249">                mutationExecutionResult.setKilledMutations(Integer.parseInt(mutationScoreMatcher.group(3)));</span>
+<span class="fc" id="L250">                mutationExecutionResult.setMutationScore(Integer.parseInt(mutationScoreMatcher.group(4)));</span>
             }
-<span class="fc" id="L251">        }</span>
+<span class="fc" id="L252">        }</span>
 
         public MutationExecutionResult getMutationExecutionResult() {
-<span class="fc" id="L254">            return mutationExecutionResult;</span>
+<span class="fc" id="L255">            return mutationExecutionResult;</span>
         }
     }
 }
