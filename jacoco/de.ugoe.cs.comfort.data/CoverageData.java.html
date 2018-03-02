@@ -88,17 +88,16 @@ public class CoverageData extends DataSet {
 <span class="fc bfc" id="L88" title="All 2 branches covered.">            if(entry.getValue() != null) {</span>
 <span class="fc bfc" id="L89" title="All 2 branches covered.">                for (IUnit coveredMethod : entry.getValue()) {</span>
 <span class="fc bfc" id="L90" title="All 2 branches covered.">                    if (!coveredMethod.getFQNOfUnit().equals(entry.getKey().getFQNOfUnit())</span>
-<span class="fc bfc" id="L91" title="All 2 branches covered.">                            &amp;&amp; !Utils.isTestBasedOnFQN(coveredMethod.getFQNOfUnit())</span>
-<span class="fc bfc" id="L92" title="All 2 branches covered.">                            &amp;&amp; !Utils.isTestBasedOnFQN(coveredMethod.getFQN())) {</span>
-<span class="fc" id="L93">                        coveredMethodsWithoutTests.add(coveredMethod);</span>
+<span class="fc bfc" id="L91" title="All 2 branches covered.">                            &amp;&amp; !Utils.isTestBasedOnFQN(coveredMethod.getFQNOfUnit())) {</span>
+<span class="fc" id="L92">                        coveredMethodsWithoutTests.add(coveredMethod);</span>
                     }
-<span class="fc" id="L95">                }</span>
-<span class="fc" id="L96">                coverageWithoutTests.put(entry.getKey(), coveredMethodsWithoutTests);</span>
+<span class="fc" id="L94">                }</span>
+<span class="fc" id="L95">                coverageWithoutTests.put(entry.getKey(), coveredMethodsWithoutTests);</span>
             } else {
-<span class="fc" id="L98">                coverageWithoutTests.put(entry.getKey(), null);</span>
+<span class="fc" id="L97">                coverageWithoutTests.put(entry.getKey(), null);</span>
             }
-<span class="fc" id="L100">        }</span>
-<span class="fc" id="L101">        return coverageWithoutTests;</span>
+<span class="fc" id="L99">        }</span>
+<span class="fc" id="L100">        return coverageWithoutTests;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>
