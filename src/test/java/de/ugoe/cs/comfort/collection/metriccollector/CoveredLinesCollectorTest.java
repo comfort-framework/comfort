@@ -106,33 +106,6 @@ public class CoveredLinesCollectorTest extends BaseMetricCollectorTest {
     }
 
     @Test
-    public void coveredTestAndProductionCodeWithSeparationBasedOnMethodNameTest() throws IOException {
-        javaConfig.setMethodLevel(true);
-
-        Set<IUnit> testedMethodsOfTest1 = new HashSet<>();
-        C5Test1.setCoveredLines(6);
-        testedMethodsOfTest1.add(C5Test1);
-
-        C1M1_p1.setCoveredLines(14);
-        testedMethodsOfTest1.add(C1M1_p1);
-
-
-        CoverageData covData = new CoverageData();
-        covData.add(T1M2, testedMethodsOfTest1);
-
-        CoveredLinesCollector coveredLinesCollectorTest = new CoveredLinesCollector(javaConfig, filerMock);
-        coveredLinesCollectorTest.getCoveredTestAndProductionLinesMethodLevel(covData);
-
-        Result expectedResult = new Result("org.foo.t1.Test1.m2", null);
-        expectedResult.addMetric("cov_tlines", "6");
-        expectedResult.addMetric("cov_plines", "14");
-
-
-        expectedResults.add(expectedResult);
-        assertEquals("Result set is not correct!", expectedResults, filerMock.getResults().getResults());
-    }
-
-    @Test
     public void coveredTestAndProductionCodeSeveralTestsTest() throws IOException {
         javaConfig.setMethodLevel(true);
 

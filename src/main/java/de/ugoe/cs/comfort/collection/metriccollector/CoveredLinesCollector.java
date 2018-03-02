@@ -35,7 +35,7 @@ import java.util.Set;
  * @author Fabian Trautsch
  */
 public class CoveredLinesCollector  extends BaseMetricCollector {
-    CoveredLinesCollector(GeneralConfiguration configuration, BaseFiler filer) {
+    public CoveredLinesCollector(GeneralConfiguration configuration, BaseFiler filer) {
         super(configuration, filer);
     }
 
@@ -62,17 +62,21 @@ public class CoveredLinesCollector  extends BaseMetricCollector {
         for(Map.Entry<IUnit, Set<IUnit>> entry: data.entrySet()) {
             Integer coveredProductionLines = 0;
             Integer coveredTestLines = 0;
+            logger.debug("Looking at test {}", entry.getKey());
             if(entry.getValue() != null) {
                 for (IUnit coveredMethod : entry.getValue()) {
                     if (!coveredMethod.getFQNOfUnit().equals(entry.getKey().getFQNOfUnit())
-                            && !Utils.isTestBasedOnFQN(coveredMethod.getFQNOfUnit())
-                            && !Utils.isTestBasedOnFQN(coveredMethod.getFQN())) {
+                            && !Utils.isTestBasedOnFQN(coveredMethod.getFQNOfUnit())) {
+                        logger.debug("Covered production code: {}", coveredMethod);
                         coveredProductionLines += coveredMethod.getCoveredLines();
                     } else {
+                        logger.debug("Covered Test: {}", coveredMethod);
                         coveredTestLines += coveredMethod.getCoveredLines();
                     }
                 }
             }
+            logger.debug("Test {} covered {} test and {} production lines", entry.getKey(),
+                    coveredTestLines, coveredProductionLines);
             Result result = new Result(entry.getKey().getFQN(), entry.getKey().getFilePath());
             result.addMetric("cov_tlines", String.valueOf(coveredTestLines));
             result.addMetric("cov_plines", String.valueOf(coveredProductionLines));
