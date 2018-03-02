@@ -47,6 +47,8 @@ import java.util.concurrent.Executors;
 import org.apache.bcel.generic.Type;
 import org.jacoco.core.analysis.CoverageBuilder;
 import org.jacoco.core.analysis.IClassCoverage;
+import org.jacoco.core.analysis.ICounter;
+import org.jacoco.core.analysis.ILine;
 import org.jacoco.core.analysis.IMethodCoverage;
 import org.jacoco.core.data.ExecutionDataStore;
 import org.jacoco.report.JavaNames;
@@ -55,200 +57,187 @@ import org.jacoco.report.JavaNames;
  * @author Fabian Trautsch
  */
 public class TestCoverageLoader extends BaseLoader {
-<span class="fc" id="L58">    private static final JavaNames JN = new JavaNames();</span>
+<span class="fc" id="L60">    private static final JavaNames JN = new JavaNames();</span>
     private FileNameUtils fileNameUtils;
 
     public TestCoverageLoader(GeneralConfiguration generalConfiguration, LoaderConfiguration loaderConfiguration) {
-<span class="fc" id="L62">        super(generalConfiguration, loaderConfiguration);</span>
-<span class="fc" id="L63">        fileNameUtils = new FileNameUtils(generalConfiguration);</span>
-<span class="fc" id="L64">    }</span>
+<span class="fc" id="L64">        super(generalConfiguration, loaderConfiguration);</span>
+<span class="fc" id="L65">        fileNameUtils = new FileNameUtils(generalConfiguration);</span>
+<span class="fc" id="L66">    }</span>
 
 
     @SupportsPython
     public CoverageData loadPythonCoverageData() throws IOException {
-<span class="fc" id="L69">        CoverageData covfefe = new CoverageData();</span>
+<span class="fc" id="L71">        CoverageData covfefe = new CoverageData();</span>
 
-<span class="fc" id="L71">        JsonParser jp = new JsonFactory().createParser(loaderConf.getCoverageLocation().toFile());</span>
-<span class="fc" id="L72">        ObjectMapper mapper = new ObjectMapper();</span>
+<span class="fc" id="L73">        JsonParser jp = new JsonFactory().createParser(loaderConf.getCoverageLocation().toFile());</span>
+<span class="fc" id="L74">        ObjectMapper mapper = new ObjectMapper();</span>
 
-<span class="fc" id="L74">        jp.nextToken(); // START_ARRAY</span>
-<span class="fc bfc" id="L75" title="All 2 branches covered.">        while (jp.nextToken() != JsonToken.END_ARRAY) {</span>
+<span class="fc" id="L76">        jp.nextToken(); // START_ARRAY</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">        while (jp.nextToken() != JsonToken.END_ARRAY) {</span>
             // Read PythonTest from JSON Coverage
-<span class="fc" id="L77">            PythonCoverageLoaderTestMethod testMethod = mapper.readValue(jp, PythonCoverageLoaderTestMethod.class);</span>
+<span class="fc" id="L79">            PythonCoverageLoaderTestMethod testMethod = mapper.readValue(jp, PythonCoverageLoaderTestMethod.class);</span>
 
             // Convert
-<span class="fc" id="L80">            PythonMethod pythonMethod = new PythonMethod(testMethod,</span>
-<span class="fc" id="L81">                    fileNameUtils.getPathForPythonModuleFQN(testMethod.getModule()));</span>
+<span class="fc" id="L82">            PythonMethod pythonMethod = new PythonMethod(testMethod,</span>
+<span class="fc" id="L83">                    fileNameUtils.getPathForPythonModuleFQN(testMethod.getModule()));</span>
 
-<span class="fc" id="L83">            Set&lt;IUnit&gt; testedMethodsWithoutTestsItself = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L85">            Set&lt;IUnit&gt; testedMethodsWithoutTestsItself = new HashSet&lt;&gt;();</span>
 
             // We need to check all tested methods, if there is a test itself is in it
             // This can be the case if the tests are part of the program itself (e.g. networkx/util/tests)
-<span class="fc bfc" id="L87" title="All 2 branches covered.">            for(PythonCoveragerloaderTestedMethod testedMethod: testMethod.getTestedMethods()) {</span>
+<span class="fc bfc" id="L89" title="All 2 branches covered.">            for(PythonCoveragerloaderTestedMethod testedMethod: testMethod.getTestedMethods()) {</span>
                 // Convert
-<span class="fc" id="L89">                PythonMethod pythonTestedMethod = new PythonMethod(testedMethod,</span>
-<span class="fc" id="L90">                        fileNameUtils.getPathForPythonModuleFQN(testedMethod.getModule()));</span>
+<span class="fc" id="L91">                PythonMethod pythonTestedMethod = new PythonMethod(testedMethod,</span>
+<span class="fc" id="L92">                        fileNameUtils.getPathForPythonModuleFQN(testedMethod.getModule()));</span>
+<span class="fc" id="L93">                pythonTestedMethod.setCoveredLines(testedMethod.getCoveredLines());</span>
 
-<span class="fc bfc" id="L92" title="All 2 branches covered.">                if(pythonTestedMethod.isTestBasedOnMethod()) {</span>
-<span class="fc" id="L93">                    logger.debug(&quot;Excluding test {}, because it is a test!&quot;, pythonTestedMethod);</span>
-                } else {
-<span class="fc" id="L95">                    testedMethodsWithoutTestsItself.add(pythonTestedMethod);</span>
-                }
-<span class="fc" id="L97">            }</span>
-<span class="fc" id="L98">            covfefe.add(pythonMethod, testedMethodsWithoutTestsItself);</span>
-<span class="fc" id="L99">        }</span>
+<span class="fc" id="L95">                testedMethodsWithoutTestsItself.add(pythonTestedMethod);</span>
+<span class="fc" id="L96">            }</span>
+<span class="fc" id="L97">            covfefe.add(pythonMethod, testedMethodsWithoutTestsItself);</span>
+<span class="fc" id="L98">        }</span>
 
-<span class="fc" id="L101">        return covfefe;</span>
+<span class="fc" id="L100">        return covfefe;</span>
     }
 
 
     @SupportsJava
     public CoverageData loadJavaCoverageData() throws IOException {
         // Get jacoco reader and visitor for the execution data
-<span class="fc" id="L108">        JacocoReportReader reader = new JacocoReportReader(loaderConf.getCoverageLocation().toFile());</span>
-<span class="fc" id="L109">        ExecutionDataVisitor visitor = new ExecutionDataVisitor();</span>
+<span class="fc" id="L107">        JacocoReportReader reader = new JacocoReportReader(loaderConf.getCoverageLocation().toFile());</span>
+<span class="fc" id="L108">        ExecutionDataVisitor visitor = new ExecutionDataVisitor();</span>
 
         // Read the jacoco execution report
-<span class="fc" id="L112">        reader.readJacocoReport(visitor, visitor);</span>
+<span class="fc" id="L111">        reader.readJacocoReport(visitor, visitor);</span>
 
         // Create coverage data
-<span class="fc" id="L115">        CoverageData covData = new CoverageData();</span>
+<span class="fc" id="L114">        CoverageData covData = new CoverageData();</span>
 
-<span class="fc" id="L117">        final ExecutorService executor = Executors.newFixedThreadPool(generalConf.getNThreads());</span>
-<span class="fc" id="L118">        CountDownLatch latch = new CountDownLatch(visitor.getSessions().entrySet().size());</span>
+<span class="fc" id="L116">        final ExecutorService executor = Executors.newFixedThreadPool(generalConf.getNThreads());</span>
+<span class="fc" id="L117">        CountDownLatch latch = new CountDownLatch(visitor.getSessions().entrySet().size());</span>
 
         // Go through each session and parse the data. Only include sessions that have a name
-<span class="fc bfc" id="L121" title="All 2 branches covered.">        for(Map.Entry&lt;String, ExecutionDataStore&gt; entry: visitor.getSessions().entrySet()) {</span>
-<span class="fc" id="L122">            executor.submit(() -&gt; {</span>
+<span class="fc bfc" id="L120" title="All 2 branches covered.">        for(Map.Entry&lt;String, ExecutionDataStore&gt; entry: visitor.getSessions().entrySet()) {</span>
+<span class="fc" id="L121">            executor.submit(() -&gt; {</span>
                 try {
-<span class="fc" id="L124">                    String sessionId = entry.getKey();</span>
+<span class="fc" id="L123">                    String sessionId = entry.getKey();</span>
 
                     // If it does not have a session id, we do not know which test was executed
-<span class="pc bpc" id="L127" title="1 of 4 branches missed.">                    if(!sessionId.isEmpty() &amp;&amp; sessionId.contains(&quot;%%&quot;)) {</span>
-<span class="fc" id="L128">                        logger.info(&quot;Analyzing Session {}...&quot;, entry.getKey());</span>
+<span class="pc bpc" id="L126" title="1 of 4 branches missed.">                    if(!sessionId.isEmpty() &amp;&amp; sessionId.contains(&quot;%%&quot;)) {</span>
+<span class="fc" id="L127">                        logger.info(&quot;Analyzing Session {}...&quot;, entry.getKey());</span>
 
                         // Create test class &amp; method
-<span class="fc" id="L131">                        String fqnOfTest = sessionId.split(&quot;%%&quot;)[0];</span>
-<span class="fc" id="L132">                        String methodName = sessionId.split(&quot;%%&quot;)[1];</span>
-<span class="fc" id="L133">                        logger.debug(&quot;Created the following TestMethod: {}&quot;, fqnOfTest+&quot;.&quot;+methodName);</span>
+<span class="fc" id="L130">                        String fqnOfTest = sessionId.split(&quot;%%&quot;)[0];</span>
+<span class="fc" id="L131">                        String methodName = sessionId.split(&quot;%%&quot;)[1];</span>
+<span class="fc" id="L132">                        logger.debug(&quot;Created the following TestMethod: {}&quot;, fqnOfTest+&quot;.&quot;+methodName);</span>
 
 
                         // Read the execution data
-<span class="fc" id="L137">                        ExecutionDataStore data = entry.getValue();</span>
+<span class="fc" id="L136">                        ExecutionDataStore data = entry.getValue();</span>
 
                         // Analyze the files, where all class files in the project dir are looked at
 
-<span class="fc" id="L141">                        CoverageBuilder covfefe = reader.analyzeFiles(data, Utils.getAllFilesFromProjectForRegex(</span>
-<span class="fc" id="L142">                                generalConf.getProjectDir(), &quot;.*\\.class&quot;));</span>
+<span class="fc" id="L140">                        CoverageBuilder covfefe = reader.analyzeFiles(data, Utils.getAllFilesFromProjectForRegex(</span>
+<span class="fc" id="L141">                                generalConf.getProjectDir(), &quot;.*\\.class&quot;));</span>
 
                         // Parse the class coverage data
-<span class="fc" id="L145">                        Set&lt;IUnit&gt; testedMethods = parseClassCoverageDataForJavaTestMethod(fqnOfTest, covfefe);</span>
-<span class="fc" id="L146">                        IUnit testMethod = new JavaMethod(fqnOfTest, methodName, new ArrayList&lt;&gt;(),</span>
-<span class="fc" id="L147">                                fileNameUtils.getPathForJavaClassFQN(fqnOfTest));</span>
+<span class="fc" id="L144">                        Set&lt;IUnit&gt; testedMethods = parseClassCoverageDataForJavaTestMethod(fqnOfTest, covfefe);</span>
+<span class="fc" id="L145">                        IUnit testMethod = new JavaMethod(fqnOfTest, methodName, new ArrayList&lt;&gt;(),</span>
+<span class="fc" id="L146">                                fileNameUtils.getPathForJavaClassFQN(fqnOfTest));</span>
 
-<span class="fc" id="L149">                        covData.add(testMethod, testedMethods);</span>
-<span class="pc bpc" id="L150" title="1 of 2 branches missed.">                        if(testedMethods.size() == 0) {</span>
-<span class="nc" id="L151">                            logger.warn(&quot;Could not find tested methods!&quot;);</span>
+<span class="fc" id="L148">                        covData.add(testMethod, testedMethods);</span>
+<span class="pc bpc" id="L149" title="1 of 2 branches missed.">                        if(testedMethods.size() == 0) {</span>
+<span class="nc" id="L150">                            logger.warn(&quot;Could not find tested methods!&quot;);</span>
                         }
 
 
                     }
-<span class="nc" id="L156">                } catch (IOException e) {</span>
-<span class="nc" id="L157">                    logger.catching(e);</span>
+<span class="nc" id="L155">                } catch (IOException e) {</span>
+<span class="nc" id="L156">                    logger.catching(e);</span>
                 } finally {
-<span class="pc" id="L159">                    latch.countDown();</span>
-<span class="pc" id="L160">                }</span>
+<span class="pc" id="L158">                    latch.countDown();</span>
+<span class="pc" id="L159">                }</span>
 
-<span class="fc" id="L162">            });</span>
-<span class="fc" id="L163">        }</span>
+<span class="fc" id="L161">            });</span>
+<span class="fc" id="L162">        }</span>
 
 
         try {
-<span class="fc" id="L167">            latch.await();</span>
-<span class="nc" id="L168">        } catch (InterruptedException e) {</span>
-<span class="nc" id="L169">            logger.catching(e);</span>
+<span class="fc" id="L166">            latch.await();</span>
+<span class="nc" id="L167">        } catch (InterruptedException e) {</span>
+<span class="nc" id="L168">            logger.catching(e);</span>
         } finally {
-<span class="pc" id="L171">            executor.shutdown();</span>
-<span class="pc" id="L172">        }</span>
-<span class="fc" id="L173">        return covData;</span>
+<span class="pc" id="L170">            executor.shutdown();</span>
+<span class="pc" id="L171">        }</span>
+<span class="fc" id="L172">        return covData;</span>
     }
 
     private Set&lt;IUnit&gt; parseClassCoverageDataForJavaTestMethod(String fqnOfTest, CoverageBuilder covfefe) {
         // Go through all classes that were found and have a look if it is covered
-<span class="fc" id="L178">        Set&lt;IUnit&gt; result = new HashSet&lt;&gt;();</span>
-<span class="fc bfc" id="L179" title="All 2 branches covered.">        for(IClassCoverage classCoverage: covfefe.getClasses()) {</span>
-<span class="fc" id="L180">            String className = JN.getQualifiedClassName(classCoverage.getName());</span>
+<span class="fc" id="L177">        Set&lt;IUnit&gt; result = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L178" title="All 2 branches covered.">        for(IClassCoverage classCoverage: covfefe.getClasses()) {</span>
+<span class="fc" id="L179">            String className = JN.getQualifiedClassName(classCoverage.getName());</span>
             // If it is covered: go through its methods to see which methods are covered
             // Exclude the test method itself and if the class is a test class
-<span class="fc bfc" id="L183" title="All 4 branches covered.">            if(classCoverage.getClassCounter().getCoveredCount() == 1 &amp;&amp; !className.equals(fqnOfTest)</span>
-<span class="pc bpc" id="L184" title="1 of 2 branches missed.">                    &amp;&amp; !Utils.isTestBasedOnFQN(className)) {</span>
-<span class="fc" id="L185">                result.addAll(parseMethodCoverageDataForJavaTestMethod(classCoverage));</span>
+<span class="fc bfc" id="L182" title="All 2 branches covered.">            if(classCoverage.getClassCounter().getCoveredCount() == 1) {</span>
+<span class="fc" id="L183">                result.addAll(parseMethodCoverageDataForJavaTestMethod(classCoverage));</span>
             }
-<span class="fc" id="L187">        }</span>
+<span class="fc" id="L185">        }</span>
 
-<span class="fc" id="L189">        return result;</span>
+<span class="fc" id="L187">        return result;</span>
     }
 
     private Set&lt;JavaMethod&gt; parseMethodCoverageDataForJavaTestMethod(IClassCoverage classCoverage) {
-<span class="fc" id="L193">        Set&lt;JavaMethod&gt; allTestedMethods = new HashSet&lt;&gt;();</span>
-<span class="fc bfc" id="L194" title="All 2 branches covered.">        for(IMethodCoverage methodCoverage: classCoverage.getMethods()) {</span>
-<span class="fc bfc" id="L195" title="All 2 branches covered.">            if(methodCoverage.getMethodCounter().getCoveredCount() == 1) {</span>
-                // Calculate covered and uncovered lines
-                //Map&lt;String, List&lt;Integer&gt;&gt; lines = coveredLines(methodCoverage);
-
-
-<span class="fc" id="L200">                String packageName = classCoverage.getPackageName().replace(&quot;/&quot;, &quot;.&quot;);</span>
-<span class="fc" id="L201">                String className = classCoverage.getName().replace(classCoverage.getPackageName()+&quot;/&quot;, &quot;&quot;);</span>
+<span class="fc" id="L191">        Set&lt;JavaMethod&gt; allTestedMethods = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L192" title="All 2 branches covered.">        for(IMethodCoverage methodCoverage: classCoverage.getMethods()) {</span>
+<span class="fc bfc" id="L193" title="All 2 branches covered.">            if(methodCoverage.getMethodCounter().getCoveredCount() == 1) {</span>
+<span class="fc" id="L194">                String packageName = classCoverage.getPackageName().replace(&quot;/&quot;, &quot;.&quot;);</span>
+<span class="fc" id="L195">                String className = classCoverage.getName().replace(classCoverage.getPackageName()+&quot;/&quot;, &quot;&quot;);</span>
 
                 // Add parameter
-<span class="fc" id="L204">                List&lt;String&gt; parameter = new ArrayList&lt;&gt;();</span>
-<span class="fc bfc" id="L205" title="All 2 branches covered.">                for(Type type : Type.getArgumentTypes(methodCoverage.getDesc())) {</span>
-<span class="fc" id="L206">                    parameter.add(type.toString());</span>
+<span class="fc" id="L198">                List&lt;String&gt; parameter = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L199" title="All 2 branches covered.">                for(Type type : Type.getArgumentTypes(methodCoverage.getDesc())) {</span>
+<span class="fc" id="L200">                    parameter.add(type.toString());</span>
                 }
 
                 // Create Java Method for tested method
                 JavaMethod testedJavaMethod;
                 try {
-<span class="fc" id="L212">                    testedJavaMethod = new JavaMethod(packageName, className, methodCoverage.getName(), parameter,</span>
-<span class="fc" id="L213">                            fileNameUtils.getPathForJavaClassFQN(packageName+&quot;.&quot;+className));</span>
-<span class="nc" id="L214">                } catch (FileNotFoundException e) {</span>
-<span class="nc" id="L215">                    testedJavaMethod = new JavaMethod(packageName, className, methodCoverage.getName(), parameter,</span>
+<span class="fc" id="L206">                    testedJavaMethod = new JavaMethod(packageName, className, methodCoverage.getName(), parameter,</span>
+<span class="fc" id="L207">                            fileNameUtils.getPathForJavaClassFQN(packageName+&quot;.&quot;+className));</span>
+<span class="nc" id="L208">                } catch (FileNotFoundException e) {</span>
+<span class="nc" id="L209">                    testedJavaMethod = new JavaMethod(packageName, className, methodCoverage.getName(), parameter,</span>
                             null);
-<span class="nc" id="L217">                    logger.warn(&quot;Could not find file for class {}&quot;, packageName+&quot;.&quot;+className);</span>
-<span class="fc" id="L218">                }</span>
-<span class="fc" id="L219">                logger.debug(&quot;Covered unit: {}&quot;, testedJavaMethod.getFQN());</span>
+<span class="nc" id="L211">                    logger.warn(&quot;Could not find file for class {}&quot;, packageName+&quot;.&quot;+className);</span>
+<span class="fc" id="L212">                }</span>
+
+                // Calculate covered lines
+<span class="fc" id="L215">                Integer coveredLines = coveredLines(methodCoverage);</span>
+<span class="fc" id="L216">                testedJavaMethod.setCoveredLines(coveredLines);</span>
+<span class="fc" id="L217">                logger.debug(&quot;Covered unit: {}&quot;, testedJavaMethod.getFQN());</span>
 
                 // Add to result set
-<span class="fc" id="L222">                allTestedMethods.add(testedJavaMethod);</span>
+<span class="fc" id="L220">                allTestedMethods.add(testedJavaMethod);</span>
             }
-<span class="fc" id="L224">        }</span>
+<span class="fc" id="L222">        }</span>
 
-<span class="fc" id="L226">        return allTestedMethods;</span>
+<span class="fc" id="L224">        return allTestedMethods;</span>
     }
 
-    /*
-    private static Map&lt;String, List&lt;Integer&gt;&gt; coveredLines(IMethodCoverage coverage) {
-        List&lt;Integer&gt; coveredLines = new ArrayList&lt;&gt;();
-        List&lt;Integer&gt; uncoveredLines = new ArrayList&lt;&gt;();
-        for (int lineId = coverage.getFirstLine(); lineId &lt;= coverage.getLastLine(); lineId++) {
-            ILine line = coverage.getLine(lineId);
-            switch (line.getInstructionCounter().getStatus()) {
+
+    private static Integer coveredLines(IMethodCoverage coverage) {
+<span class="fc" id="L229">        Integer allCoveredLines = 0;</span>
+<span class="fc bfc" id="L230" title="All 2 branches covered.">        for (int lineId = coverage.getFirstLine(); lineId &lt;= coverage.getLastLine(); lineId++) {</span>
+<span class="fc" id="L231">            ILine line = coverage.getLine(lineId);</span>
+<span class="fc bfc" id="L232" title="All 2 branches covered.">            switch (line.getInstructionCounter().getStatus()) {</span>
                 case ICounter.FULLY_COVERED:
                 case ICounter.PARTLY_COVERED:
-                    coveredLines.add(lineId);
-                    break;
-                case ICounter.NOT_COVERED:
-                    uncoveredLines.add(lineId);
-                    break;
+<span class="fc" id="L235">                    allCoveredLines++;</span>
+<span class="fc" id="L236">                    break;</span>
                 default:
             }
         }
-
-        Map&lt;String, List&lt;Integer&gt;&gt; result = new HashMap&lt;&gt;();
-        result.put(&quot;covered&quot;, coveredLines);
-        result.put(&quot;uncovered&quot;, uncoveredLines);
-
-        return result;
-    }*/
+<span class="fc" id="L240">        return allCoveredLines;</span>
+    }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

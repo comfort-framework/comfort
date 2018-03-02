@@ -77,58 +77,59 @@ public class MutationDataCollector extends BaseMetricCollector {
 
         // Create a list of futures, we add them here so that we can wait for completion
 <span class="fc" id="L79">        List&lt;ListenableFuture&lt;Void&gt;&gt; futures = new ArrayList&lt;&gt;();</span>
-<span class="fc bfc" id="L80" title="All 2 branches covered.">        for (Map.Entry&lt;IUnit, Set&lt;IUnit&gt;&gt; entry : data.getCoverageData().entrySet()) {</span>
+<span class="fc" id="L80">        System.out.println(data.getCoverageData().entrySet());</span>
+<span class="fc bfc" id="L81" title="All 2 branches covered.">        for (Map.Entry&lt;IUnit, Set&lt;IUnit&gt;&gt; entry : data.getCoverageData().entrySet()) {</span>
             // We skip already analyzed tests
-<span class="pc bpc" id="L82" title="3 of 4 branches missed.">            if(alreadyAnalyzedTests.contains(entry.getKey().getFQN()) &amp;&amp; !generalConf.isForceRerun()) {</span>
-<span class="nc" id="L83">                logger.debug(&quot;Test {} already has mutation data...&quot;, entry.getKey().getFQN());</span>
+<span class="pc bpc" id="L83" title="3 of 4 branches missed.">            if(alreadyAnalyzedTests.contains(entry.getKey().getFQN()) &amp;&amp; !generalConf.isForceRerun()) {</span>
+<span class="nc" id="L84">                logger.debug(&quot;Test {} already has mutation data...&quot;, entry.getKey().getFQN());</span>
             } else {
                 // We create a listenable future here so that we can reuse the thread to store its results
-<span class="fc" id="L86">                ListenableFuture&lt;Result&gt; result = executor.submit(</span>
-<span class="fc" id="L87">                        new MutationDataCollectorThread(entry.getKey(), generalConf, fileNameUtils,</span>
+<span class="fc" id="L87">                ListenableFuture&lt;Result&gt; result = executor.submit(</span>
+<span class="fc" id="L88">                        new MutationDataCollectorThread(entry.getKey(), generalConf, fileNameUtils,</span>
                                 generatedMutationsAndItsClassification, javaFiles));
 
                 //Blank runnable to evaluate write completion -&gt; little hack as we can not wait for the completion
                 // of the callbacks but only on the completion of the main task of the thread. Therefore, we
                 // create a callback here that is called every time a thread finishes his storing process
-<span class="fc" id="L93">                Callable&lt;Void&gt; callback = () -&gt; null;</span>
-<span class="fc" id="L94">                final ListenableFutureTask&lt;Void&gt; callbackFuture = ListenableFutureTask.create(callback);</span>
-<span class="fc" id="L95">                futures.add(callbackFuture);</span>
+<span class="fc" id="L94">                Callable&lt;Void&gt; callback = () -&gt; null;</span>
+<span class="fc" id="L95">                final ListenableFutureTask&lt;Void&gt; callbackFuture = ListenableFutureTask.create(callback);</span>
+<span class="fc" id="L96">                futures.add(callbackFuture);</span>
 
                 // Add callback for the thread so that it stores its results
-<span class="fc" id="L98">                Futures.addCallback(result, new FutureCallback&lt;Result&gt;() {</span>
+<span class="fc" id="L99">                Futures.addCallback(result, new FutureCallback&lt;Result&gt;() {</span>
                     @Override
                     @ParametersAreNonnullByDefault
                     public void onSuccess(Result result) {
                         try {
-<span class="fc" id="L103">                            filer.storeResult(result);</span>
-<span class="fc" id="L104">                            logger.info(&quot;Stored result for test {}&quot;, entry.getKey().getFQN());</span>
-<span class="nc" id="L105">                        } catch (IOException e) {</span>
-<span class="nc" id="L106">                            logger.catching(e);</span>
+<span class="fc" id="L104">                            filer.storeResult(result);</span>
+<span class="fc" id="L105">                            logger.info(&quot;Stored result for test {}&quot;, entry.getKey().getFQN());</span>
+<span class="nc" id="L106">                        } catch (IOException e) {</span>
+<span class="nc" id="L107">                            logger.catching(e);</span>
                         } finally {
-<span class="pc" id="L108">                            callbackFuture.run();</span>
-<span class="pc" id="L109">                        }</span>
-<span class="fc" id="L110">                    }</span>
+<span class="pc" id="L109">                            callbackFuture.run();</span>
+<span class="pc" id="L110">                        }</span>
+<span class="fc" id="L111">                    }</span>
 
                     @Override
                     @ParametersAreNonnullByDefault
                     public void onFailure(Throwable t) {
-<span class="nc" id="L115">                        logger.catching(t);</span>
-<span class="nc" id="L116">                        callbackFuture.run();</span>
-<span class="nc" id="L117">                    }</span>
-<span class="fc" id="L118">                }, MoreExecutors.directExecutor());</span>
+<span class="nc" id="L116">                        logger.catching(t);</span>
+<span class="nc" id="L117">                        callbackFuture.run();</span>
+<span class="nc" id="L118">                    }</span>
+<span class="fc" id="L119">                }, MoreExecutors.directExecutor());</span>
             }
-<span class="fc" id="L120">        }</span>
+<span class="fc" id="L121">        }</span>
 
         // Wait for the completion of all threads
-<span class="fc" id="L123">        ListenableFuture&lt;List&lt;Void&gt;&gt; listFuture = Futures.successfulAsList(futures);</span>
-<span class="fc" id="L124">        logger.info(&quot;Waiting for completion...&quot;);</span>
+<span class="fc" id="L124">        ListenableFuture&lt;List&lt;Void&gt;&gt; listFuture = Futures.successfulAsList(futures);</span>
+<span class="fc" id="L125">        logger.info(&quot;Waiting for completion...&quot;);</span>
         try {
-<span class="fc" id="L126">            listFuture.get();</span>
-<span class="nc" id="L127">        } catch (InterruptedException | ExecutionException e) {</span>
-<span class="nc" id="L128">            logger.catching(e);</span>
-<span class="fc" id="L129">        }</span>
-<span class="fc" id="L130">        executor.shutdown();</span>
-<span class="fc" id="L131">        logger.info(&quot;Done...&quot;);</span>
-<span class="fc" id="L132">    }</span>
+<span class="fc" id="L127">            listFuture.get();</span>
+<span class="nc" id="L128">        } catch (InterruptedException | ExecutionException e) {</span>
+<span class="nc" id="L129">            logger.catching(e);</span>
+<span class="fc" id="L130">        }</span>
+<span class="fc" id="L131">        executor.shutdown();</span>
+<span class="fc" id="L132">        logger.info(&quot;Done...&quot;);</span>
+<span class="fc" id="L133">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

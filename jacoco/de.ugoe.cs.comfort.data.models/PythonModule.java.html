@@ -33,100 +33,111 @@ public class PythonModule implements Comparable&lt;PythonModule&gt;, Comparator&
     protected String pPackage;
     protected String pModule;
     protected Path fileName;
+<span class="fc" id="L36">    protected Integer coveredLines = null;</span>
 
-<span class="fc" id="L37">    public PythonModule(String pPackage, String pModule, Path fileName) {</span>
-<span class="fc" id="L38">        this.pPackage = pPackage;</span>
-<span class="fc" id="L39">        this.pModule = pModule;</span>
-<span class="fc" id="L40">        this.fileName = fileName;</span>
-<span class="fc" id="L41">    }</span>
+<span class="fc" id="L38">    public PythonModule(String pPackage, String pModule, Path fileName) {</span>
+<span class="fc" id="L39">        this.pPackage = pPackage;</span>
+<span class="fc" id="L40">        this.pModule = pModule;</span>
+<span class="fc" id="L41">        this.fileName = fileName;</span>
+<span class="fc" id="L42">    }</span>
 
-<span class="fc" id="L43">    public PythonModule(String fqn, Path fileName) {</span>
-<span class="fc" id="L44">        String[] fqnParts = fqn.split(&quot;\\.&quot;);</span>
-<span class="fc" id="L45">        this.pModule = fqnParts[fqnParts.length-1];</span>
-<span class="fc" id="L46">        this.pPackage = String.join(&quot;.&quot;, Arrays.copyOfRange(fqnParts, 0, fqnParts.length-1));</span>
-<span class="fc" id="L47">        this.fileName = fileName;</span>
-<span class="fc" id="L48">    }</span>
+<span class="fc" id="L44">    public PythonModule(String fqn, Path fileName) {</span>
+<span class="fc" id="L45">        String[] fqnParts = fqn.split(&quot;\\.&quot;);</span>
+<span class="fc" id="L46">        this.pModule = fqnParts[fqnParts.length-1];</span>
+<span class="fc" id="L47">        this.pPackage = String.join(&quot;.&quot;, Arrays.copyOfRange(fqnParts, 0, fqnParts.length-1));</span>
+<span class="fc" id="L48">        this.fileName = fileName;</span>
+<span class="fc" id="L49">    }</span>
 
     @Override
     public String getPackage() {
-<span class="fc" id="L52">        return pPackage;</span>
+<span class="fc" id="L53">        return pPackage;</span>
+    }
+
+    @Override
+    public void setCoveredLines(Integer coveredLines) {
+<span class="fc" id="L58">        this.coveredLines = coveredLines;</span>
+<span class="fc" id="L59">    }</span>
+
+    @Override
+    public Integer getCoveredLines() {
+<span class="nc" id="L63">        return coveredLines;</span>
     }
 
     @Override
     public Path getFilePath() {
-<span class="fc" id="L57">        return fileName;</span>
+<span class="fc" id="L68">        return fileName;</span>
     }
 
     public Boolean isTestBasedOnFileName() {
-<span class="nc" id="L61">        return fileName.toString().toLowerCase().contains(&quot;test&quot;);</span>
+<span class="nc" id="L72">        return fileName.toString().toLowerCase().contains(&quot;test&quot;);</span>
     }
 
     public Boolean isTestBasedOnFQNofUnit() {
-<span class="fc" id="L65">        return getFQNOfUnit().toLowerCase().contains(&quot;test&quot;);</span>
+<span class="fc" id="L76">        return getFQNOfUnit().toLowerCase().contains(&quot;test&quot;);</span>
     }
 
     public String getModule() {
-<span class="fc" id="L69">        return pModule;</span>
+<span class="fc" id="L80">        return pModule;</span>
     }
 
     @Override
     public String getFQNOfUnit() {
-<span class="fc" id="L74">        return pPackage+&quot;.&quot;+pModule;</span>
+<span class="fc" id="L85">        return pPackage+&quot;.&quot;+pModule;</span>
     }
 
     @Override
     public String getFQN() {
-<span class="fc" id="L79">        return getFQNOfUnit();</span>
+<span class="fc" id="L90">        return getFQNOfUnit();</span>
     }
 
     @Override
     public int compareTo(@Nonnull PythonModule o) {
-<span class="nc" id="L84">        return new CompareToBuilder()</span>
-<span class="nc" id="L85">                .append(pPackage, o.pPackage)</span>
-<span class="nc" id="L86">                .append(pModule, o.pModule)</span>
-<span class="nc" id="L87">                .append(fileName, o.fileName)</span>
-<span class="nc" id="L88">                .toComparison();</span>
+<span class="nc" id="L95">        return new CompareToBuilder()</span>
+<span class="nc" id="L96">                .append(pPackage, o.pPackage)</span>
+<span class="nc" id="L97">                .append(pModule, o.pModule)</span>
+<span class="nc" id="L98">                .append(fileName, o.fileName)</span>
+<span class="nc" id="L99">                .toComparison();</span>
     }
 
     @Override
     public int compare(PythonModule o1, PythonModule o2) {
-<span class="nc" id="L93">        return o1.compareTo(o2);</span>
+<span class="nc" id="L104">        return o1.compareTo(o2);</span>
     }
 
     @Override
     public boolean equals(Object obj) {
-<span class="pc bpc" id="L98" title="1 of 2 branches missed.">        if(!(obj instanceof PythonModule)) {</span>
-<span class="nc" id="L99">            return false;</span>
+<span class="pc bpc" id="L109" title="1 of 2 branches missed.">        if(!(obj instanceof PythonModule)) {</span>
+<span class="nc" id="L110">            return false;</span>
         }
 
-<span class="pc bpc" id="L102" title="1 of 2 branches missed.">        if(obj == this) {</span>
-<span class="nc" id="L103">            return true;</span>
+<span class="pc bpc" id="L113" title="1 of 2 branches missed.">        if(obj == this) {</span>
+<span class="nc" id="L114">            return true;</span>
         }
 
-<span class="fc" id="L106">        PythonModule otherNode = (PythonModule) obj;</span>
-<span class="fc" id="L107">        return new EqualsBuilder()</span>
-<span class="fc" id="L108">                .append(pPackage, otherNode.pPackage)</span>
-<span class="fc" id="L109">                .append(pModule, otherNode.pModule)</span>
-<span class="fc" id="L110">                .append(fileName, otherNode.fileName)</span>
-<span class="fc" id="L111">                .isEquals();</span>
+<span class="fc" id="L117">        PythonModule otherNode = (PythonModule) obj;</span>
+<span class="fc" id="L118">        return new EqualsBuilder()</span>
+<span class="fc" id="L119">                .append(pPackage, otherNode.pPackage)</span>
+<span class="fc" id="L120">                .append(pModule, otherNode.pModule)</span>
+<span class="fc" id="L121">                .append(fileName, otherNode.fileName)</span>
+<span class="fc" id="L122">                .isEquals();</span>
     }
 
     @Override
     public int hashCode() {
-<span class="fc" id="L116">        return new HashCodeBuilder(17, 31)</span>
-<span class="fc" id="L117">                .append(pPackage)</span>
-<span class="fc" id="L118">                .append(pModule)</span>
-<span class="fc" id="L119">                .append(fileName)</span>
-<span class="fc" id="L120">                .toHashCode();</span>
+<span class="fc" id="L127">        return new HashCodeBuilder(17, 31)</span>
+<span class="fc" id="L128">                .append(pPackage)</span>
+<span class="fc" id="L129">                .append(pModule)</span>
+<span class="fc" id="L130">                .append(fileName)</span>
+<span class="fc" id="L131">                .toHashCode();</span>
     }
 
     @Override
     public String toString() {
-<span class="fc" id="L125">        return MoreObjects.toStringHelper(this)</span>
-<span class="fc" id="L126">                .add(&quot;pPackage&quot;, pPackage)</span>
-<span class="fc" id="L127">                .add(&quot;pModule&quot;, pModule)</span>
-<span class="fc" id="L128">                .add(&quot;fileName&quot;, fileName)</span>
-<span class="fc" id="L129">                .toString();</span>
+<span class="fc" id="L136">        return MoreObjects.toStringHelper(this)</span>
+<span class="fc" id="L137">                .add(&quot;pPackage&quot;, pPackage)</span>
+<span class="fc" id="L138">                .add(&quot;pModule&quot;, pModule)</span>
+<span class="fc" id="L139">                .add(&quot;fileName&quot;, fileName)</span>
+<span class="fc" id="L140">                .toString();</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

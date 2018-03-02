@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CoveredLinesCollector.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">comfort</a> &gt; <a href="index.source.html" class="el_package">de.ugoe.cs.comfort.collection.metriccollector</a> &gt; <span class="el_source">CoveredLinesCollector.java</span></div><h1>CoveredLinesCollector.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2017 University of Goettingen, Germany
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.ugoe.cs.comfort.collection.metriccollector;
+
+import de.ugoe.cs.comfort.Utils;
+import de.ugoe.cs.comfort.annotations.SupportsClass;
+import de.ugoe.cs.comfort.annotations.SupportsJava;
+import de.ugoe.cs.comfort.annotations.SupportsMethod;
+import de.ugoe.cs.comfort.annotations.SupportsPython;
+import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
+import de.ugoe.cs.comfort.data.CoverageData;
+import de.ugoe.cs.comfort.data.models.IUnit;
+import de.ugoe.cs.comfort.filer.BaseFiler;
+import de.ugoe.cs.comfort.filer.models.Result;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+/**
+ * @author Fabian Trautsch
+ */
+public class CoveredLinesCollector  extends BaseMetricCollector {
+    CoveredLinesCollector(GeneralConfiguration configuration, BaseFiler filer) {
+<span class="fc" id="L39">        super(configuration, filer);</span>
+<span class="fc" id="L40">    }</span>
+
+    @SupportsJava
+    @SupportsPython
+    @SupportsMethod
+    public void getCoveredTestAndProductionLinesMethodLevel(CoverageData coverageData) throws IOException {
+
+<span class="fc" id="L47">        Set&lt;Result&gt; results = generateResults(coverageData.getCoverageDataForAll());</span>
+<span class="fc" id="L48">        filer.storeResults(results);</span>
+<span class="fc" id="L49">    }</span>
+
+    @SupportsJava
+    @SupportsPython
+    @SupportsClass
+    public void getCoveredTestAndProductionLinesClassLevel(CoverageData coverageData) throws IOException {
+
+<span class="fc" id="L56">        Set&lt;Result&gt; results = generateResults(coverageData.getCoverageDataForAllClassLevel());</span>
+<span class="fc" id="L57">        filer.storeResults(results);</span>
+<span class="fc" id="L58">    }</span>
+
+    private Set&lt;Result&gt; generateResults(Map&lt;IUnit, Set&lt;IUnit&gt;&gt; data) {
+<span class="fc" id="L61">        Set&lt;Result&gt; results = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">        for(Map.Entry&lt;IUnit, Set&lt;IUnit&gt;&gt; entry: data.entrySet()) {</span>
+<span class="fc" id="L63">            Integer coveredProductionLines = 0;</span>
+<span class="fc" id="L64">            Integer coveredTestLines = 0;</span>
+<span class="pc bpc" id="L65" title="1 of 2 branches missed.">            if(entry.getValue() != null) {</span>
+<span class="fc bfc" id="L66" title="All 2 branches covered.">                for (IUnit coveredMethod : entry.getValue()) {</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">                    if (!coveredMethod.getFQNOfUnit().equals(entry.getKey().getFQNOfUnit())</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">                            &amp;&amp; !Utils.isTestBasedOnFQN(coveredMethod.getFQNOfUnit())</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">                            &amp;&amp; !Utils.isTestBasedOnFQN(coveredMethod.getFQN())) {</span>
+<span class="fc" id="L70">                        coveredProductionLines += coveredMethod.getCoveredLines();</span>
+                    } else {
+<span class="fc" id="L72">                        coveredTestLines += coveredMethod.getCoveredLines();</span>
+                    }
+<span class="fc" id="L74">                }</span>
+            }
+<span class="fc" id="L76">            Result result = new Result(entry.getKey().getFQN(), entry.getKey().getFilePath());</span>
+<span class="fc" id="L77">            result.addMetric(&quot;cov_tlines&quot;, String.valueOf(coveredTestLines));</span>
+<span class="fc" id="L78">            result.addMetric(&quot;cov_plines&quot;, String.valueOf(coveredProductionLines));</span>
+<span class="fc" id="L79">            results.add(result);</span>
+<span class="fc" id="L80">        }</span>
+<span class="fc" id="L81">        return results;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

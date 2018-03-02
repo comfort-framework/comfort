@@ -32,102 +32,113 @@ public class JavaClass implements Comparable&lt;JavaClass&gt;, Comparator&lt;Jav
     protected String jPackage;
     protected String jClass;
     protected Path fileName;
+<span class="fc" id="L35">    protected Integer coveredLines = null;</span>
 
-<span class="fc" id="L36">    public JavaClass(String jPackage, String jClass, Path fileName) {</span>
-<span class="fc" id="L37">        this.jPackage = jPackage;</span>
-<span class="fc" id="L38">        this.jClass = jClass;</span>
-<span class="fc" id="L39">        this.fileName = fileName;</span>
-<span class="fc" id="L40">    }</span>
+<span class="fc" id="L37">    public JavaClass(String jPackage, String jClass, Path fileName) {</span>
+<span class="fc" id="L38">        this.jPackage = jPackage;</span>
+<span class="fc" id="L39">        this.jClass = jClass;</span>
+<span class="fc" id="L40">        this.fileName = fileName;</span>
+<span class="fc" id="L41">    }</span>
 
-<span class="fc" id="L42">    public JavaClass(String fullyQualifiedName, Path fileName) {</span>
-<span class="fc" id="L43">        this.jPackage = Utils.getPackageName(fullyQualifiedName);</span>
-<span class="fc" id="L44">        this.jClass = Utils.getClassName(fullyQualifiedName);</span>
-<span class="fc" id="L45">        this.fileName = fileName;</span>
-<span class="fc" id="L46">    }</span>
+<span class="fc" id="L43">    public JavaClass(String fullyQualifiedName, Path fileName) {</span>
+<span class="fc" id="L44">        this.jPackage = Utils.getPackageName(fullyQualifiedName);</span>
+<span class="fc" id="L45">        this.jClass = Utils.getClassName(fullyQualifiedName);</span>
+<span class="fc" id="L46">        this.fileName = fileName;</span>
+<span class="fc" id="L47">    }</span>
 
     @Override
     public String getPackage() {
-<span class="fc" id="L50">        return jPackage;</span>
+<span class="fc" id="L51">        return jPackage;</span>
+    }
+
+    @Override
+    public void setCoveredLines(Integer coveredLines) {
+<span class="fc" id="L56">        this.coveredLines = coveredLines;</span>
+<span class="fc" id="L57">    }</span>
+
+    @Override
+    public Integer getCoveredLines() {
+<span class="fc" id="L61">        return coveredLines;</span>
     }
 
     public Path getFilePath() {
-<span class="fc" id="L54">        return fileName;</span>
+<span class="fc" id="L65">        return fileName;</span>
     }
 
     public Boolean isTestBasedOnFileName() {
-<span class="nc" id="L58">        return fileName.toString().toLowerCase().contains(&quot;test&quot;);</span>
+<span class="nc" id="L69">        return fileName.toString().toLowerCase().contains(&quot;test&quot;);</span>
     }
 
     public Boolean isTestBasedOnFQNofUnit() {
-<span class="fc" id="L62">        return getFQNOfUnit().toLowerCase().contains(&quot;test&quot;);</span>
+<span class="fc" id="L73">        return getFQNOfUnit().toLowerCase().contains(&quot;test&quot;);</span>
     }
 
     @Override
     public String getFQNOfUnit() {
-<span class="pc bpc" id="L67" title="1 of 4 branches missed.">        if(jPackage == null || jPackage.equals(&quot;&quot;)) {</span>
-<span class="fc" id="L68">            return jClass;</span>
+<span class="pc bpc" id="L78" title="1 of 4 branches missed.">        if(jPackage == null || jPackage.equals(&quot;&quot;)) {</span>
+<span class="fc" id="L79">            return jClass;</span>
         }
 
-<span class="fc" id="L71">        return jPackage+&quot;.&quot;+jClass;</span>
+<span class="fc" id="L82">        return jPackage+&quot;.&quot;+jClass;</span>
     }
 
     @Override
     public String getFQN() {
-<span class="fc" id="L76">        return getFQNOfUnit();</span>
+<span class="fc" id="L87">        return getFQNOfUnit();</span>
     }
 
     public Boolean isInnerClass() {
-<span class="fc" id="L80">        return jClass.contains(&quot;$&quot;);</span>
+<span class="fc" id="L91">        return jClass.contains(&quot;$&quot;);</span>
     }
 
     @Override
     public int compareTo(@Nonnull JavaClass o) {
-<span class="nc" id="L85">        return new CompareToBuilder()</span>
-<span class="nc" id="L86">                .append(jPackage, o.jPackage)</span>
-<span class="nc" id="L87">                .append(jClass, o.jClass)</span>
-<span class="nc" id="L88">                .append(fileName, o.fileName)</span>
-<span class="nc" id="L89">                .toComparison();</span>
+<span class="nc" id="L96">        return new CompareToBuilder()</span>
+<span class="nc" id="L97">                .append(jPackage, o.jPackage)</span>
+<span class="nc" id="L98">                .append(jClass, o.jClass)</span>
+<span class="nc" id="L99">                .append(fileName, o.fileName)</span>
+<span class="nc" id="L100">                .toComparison();</span>
     }
 
     @Override
     public int compare(JavaClass o1, JavaClass o2) {
-<span class="nc" id="L94">        return o1.compareTo(o2);</span>
+<span class="nc" id="L105">        return o1.compareTo(o2);</span>
     }
 
     @Override
     public boolean equals(Object obj) {
-<span class="pc bpc" id="L99" title="1 of 2 branches missed.">        if(!(obj instanceof JavaClass)) {</span>
-<span class="nc" id="L100">            return false;</span>
+<span class="pc bpc" id="L110" title="1 of 2 branches missed.">        if(!(obj instanceof JavaClass)) {</span>
+<span class="nc" id="L111">            return false;</span>
         }
 
-<span class="fc bfc" id="L103" title="All 2 branches covered.">        if(obj == this) {</span>
-<span class="fc" id="L104">            return true;</span>
+<span class="fc bfc" id="L114" title="All 2 branches covered.">        if(obj == this) {</span>
+<span class="fc" id="L115">            return true;</span>
         }
 
-<span class="fc" id="L107">        JavaClass otherNode = (JavaClass) obj;</span>
-<span class="fc" id="L108">        return new EqualsBuilder()</span>
-<span class="fc" id="L109">                .append(jPackage, otherNode.jPackage)</span>
-<span class="fc" id="L110">                .append(jClass, otherNode.jClass)</span>
-<span class="fc" id="L111">                .append(fileName, otherNode.fileName)</span>
-<span class="fc" id="L112">                .isEquals();</span>
+<span class="fc" id="L118">        JavaClass otherNode = (JavaClass) obj;</span>
+<span class="fc" id="L119">        return new EqualsBuilder()</span>
+<span class="fc" id="L120">                .append(jPackage, otherNode.jPackage)</span>
+<span class="fc" id="L121">                .append(jClass, otherNode.jClass)</span>
+<span class="fc" id="L122">                .append(fileName, otherNode.fileName)</span>
+<span class="fc" id="L123">                .isEquals();</span>
     }
 
     @Override
     public int hashCode() {
-<span class="fc" id="L117">        return new HashCodeBuilder(17, 31)</span>
-<span class="fc" id="L118">                .append(jPackage)</span>
-<span class="fc" id="L119">                .append(jClass)</span>
-<span class="fc" id="L120">                .append(fileName)</span>
-<span class="fc" id="L121">                .toHashCode();</span>
+<span class="fc" id="L128">        return new HashCodeBuilder(17, 31)</span>
+<span class="fc" id="L129">                .append(jPackage)</span>
+<span class="fc" id="L130">                .append(jClass)</span>
+<span class="fc" id="L131">                .append(fileName)</span>
+<span class="fc" id="L132">                .toHashCode();</span>
     }
 
     @Override
     public String toString() {
-<span class="fc" id="L126">        return MoreObjects.toStringHelper(this)</span>
-<span class="fc" id="L127">                .add(&quot;jPackage&quot;, jPackage)</span>
-<span class="fc" id="L128">                .add(&quot;jClass&quot;, jClass)</span>
-<span class="fc" id="L129">                .add(&quot;fileName&quot;, fileName)</span>
-<span class="fc" id="L130">                .toString();</span>
+<span class="fc" id="L137">        return MoreObjects.toStringHelper(this)</span>
+<span class="fc" id="L138">                .add(&quot;jPackage&quot;, jPackage)</span>
+<span class="fc" id="L139">                .add(&quot;jClass&quot;, jClass)</span>
+<span class="fc" id="L140">                .add(&quot;fileName&quot;, fileName)</span>
+<span class="fc" id="L141">                .toString();</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

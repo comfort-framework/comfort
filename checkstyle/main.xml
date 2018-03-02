@@ -66,6 +66,8 @@
 </file>
 <file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/CodeCoverStrategy.java">
 </file>
+<file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/CoveredLinesCollector.java">
+</file>
 <file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/DependencyCollector.java">
 </file>
 <file name="/home/travis/build/comfort-framework/comfort/src/main/java/de/ugoe/cs/comfort/collection/metriccollector/DijkstraAlgorithm.java">
