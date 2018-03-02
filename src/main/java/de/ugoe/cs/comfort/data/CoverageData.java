@@ -17,6 +17,7 @@
 package de.ugoe.cs.comfort.data;
 
 import com.google.common.base.MoreObjects;
+import de.ugoe.cs.comfort.Utils;
 import de.ugoe.cs.comfort.data.models.IUnit;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
@@ -64,10 +65,39 @@ public class CoverageData extends DataSet {
     }
 
     public Map<IUnit, Set<IUnit>> getCoverageData() {
-        return covfefeMethodLevel;
+        // Return coverage data without test methods and classes
+        return filterOutCoveredTests(covfefeMethodLevel);
     }
 
     public Map<IUnit, Set<IUnit>> getCoverageDataClassLevel() {
+        return filterOutCoveredTests(covfefeClassLevel);
+    }
+
+    public Map<IUnit, Set<IUnit>> getCoverageDataForAll() {
+        return covfefeMethodLevel;
+    }
+
+    public Map<IUnit, Set<IUnit>> getCoverageDataForAllClassLevel() {
         return covfefeClassLevel;
+    }
+
+    private Map<IUnit, Set<IUnit>> filterOutCoveredTests(Map<IUnit, Set<IUnit>> data) {
+        Map<IUnit, Set<IUnit>> coverageWithoutTests = new HashMap<>();
+        for(Map.Entry<IUnit, Set<IUnit>> entry: data.entrySet()) {
+            Set<IUnit> coveredMethodsWithoutTests = new HashSet<>();
+            if(entry.getValue() != null) {
+                for (IUnit coveredMethod : entry.getValue()) {
+                    if (!coveredMethod.getFQNOfUnit().equals(entry.getKey().getFQNOfUnit())
+                            && !Utils.isTestBasedOnFQN(coveredMethod.getFQNOfUnit())
+                            && !Utils.isTestBasedOnFQN(coveredMethod.getFQN())) {
+                        coveredMethodsWithoutTests.add(coveredMethod);
+                    }
+                }
+                coverageWithoutTests.put(entry.getKey(), coveredMethodsWithoutTests);
+            } else {
+                coverageWithoutTests.put(entry.getKey(), null);
+            }
+        }
+        return coverageWithoutTests;
     }
 }

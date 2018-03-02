@@ -146,6 +146,7 @@ public class BaseTest {
     protected   JavaMethod C3M1 = new JavaMethod("org.foo.bar.C3", "m1", new ArrayList<>(), null);
     protected   JavaMethod C3M2 = new JavaMethod("org.foo.bar.C3", "m2", new ArrayList<>(), null);
     protected   JavaMethod C4M1 = new JavaMethod("org.foo.bar.C4", "m1", new ArrayList<>(), null);
+    protected   JavaMethod C5Test1 = new JavaMethod("org.foo.bar.C5", "test1", new ArrayList<>(), null);
     protected   JavaMethod covP1C1M1 = new JavaMethod("org.foo.bar.C1", "m1", new ArrayList<>(), null);
     protected   JavaMethod covP1C1M2 = new JavaMethod("org.foo.bar.C1", "m2", new ArrayList<>(), null);
     protected   JavaMethod covP1C2M1 = new JavaMethod("org.foo.bar.C2", "m1", new ArrayList<>(), null);

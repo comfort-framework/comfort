@@ -77,6 +77,7 @@ public class MutationDataCollector extends BaseMetricCollector {
 
         // Create a list of futures, we add them here so that we can wait for completion
         List<ListenableFuture<Void>> futures = new ArrayList<>();
+        System.out.println(data.getCoverageData().entrySet());
         for (Map.Entry<IUnit, Set<IUnit>> entry : data.getCoverageData().entrySet()) {
             // We skip already analyzed tests
             if(alreadyAnalyzedTests.contains(entry.getKey().getFQN()) && !generalConf.isForceRerun()) {

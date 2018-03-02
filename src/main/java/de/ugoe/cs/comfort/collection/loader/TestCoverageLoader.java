@@ -47,6 +47,8 @@ import java.util.concurrent.Executors;
 import org.apache.bcel.generic.Type;
 import org.jacoco.core.analysis.CoverageBuilder;
 import org.jacoco.core.analysis.IClassCoverage;
+import org.jacoco.core.analysis.ICounter;
+import org.jacoco.core.analysis.ILine;
 import org.jacoco.core.analysis.IMethodCoverage;
 import org.jacoco.core.data.ExecutionDataStore;
 import org.jacoco.report.JavaNames;
@@ -88,12 +90,9 @@ public class TestCoverageLoader extends BaseLoader {
                 // Convert
                 PythonMethod pythonTestedMethod = new PythonMethod(testedMethod,
                         fileNameUtils.getPathForPythonModuleFQN(testedMethod.getModule()));
+                pythonTestedMethod.setCoveredLines(testedMethod.getCoveredLines());
 
-                if(pythonTestedMethod.isTestBasedOnMethod()) {
-                    logger.debug("Excluding test {}, because it is a test!", pythonTestedMethod);
-                } else {
-                    testedMethodsWithoutTestsItself.add(pythonTestedMethod);
-                }
+                testedMethodsWithoutTestsItself.add(pythonTestedMethod);
             }
             covfefe.add(pythonMethod, testedMethodsWithoutTestsItself);
         }
@@ -180,8 +179,7 @@ public class TestCoverageLoader extends BaseLoader {
             String className = JN.getQualifiedClassName(classCoverage.getName());
             // If it is covered: go through its methods to see which methods are covered
             // Exclude the test method itself and if the class is a test class
-            if(classCoverage.getClassCounter().getCoveredCount() == 1 && !className.equals(fqnOfTest)
-                    && !Utils.isTestBasedOnFQN(className)) {
+            if(classCoverage.getClassCounter().getCoveredCount() == 1) {
                 result.addAll(parseMethodCoverageDataForJavaTestMethod(classCoverage));
             }
         }
@@ -193,10 +191,6 @@ public class TestCoverageLoader extends BaseLoader {
         Set<JavaMethod> allTestedMethods = new HashSet<>();
         for(IMethodCoverage methodCoverage: classCoverage.getMethods()) {
             if(methodCoverage.getMethodCounter().getCoveredCount() == 1) {
-                // Calculate covered and uncovered lines
-                //Map<String, List<Integer>> lines = coveredLines(methodCoverage);
-
-
                 String packageName = classCoverage.getPackageName().replace("/", ".");
                 String className = classCoverage.getName().replace(classCoverage.getPackageName()+"/", "");
 
@@ -216,6 +210,10 @@ public class TestCoverageLoader extends BaseLoader {
                             null);
                     logger.warn("Could not find file for class {}", packageName+"."+className);
                 }
+
+                // Calculate covered lines
+                Integer coveredLines = coveredLines(methodCoverage);
+                testedJavaMethod.setCoveredLines(coveredLines);
                 logger.debug("Covered unit: {}", testedJavaMethod.getFQN());
 
                 // Add to result set
@@ -226,28 +224,19 @@ public class TestCoverageLoader extends BaseLoader {
         return allTestedMethods;
     }
 
-    /*
-    private static Map<String, List<Integer>> coveredLines(IMethodCoverage coverage) {
-        List<Integer> coveredLines = new ArrayList<>();
-        List<Integer> uncoveredLines = new ArrayList<>();
+
+    private static Integer coveredLines(IMethodCoverage coverage) {
+        Integer allCoveredLines = 0;
         for (int lineId = coverage.getFirstLine(); lineId <= coverage.getLastLine(); lineId++) {
             ILine line = coverage.getLine(lineId);
             switch (line.getInstructionCounter().getStatus()) {
                 case ICounter.FULLY_COVERED:
                 case ICounter.PARTLY_COVERED:
-                    coveredLines.add(lineId);
-                    break;
-                case ICounter.NOT_COVERED:
-                    uncoveredLines.add(lineId);
+                    allCoveredLines++;
                     break;
                 default:
             }
         }
-
-        Map<String, List<Integer>> result = new HashMap<>();
-        result.put("covered", coveredLines);
-        result.put("uncovered", uncoveredLines);
-
-        return result;
-    }*/
+        return allCoveredLines;
+    }
 }

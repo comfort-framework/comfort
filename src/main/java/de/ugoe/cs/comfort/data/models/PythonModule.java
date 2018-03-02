@@ -33,6 +33,7 @@ public class PythonModule implements Comparable<PythonModule>, Comparator<Python
     protected String pPackage;
     protected String pModule;
     protected Path fileName;
+    protected Integer coveredLines = null;
 
     public PythonModule(String pPackage, String pModule, Path fileName) {
         this.pPackage = pPackage;
@@ -50,6 +51,16 @@ public class PythonModule implements Comparable<PythonModule>, Comparator<Python
     @Override
     public String getPackage() {
         return pPackage;
+    }
+
+    @Override
+    public void setCoveredLines(Integer coveredLines) {
+        this.coveredLines = coveredLines;
+    }
+
+    @Override
+    public Integer getCoveredLines() {
+        return coveredLines;
     }
 
     @Override

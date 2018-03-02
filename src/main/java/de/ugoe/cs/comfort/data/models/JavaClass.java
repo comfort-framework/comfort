@@ -32,6 +32,7 @@ public class JavaClass implements Comparable<JavaClass>, Comparator<JavaClass>, 
     protected String jPackage;
     protected String jClass;
     protected Path fileName;
+    protected Integer coveredLines = null;
 
     public JavaClass(String jPackage, String jClass, Path fileName) {
         this.jPackage = jPackage;
@@ -48,6 +49,16 @@ public class JavaClass implements Comparable<JavaClass>, Comparator<JavaClass>, 
     @Override
     public String getPackage() {
         return jPackage;
+    }
+
+    @Override
+    public void setCoveredLines(Integer coveredLines) {
+        this.coveredLines = coveredLines;
+    }
+
+    @Override
+    public Integer getCoveredLines() {
+        return coveredLines;
     }
 
     public Path getFilePath() {

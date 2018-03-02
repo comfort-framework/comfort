@@ -62,6 +62,10 @@ public class PythonCoveragerloaderTestedMethod {
         return this.method;
     }
 
+    public Integer getCoveredLines() {
+        return coveredLines.size();
+    }
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)

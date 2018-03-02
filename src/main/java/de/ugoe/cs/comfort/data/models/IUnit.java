@@ -32,4 +32,8 @@ public interface IUnit extends Serializable {
     Boolean isTestBasedOnFQNofUnit();
 
     String getPackage();
+
+    void setCoveredLines(Integer coveredLines);
+
+    Integer getCoveredLines();
 }
