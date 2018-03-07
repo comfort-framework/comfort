@@ -22,9 +22,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Scanner;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
@@ -120,16 +124,89 @@ public class Utils {
     }
 
     public static Path getPathForFullyQualifiedClassNameInSetOfPaths(Set<Path> javaFiles,
-                                                                     String fullyQualifiedClassName)
+                                                                     String fullyQualifiedClassName,
+                                                                     Path projectRoot)
             throws FileNotFoundException {
-        String javaFile =
-                fullyQualifiedClassName.split("\\$")[0].replace(".", "/").concat(".java");
-        List<Path> candidatePaths = javaFiles.stream()
-                .filter(path -> path.endsWith(javaFile)).collect(Collectors.toList());
-        if(candidatePaths.size() != 1) {
-            throw new FileNotFoundException("File for class"+fullyQualifiedClassName+" was not found!");
+        /*
+        Create a set of possible names:
+        First -> original name; Afterwards, cut of parts that start with $ (to handle subclasses).
+        E.g., $Gson$Types$GenericArrayTypeImpl would result in the following list:
+        [$Gson$Types$GenericArrayTypeImpl.java, $Gson$Types.java, $Gson.java, '']
+         */
+        Set<String> possibleNames = new HashSet<>();
+        possibleNames.add(fullyQualifiedClassName.replace(".", "/").concat(".java"));
+
+        String[] parts = fullyQualifiedClassName.split("\\$");
+        for(int i=0; i<parts.length; i++) {
+            possibleNames.add(
+                    String.join("$", Arrays.copyOfRange(parts, 0, parts.length-i))
+                            .replace(".", "/")
+                            .concat(".java")
+            );
         }
 
-        return candidatePaths.get(0);
+        Predicate<Path> endsWithSameString =
+                p -> possibleNames.stream().anyMatch(pn -> p.toString().endsWith(pn));
+
+        List<Path> candidatePaths = javaFiles.stream()
+                .filter(endsWithSameString)
+                .collect(Collectors.toList());
+
+
+        Optional<Path> bestFit = candidatePaths.stream().max(Comparator.comparingInt(p -> p.toString().length()));
+        if(bestFit.isPresent()) {
+            LOGGER.debug("{} is best fit for {}", bestFit.get(), fullyQualifiedClassName);
+            return bestFit.get();
+        } else {
+            /*
+            We need to look if we find a class or enum definition in any of the other class files, as it can be the
+            case, that a class or enum is defined in another class source file.
+             */
+            for(String possibleName: possibleNames) {
+                String[] allParts = possibleName.split("\\/");
+                String lastPart = allParts[allParts.length-1].replace(".java", "");
+                String pathExceptLastPart = String.join("/", Arrays.copyOfRange(allParts, 0, allParts.length-1));
+                for(Path possibleFile: javaFiles) {
+                    // The package declaration must be the same, therefore, we only look for files that are in
+                    // the same package
+                    if(!possibleFile.toString().contains(pathExceptLastPart)) {
+                        continue;
+                    }
+
+                    Path searchInPath = projectRoot;
+
+                    if(!possibleFile.startsWith(projectRoot)) {
+                        searchInPath = Paths.get(projectRoot.toString(), possibleFile.toString());
+                    }
+
+                    Boolean classFound = searchFile(searchInPath, "class "+lastPart);
+                    Boolean enumFound = searchFile(searchInPath, "enum "+lastPart);
+
+                    if(classFound || enumFound) {
+                        LOGGER.debug("{} is best fit for {}", possibleFile, fullyQualifiedClassName);
+                        return possibleFile;
+                    }
+                }
+            }
+            throw new FileNotFoundException("File for class "+fullyQualifiedClassName+" was not found!");
+        }
+    }
+
+    private static Boolean searchFile(Path file, String pattern) {
+        Scanner scanner = null;
+        try {
+            scanner = new Scanner(file.toFile(), "utf-8");
+            if (scanner.findWithinHorizon(pattern, 0) != null) {
+                return true;
+            }
+        } catch (FileNotFoundException e) {
+            return false;
+        } finally {
+            if(scanner != null) {
+                scanner.close();
+            }
+        }
+
+        return false;
     }
 }

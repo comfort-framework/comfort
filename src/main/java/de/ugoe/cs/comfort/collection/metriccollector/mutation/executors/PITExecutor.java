@@ -16,6 +16,7 @@
 
 package de.ugoe.cs.comfort.collection.metriccollector.mutation.executors;
 
+import de.ugoe.cs.comfort.Utils;
 import de.ugoe.cs.comfort.collection.metriccollector.mutation.MutationChangeClassifier;
 import de.ugoe.cs.comfort.collection.metriccollector.mutation.MutationExecutionResult;
 import de.ugoe.cs.comfort.collection.metriccollector.mutation.MutationLocation;
@@ -183,7 +184,9 @@ public class PITExecutor implements IMutationExecutor {
             try {
                 if(changeClassification == null) {
                     changeClassification = MutationChangeClassifier.getChangeClassification(
-                            findFileBasedOnName(cols[1]), mutationOperator, lineNumber
+                            Utils.getPathForFullyQualifiedClassNameInSetOfPaths(javaFiles, cols[1], projectRoot),
+                            mutationOperator,
+                            lineNumber
                     );
                     generatedMutationsAndItsClassification.put(mutationLocation, changeClassification);
                 }

@@ -75,7 +75,8 @@ public class FileNameUtils {
 
     public Path getPathForJavaClassFQN(String fullyQualifiedName) throws FileNotFoundException {
         return Utils.getPathForFullyQualifiedClassNameInSetOfPaths(filesWithoutProjectDir,
-                fullyQualifiedName.replace(configuration.getProjectDir().toString(), ""));
+                fullyQualifiedName.replace(configuration.getProjectDir().toString(), ""),
+                configuration.getProjectDir());
     }
 
     public Path getPathForPythonModuleFQN(String fullyQualifiedName) throws FileNotFoundException {
@@ -101,7 +102,8 @@ public class FileNameUtils {
                 String[] testParts = testWithoutAttributes.split("\\.");
                 String testFileName = String.join(".", Arrays.copyOfRange(testParts, 0, testParts.length - 1));
                 return Utils.getPathForFullyQualifiedClassNameInSetOfPaths(filesWithoutProjectDir,
-                        testFileName.replace(configuration.getProjectDir().toString(), ""));
+                        testFileName.replace(configuration.getProjectDir().toString(), ""),
+                        configuration.getProjectDir());
             } else {
                 return getPathForJavaClassFQN(identifier);
             }
