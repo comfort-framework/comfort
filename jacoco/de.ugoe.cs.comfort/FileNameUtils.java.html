@@ -75,35 +75,37 @@ public class FileNameUtils {
 
     public Path getPathForJavaClassFQN(String fullyQualifiedName) throws FileNotFoundException {
 <span class="fc" id="L77">        return Utils.getPathForFullyQualifiedClassNameInSetOfPaths(filesWithoutProjectDir,</span>
-<span class="fc" id="L78">                fullyQualifiedName.replace(configuration.getProjectDir().toString(), &quot;&quot;));</span>
+<span class="fc" id="L78">                fullyQualifiedName.replace(configuration.getProjectDir().toString(), &quot;&quot;),</span>
+<span class="fc" id="L79">                configuration.getProjectDir());</span>
     }
 
     public Path getPathForPythonModuleFQN(String fullyQualifiedName) throws FileNotFoundException {
-<span class="fc" id="L82">        return Utils.getPathForModuleNameInSetOfPaths(filesWithoutProjectDir,</span>
-<span class="fc" id="L83">                fullyQualifiedName.replace(configuration.getProjectDir().toString(), &quot;&quot;));</span>
+<span class="fc" id="L83">        return Utils.getPathForModuleNameInSetOfPaths(filesWithoutProjectDir,</span>
+<span class="fc" id="L84">                fullyQualifiedName.replace(configuration.getProjectDir().toString(), &quot;&quot;));</span>
     }
 
     public Path getPathForIdentifier(String identifier, boolean executeOnMethodLevel) throws FileNotFoundException {
 
-<span class="pc bpc" id="L88" title="1 of 2 branches missed.">        if (this.configuration.getLanguage().equals(&quot;python&quot;)) {</span>
-<span class="nc bnc" id="L89" title="All 2 branches missed.">            if (executeOnMethodLevel) {</span>
-<span class="nc" id="L90">                String[] testParts = identifier.split(&quot;\\:&quot;);</span>
-<span class="nc" id="L91">                String testFileName = testParts[0];</span>
-<span class="nc" id="L92">                return Utils.getPathForModuleNameInSetOfPaths(filesWithoutProjectDir,</span>
-<span class="nc" id="L93">                        testFileName.replace(configuration.getProjectDir().toString(), &quot;&quot;));</span>
+<span class="pc bpc" id="L89" title="1 of 2 branches missed.">        if (this.configuration.getLanguage().equals(&quot;python&quot;)) {</span>
+<span class="nc bnc" id="L90" title="All 2 branches missed.">            if (executeOnMethodLevel) {</span>
+<span class="nc" id="L91">                String[] testParts = identifier.split(&quot;\\:&quot;);</span>
+<span class="nc" id="L92">                String testFileName = testParts[0];</span>
+<span class="nc" id="L93">                return Utils.getPathForModuleNameInSetOfPaths(filesWithoutProjectDir,</span>
+<span class="nc" id="L94">                        testFileName.replace(configuration.getProjectDir().toString(), &quot;&quot;));</span>
             } else {
-<span class="nc" id="L95">                return Utils.getPathForModuleNameInSetOfPaths(filesWithoutProjectDir,</span>
-<span class="nc" id="L96">                        identifier.replace(configuration.getProjectDir().toString(), &quot;&quot;));</span>
+<span class="nc" id="L96">                return Utils.getPathForModuleNameInSetOfPaths(filesWithoutProjectDir,</span>
+<span class="nc" id="L97">                        identifier.replace(configuration.getProjectDir().toString(), &quot;&quot;));</span>
             }
         } else {
-<span class="fc bfc" id="L99" title="All 2 branches covered.">            if (executeOnMethodLevel) {</span>
-<span class="fc" id="L100">                String testWithoutAttributes = identifier.split(&quot;\\[&quot;)[0];</span>
-<span class="fc" id="L101">                String[] testParts = testWithoutAttributes.split(&quot;\\.&quot;);</span>
-<span class="fc" id="L102">                String testFileName = String.join(&quot;.&quot;, Arrays.copyOfRange(testParts, 0, testParts.length - 1));</span>
-<span class="fc" id="L103">                return Utils.getPathForFullyQualifiedClassNameInSetOfPaths(filesWithoutProjectDir,</span>
-<span class="fc" id="L104">                        testFileName.replace(configuration.getProjectDir().toString(), &quot;&quot;));</span>
+<span class="fc bfc" id="L100" title="All 2 branches covered.">            if (executeOnMethodLevel) {</span>
+<span class="fc" id="L101">                String testWithoutAttributes = identifier.split(&quot;\\[&quot;)[0];</span>
+<span class="fc" id="L102">                String[] testParts = testWithoutAttributes.split(&quot;\\.&quot;);</span>
+<span class="fc" id="L103">                String testFileName = String.join(&quot;.&quot;, Arrays.copyOfRange(testParts, 0, testParts.length - 1));</span>
+<span class="fc" id="L104">                return Utils.getPathForFullyQualifiedClassNameInSetOfPaths(filesWithoutProjectDir,</span>
+<span class="fc" id="L105">                        testFileName.replace(configuration.getProjectDir().toString(), &quot;&quot;),</span>
+<span class="fc" id="L106">                        configuration.getProjectDir());</span>
             } else {
-<span class="fc" id="L106">                return getPathForJavaClassFQN(identifier);</span>
+<span class="fc" id="L108">                return getPathForJavaClassFQN(identifier);</span>
             }
         }
     }

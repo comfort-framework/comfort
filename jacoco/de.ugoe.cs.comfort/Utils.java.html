@@ -22,9 +22,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Scanner;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
@@ -34,103 +38,176 @@ import org.apache.logging.log4j.Logger;
 /**
  * @author Fabian Trautsch
  */
-<span class="nc" id="L37">public class Utils {</span>
-<span class="fc" id="L38">    private static final Logger LOGGER = LogManager.getLogger(Utils.class.getName());</span>
+<span class="nc" id="L41">public class Utils {</span>
+<span class="fc" id="L42">    private static final Logger LOGGER = LogManager.getLogger(Utils.class.getName());</span>
 
     public static Boolean isTestBasedOnName(String nameOfFile) {
-<span class="fc" id="L41">        String lowerCaseName = nameOfFile.toLowerCase();</span>
-<span class="pc bpc" id="L42" title="1 of 4 branches missed.">        return lowerCaseName.contains(&quot;test&quot;) || lowerCaseName.contains(&quot;validate&quot;);</span>
+<span class="fc" id="L45">        String lowerCaseName = nameOfFile.toLowerCase();</span>
+<span class="pc bpc" id="L46" title="1 of 4 branches missed.">        return lowerCaseName.contains(&quot;test&quot;) || lowerCaseName.contains(&quot;validate&quot;);</span>
 
     }
 
     public static Boolean isTestBasedOnFQN(String fullyQualifiedName) {
-<span class="fc" id="L47">        String lowerCaseName = fullyQualifiedName.substring(fullyQualifiedName.lastIndexOf('.') + 1).toLowerCase();</span>
-<span class="pc bpc" id="L48" title="1 of 4 branches missed.">        return lowerCaseName.contains(&quot;test&quot;) || lowerCaseName.contains(&quot;validate&quot;);</span>
+<span class="fc" id="L51">        String lowerCaseName = fullyQualifiedName.substring(fullyQualifiedName.lastIndexOf('.') + 1).toLowerCase();</span>
+<span class="pc bpc" id="L52" title="1 of 4 branches missed.">        return lowerCaseName.contains(&quot;test&quot;) || lowerCaseName.contains(&quot;validate&quot;);</span>
     }
 
     public static String getPackageName(String fullyQualifiedName) {
-<span class="fc" id="L52">        String[] parts = fullyQualifiedName.split(Pattern.quote(&quot;.&quot;));</span>
-<span class="fc" id="L53">        return String.join(&quot;.&quot;, Arrays.copyOfRange(parts, 0, parts.length-1));</span>
+<span class="fc" id="L56">        String[] parts = fullyQualifiedName.split(Pattern.quote(&quot;.&quot;));</span>
+<span class="fc" id="L57">        return String.join(&quot;.&quot;, Arrays.copyOfRange(parts, 0, parts.length-1));</span>
     }
 
     public static String getClassName(String fullyQualifiedName) {
-<span class="fc" id="L57">        fullyQualifiedName = fullyQualifiedName.replaceAll(&quot;\\[&quot;, &quot;&quot;)</span>
-<span class="fc" id="L58">                .replaceAll(&quot;\\]&quot;, &quot;&quot;);</span>
-<span class="fc" id="L59">        String[] parts = fullyQualifiedName.split(Pattern.quote(&quot;.&quot;));</span>
-<span class="fc" id="L60">        return String.join(&quot;.&quot;, Arrays.copyOfRange(parts, parts.length-1, parts.length));</span>
+<span class="fc" id="L61">        fullyQualifiedName = fullyQualifiedName.replaceAll(&quot;\\[&quot;, &quot;&quot;)</span>
+<span class="fc" id="L62">                .replaceAll(&quot;\\]&quot;, &quot;&quot;);</span>
+<span class="fc" id="L63">        String[] parts = fullyQualifiedName.split(Pattern.quote(&quot;.&quot;));</span>
+<span class="fc" id="L64">        return String.join(&quot;.&quot;, Arrays.copyOfRange(parts, parts.length-1, parts.length));</span>
     }
 
     public static String getFQNWithoutMethod(String fqnWithMethod) {
-<span class="fc" id="L64">        String[] parts = fqnWithMethod.split(Pattern.quote(&quot;.&quot;));</span>
-<span class="fc" id="L65">        return String.join(&quot;.&quot;, Arrays.copyOfRange(parts, 0, parts.length-1));</span>
+<span class="fc" id="L68">        String[] parts = fqnWithMethod.split(Pattern.quote(&quot;.&quot;));</span>
+<span class="fc" id="L69">        return String.join(&quot;.&quot;, Arrays.copyOfRange(parts, 0, parts.length-1));</span>
     }
 
     public static Set&lt;Path&gt; getAllFilesFromProjectForRegex(Path projectDir, String regex) throws IOException {
-<span class="fc" id="L69">        Set&lt;Path&gt; javaFiles = new HashSet&lt;&gt;();</span>
-<span class="fc" id="L70">        Files.find(</span>
+<span class="fc" id="L73">        Set&lt;Path&gt; javaFiles = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L74">        Files.find(</span>
                 projectDir,
                 999,
-<span class="fc bfc" id="L73" title="All 4 branches covered.">                (p, bfa) -&gt; bfa.isRegularFile() &amp;&amp; p.getFileName().toString().matches(regex)</span>
-<span class="fc" id="L74">        ).forEach(javaFiles::add);</span>
-<span class="fc" id="L75">        return javaFiles;</span>
+<span class="fc bfc" id="L77" title="All 4 branches covered.">                (p, bfa) -&gt; bfa.isRegularFile() &amp;&amp; p.getFileName().toString().matches(regex)</span>
+<span class="fc" id="L78">        ).forEach(javaFiles::add);</span>
+<span class="fc" id="L79">        return javaFiles;</span>
     }
 
     public static Set&lt;Path&gt; getAllFilesFromProjectForRegexWithoutProjectDirPath(Path projectDir,
                                                                                 String regex) throws  IOException {
-<span class="nc" id="L80">        Set&lt;Path&gt; files = new HashSet&lt;&gt;();</span>
-<span class="nc" id="L81">        Files.find(</span>
+<span class="nc" id="L84">        Set&lt;Path&gt; files = new HashSet&lt;&gt;();</span>
+<span class="nc" id="L85">        Files.find(</span>
                 projectDir,
                 999,
-<span class="nc bnc" id="L84" title="All 4 branches missed.">                (p, bfa) -&gt; bfa.isRegularFile() &amp;&amp; p.getFileName().toString().matches(regex)</span>
-<span class="nc" id="L85">        ).forEach(</span>
+<span class="nc bnc" id="L88" title="All 4 branches missed.">                (p, bfa) -&gt; bfa.isRegularFile() &amp;&amp; p.getFileName().toString().matches(regex)</span>
+<span class="nc" id="L89">        ).forEach(</span>
                 // Replace the path to the project directory
-<span class="nc" id="L87">                path -&gt; files.add(path.subpath(projectDir.getNameCount(), path.getNameCount()))</span>
+<span class="nc" id="L91">                path -&gt; files.add(path.subpath(projectDir.getNameCount(), path.getNameCount()))</span>
         );
-<span class="nc" id="L89">        return files;</span>
+<span class="nc" id="L93">        return files;</span>
     }
 
     public static Path getPathForModuleNameInSetOfPaths(Set&lt;Path&gt; pythonFiles, String moduleName)
             throws FileNotFoundException {
-<span class="fc" id="L94">        String pythonFile = moduleName.replace(&quot;.&quot;, &quot;/&quot;).concat(&quot;.py&quot;);</span>
+<span class="fc" id="L98">        String pythonFile = moduleName.replace(&quot;.&quot;, &quot;/&quot;).concat(&quot;.py&quot;);</span>
 
         // First look if the whole module name can be found, e.g.
         // tests.new_tests.test_module1 == tests/new_tests/test_module.py
-<span class="fc" id="L98">        List&lt;Path&gt; candidatePaths = pythonFiles.stream()</span>
-<span class="fc" id="L99">                .filter(path -&gt; path.toString().equals(pythonFile)).collect(Collectors.toList());</span>
-<span class="pc bpc" id="L100" title="1 of 2 branches missed.">        if(candidatePaths.size() == 1) {</span>
-<span class="fc" id="L101">            return candidatePaths.get(0);</span>
+<span class="fc" id="L102">        List&lt;Path&gt; candidatePaths = pythonFiles.stream()</span>
+<span class="fc" id="L103">                .filter(path -&gt; path.toString().equals(pythonFile)).collect(Collectors.toList());</span>
+<span class="pc bpc" id="L104" title="1 of 2 branches missed.">        if(candidatePaths.size() == 1) {</span>
+<span class="fc" id="L105">            return candidatePaths.get(0);</span>
         }
 
         // If it is not found, we just look if we find a module that ends with the test name, this can also happen
-<span class="nc" id="L105">        candidatePaths = pythonFiles.stream()</span>
-<span class="nc" id="L106">                .filter(path -&gt; path.toString().endsWith(pythonFile)).collect(Collectors.toList());</span>
-<span class="nc bnc" id="L107" title="All 2 branches missed.">        if(candidatePaths.size() == 1) {</span>
-<span class="nc" id="L108">            return candidatePaths.get(0);</span>
+<span class="nc" id="L109">        candidatePaths = pythonFiles.stream()</span>
+<span class="nc" id="L110">                .filter(path -&gt; path.toString().endsWith(pythonFile)).collect(Collectors.toList());</span>
+<span class="nc bnc" id="L111" title="All 2 branches missed.">        if(candidatePaths.size() == 1) {</span>
+<span class="nc" id="L112">            return candidatePaths.get(0);</span>
         }
 
         // If a specific module does not exist, we check if it is a package, if yes, than it is a doctest in the
         // __init__ of the package
-<span class="nc" id="L113">        Path initFile = Paths.get(pythonFile.replace(&quot;.py&quot;, &quot;&quot;), &quot;__init__.py&quot;);</span>
-<span class="nc bnc" id="L114" title="All 2 branches missed.">        if(pythonFiles.contains(initFile)) {</span>
-<span class="nc" id="L115">            return initFile;</span>
+<span class="nc" id="L117">        Path initFile = Paths.get(pythonFile.replace(&quot;.py&quot;, &quot;&quot;), &quot;__init__.py&quot;);</span>
+<span class="nc bnc" id="L118" title="All 2 branches missed.">        if(pythonFiles.contains(initFile)) {</span>
+<span class="nc" id="L119">            return initFile;</span>
         }
 
-<span class="nc" id="L118">        LOGGER.debug(&quot;PythonFile: {}, Paths: {}&quot;, pythonFile, candidatePaths);</span>
-<span class="nc" id="L119">        throw new FileNotFoundException(&quot;File for module&quot;+moduleName+&quot; was not found!&quot;);</span>
+<span class="nc" id="L122">        LOGGER.debug(&quot;PythonFile: {}, Paths: {}&quot;, pythonFile, candidatePaths);</span>
+<span class="nc" id="L123">        throw new FileNotFoundException(&quot;File for module&quot;+moduleName+&quot; was not found!&quot;);</span>
     }
 
     public static Path getPathForFullyQualifiedClassNameInSetOfPaths(Set&lt;Path&gt; javaFiles,
-                                                                     String fullyQualifiedClassName)
+                                                                     String fullyQualifiedClassName,
+                                                                     Path projectRoot)
             throws FileNotFoundException {
-<span class="fc" id="L125">        String javaFile =</span>
-<span class="fc" id="L126">                fullyQualifiedClassName.split(&quot;\\$&quot;)[0].replace(&quot;.&quot;, &quot;/&quot;).concat(&quot;.java&quot;);</span>
-<span class="fc" id="L127">        List&lt;Path&gt; candidatePaths = javaFiles.stream()</span>
-<span class="fc" id="L128">                .filter(path -&gt; path.endsWith(javaFile)).collect(Collectors.toList());</span>
-<span class="fc bfc" id="L129" title="All 2 branches covered.">        if(candidatePaths.size() != 1) {</span>
-<span class="fc" id="L130">            throw new FileNotFoundException(&quot;File for class&quot;+fullyQualifiedClassName+&quot; was not found!&quot;);</span>
+        /*
+        Create a set of possible names:
+        First -&gt; original name; Afterwards, cut of parts that start with $ (to handle subclasses).
+        E.g., $Gson$Types$GenericArrayTypeImpl would result in the following list:
+        [$Gson$Types$GenericArrayTypeImpl.java, $Gson$Types.java, $Gson.java, '']
+         */
+<span class="fc" id="L136">        Set&lt;String&gt; possibleNames = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L137">        possibleNames.add(fullyQualifiedClassName.replace(&quot;.&quot;, &quot;/&quot;).concat(&quot;.java&quot;));</span>
+
+<span class="fc" id="L139">        String[] parts = fullyQualifiedClassName.split(&quot;\\$&quot;);</span>
+<span class="fc bfc" id="L140" title="All 2 branches covered.">        for(int i=0; i&lt;parts.length; i++) {</span>
+<span class="fc" id="L141">            possibleNames.add(</span>
+<span class="fc" id="L142">                    String.join(&quot;$&quot;, Arrays.copyOfRange(parts, 0, parts.length-i))</span>
+<span class="fc" id="L143">                            .replace(&quot;.&quot;, &quot;/&quot;)</span>
+<span class="fc" id="L144">                            .concat(&quot;.java&quot;)</span>
+            );
         }
 
-<span class="fc" id="L133">        return candidatePaths.get(0);</span>
+<span class="fc" id="L148">        Predicate&lt;Path&gt; endsWithSameString =</span>
+<span class="fc" id="L149">                p -&gt; possibleNames.stream().anyMatch(pn -&gt; p.toString().endsWith(pn));</span>
+
+<span class="fc" id="L151">        List&lt;Path&gt; candidatePaths = javaFiles.stream()</span>
+<span class="fc" id="L152">                .filter(endsWithSameString)</span>
+<span class="fc" id="L153">                .collect(Collectors.toList());</span>
+
+
+<span class="pc" id="L156">        Optional&lt;Path&gt; bestFit = candidatePaths.stream().max(Comparator.comparingInt(p -&gt; p.toString().length()));</span>
+<span class="fc bfc" id="L157" title="All 2 branches covered.">        if(bestFit.isPresent()) {</span>
+<span class="fc" id="L158">            LOGGER.debug(&quot;{} is best fit for {}&quot;, bestFit.get(), fullyQualifiedClassName);</span>
+<span class="fc" id="L159">            return bestFit.get();</span>
+        } else {
+            /*
+            We need to look if we find a class or enum definition in any of the other class files, as it can be the
+            case, that a class or enum is defined in another class source file.
+             */
+<span class="fc bfc" id="L165" title="All 2 branches covered.">            for(String possibleName: possibleNames) {</span>
+<span class="fc" id="L166">                String[] allParts = possibleName.split(&quot;\\/&quot;);</span>
+<span class="fc" id="L167">                String lastPart = allParts[allParts.length-1].replace(&quot;.java&quot;, &quot;&quot;);</span>
+<span class="fc" id="L168">                String pathExceptLastPart = String.join(&quot;/&quot;, Arrays.copyOfRange(allParts, 0, allParts.length-1));</span>
+<span class="fc bfc" id="L169" title="All 2 branches covered.">                for(Path possibleFile: javaFiles) {</span>
+                    // The package declaration must be the same, therefore, we only look for files that are in
+                    // the same package
+<span class="fc bfc" id="L172" title="All 2 branches covered.">                    if(!possibleFile.toString().contains(pathExceptLastPart)) {</span>
+<span class="fc" id="L173">                        continue;</span>
+                    }
+
+<span class="fc" id="L176">                    Path searchInPath = projectRoot;</span>
+
+<span class="pc bpc" id="L178" title="1 of 2 branches missed.">                    if(!possibleFile.startsWith(projectRoot)) {</span>
+<span class="fc" id="L179">                        searchInPath = Paths.get(projectRoot.toString(), possibleFile.toString());</span>
+                    }
+
+<span class="fc" id="L182">                    Boolean classFound = searchFile(searchInPath, &quot;class &quot;+lastPart);</span>
+<span class="fc" id="L183">                    Boolean enumFound = searchFile(searchInPath, &quot;enum &quot;+lastPart);</span>
+
+<span class="pc bpc" id="L185" title="1 of 4 branches missed.">                    if(classFound || enumFound) {</span>
+<span class="fc" id="L186">                        LOGGER.debug(&quot;{} is best fit for {}&quot;, possibleFile, fullyQualifiedClassName);</span>
+<span class="fc" id="L187">                        return possibleFile;</span>
+                    }
+<span class="nc" id="L189">                }</span>
+<span class="fc" id="L190">            }</span>
+<span class="fc" id="L191">            throw new FileNotFoundException(&quot;File for class &quot;+fullyQualifiedClassName+&quot; was not found!&quot;);</span>
+        }
+    }
+
+    private static Boolean searchFile(Path file, String pattern) {
+<span class="fc" id="L196">        Scanner scanner = null;</span>
+        try {
+<span class="fc" id="L198">            scanner = new Scanner(file.toFile(), &quot;utf-8&quot;);</span>
+<span class="fc bfc" id="L199" title="All 2 branches covered.">            if (scanner.findWithinHorizon(pattern, 0) != null) {</span>
+<span class="fc" id="L200">                return true;</span>
+            }
+<span class="nc" id="L202">        } catch (FileNotFoundException e) {</span>
+<span class="nc" id="L203">            return false;</span>
+        } finally {
+<span class="pc bpc" id="L205" title="6 of 8 branches missed.">            if(scanner != null) {</span>
+<span class="pc" id="L206">                scanner.close();</span>
+            }
+        }
+
+<span class="fc" id="L210">        return false;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>
