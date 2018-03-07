@@ -39,14 +39,14 @@ public class BaseLoader extends BaseModel {
     public DataSet loadData() throws LoaderException {
 <span class="pc bpc" id="L40" title="1 of 2 branches missed.">        for(Method method : this.getClass().getDeclaredMethods()) {</span>
             try {
-<span class="fc bfc" id="L42" title="All 2 branches covered.">                if (shouldMethodBeExecutedIgnoreLevel(method)) {</span>
+<span class="pc bpc" id="L42" title="1 of 2 branches missed.">                if (shouldMethodBeExecutedIgnoreLevel(method)) {</span>
 <span class="fc" id="L43">                    this.logger.info(&quot;Using data loader method {} from class {}...&quot;, method.getName(),</span>
 <span class="fc" id="L44">                            this.getClass().getName());</span>
 <span class="fc" id="L45">                    return (DataSet) method.invoke(this);</span>
                 }
 <span class="nc" id="L47">            } catch (IllegalAccessException | InvocationTargetException e) {</span>
 <span class="nc" id="L48">                throw new LoaderException(&quot;Could not load data: &quot; + e.getMessage());</span>
-<span class="fc" id="L49">            }</span>
+<span class="nc" id="L49">            }</span>
         }
 <span class="nc" id="L51">        throw new LoaderException(&quot;No method found that supports &quot;+generalConf.getLanguage());</span>
     }
