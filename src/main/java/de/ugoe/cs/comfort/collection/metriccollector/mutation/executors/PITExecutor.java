@@ -146,10 +146,6 @@ public class PITExecutor implements IMutationExecutor {
             MutationExecutionResult mutationExecutionResult = outputParser.getMutationExecutionResult();
 
 
-            if (mutationExecutionResult.getNumTests() != 1) {
-                throw new IOException("Not only one test found by pit!");
-            }
-
             if (mutationExecutionResult.getNumMutationUnits() < 1) {
                 throw new IOException("No mutation units generated!");
             }
