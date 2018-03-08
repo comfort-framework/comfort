@@ -202,18 +202,6 @@ public class PITExecutor implements IMutationExecutor {
         return mutationResults;
     }
 
-
-    private Path findFileBasedOnName(String name) throws MutationResultException {
-        String nameWithoutSubClass = name.split("\\$")[0];
-        for(Path javaFile : javaFiles) {
-            if(javaFile.toString().endsWith("/"+nameWithoutSubClass.replaceAll("\\.", "/")+".java")) {
-                return javaFile;
-            }
-        }
-
-        throw new MutationResultException("File "+name+" not found!");
-    }
-
     private static class PITExecutionOutputParser implements InvocationOutputHandler {
         MutationExecutionResult mutationExecutionResult = new MutationExecutionResult();
 

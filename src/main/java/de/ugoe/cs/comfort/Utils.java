@@ -173,7 +173,7 @@ public class Utils {
                         continue;
                     }
 
-                    Path searchInPath = projectRoot;
+                    Path searchInPath = possibleFile;
 
                     if(!possibleFile.startsWith(projectRoot)) {
                         searchInPath = Paths.get(projectRoot.toString(), possibleFile.toString());
@@ -188,8 +188,8 @@ public class Utils {
                     }
                 }
             }
-            throw new FileNotFoundException("File for class "+fullyQualifiedClassName+" was not found!");
         }
+        throw new FileNotFoundException("File for class "+fullyQualifiedClassName+" was not found!");
     }
 
     private static Boolean searchFile(Path file, String pattern) {
