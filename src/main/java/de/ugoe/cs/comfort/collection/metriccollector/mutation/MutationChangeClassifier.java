@@ -67,7 +67,7 @@ public class MutationChangeClassifier {
                 case "org.pitest.mutationtest.engine.gregor.mutators.ConstructorCallMutator":
                     return "INTERFACE";
                 case "org.pitest.mutationtest.engine.gregor.mutators.EmptyObjectReturnValsMutator":
-                    return "INTERFACE";
+                    return "LOGIC/CONTROL";
                 case "org.pitest.mutationtest.engine.gregor.mutators.IncrementsMutator":
                     op = new IncrementsOperator();
                     break;
