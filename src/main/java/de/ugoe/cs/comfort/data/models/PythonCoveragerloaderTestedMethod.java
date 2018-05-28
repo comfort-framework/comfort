@@ -66,6 +66,10 @@ public class PythonCoveragerloaderTestedMethod {
         return coveredLines.size();
     }
 
+    public Path getLocation() {
+        return location;
+    }
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)

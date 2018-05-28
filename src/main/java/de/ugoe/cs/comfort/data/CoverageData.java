@@ -82,6 +82,8 @@ public class CoverageData extends DataSet {
     }
 
     private Map<IUnit, Set<IUnit>> filterOutCoveredTests(Map<IUnit, Set<IUnit>> data) {
+        // Here we filter out covered tests, as we only want to have return production code coverage and not test data
+        // coverage
         Map<IUnit, Set<IUnit>> coverageWithoutTests = new HashMap<>();
         for(Map.Entry<IUnit, Set<IUnit>> entry: data.entrySet()) {
             Set<IUnit> coveredMethodsWithoutTests = new HashSet<>();

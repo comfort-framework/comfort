@@ -21,18 +21,14 @@ import de.ugoe.cs.comfort.annotations.SupportsClass;
 import de.ugoe.cs.comfort.annotations.SupportsJava;
 import de.ugoe.cs.comfort.annotations.SupportsMethod;
 import de.ugoe.cs.comfort.annotations.SupportsPython;
-import de.ugoe.cs.comfort.collection.loader.ProjectFilesLoader;
 import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
 import de.ugoe.cs.comfort.data.CoverageData;
 import de.ugoe.cs.comfort.data.ProjectFiles;
 import de.ugoe.cs.comfort.data.models.IUnit;
-import de.ugoe.cs.comfort.exception.LoaderException;
 import de.ugoe.cs.comfort.filer.BaseFiler;
 import de.ugoe.cs.comfort.filer.models.Result;
-import de.ugoe.cs.smartshark.model.Project;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -56,7 +52,7 @@ public class NamingConventionTestTypeCollector extends BaseMetricCollector {
     @SupportsClass
     public void createResults(ProjectFiles projectFiles) throws IOException {
         // Get all code files without tests in a list for comparison later on
-        List<String> codeFileNamesWithoutTests = new ArrayList<>();
+        Set<String> codeFileNamesWithoutTests = new HashSet<>();
         projectFiles.getCodeFilesWithoutTestFiles().forEach(
                 codeFilePath ->
                     codeFileNamesWithoutTests.add(Files.getNameWithoutExtension(codeFilePath.toString()).toLowerCase())
@@ -81,14 +77,16 @@ public class NamingConventionTestTypeCollector extends BaseMetricCollector {
             // Create filer map
             Set<Result> result = new HashSet<>();
             for(Map.Entry<IUnit, Set<IUnit>> unit: coverageData.getCoverageData().entrySet()) {
-                List<String> coveredUnits = new ArrayList<>();
+                Set<String> coveredUnits = new HashSet<>();
                 for(IUnit coveredUnit: unit.getValue()) {
                     String[] fqnParts = coveredUnit.getFQNOfUnit().split("\\.");
                     String className = fqnParts[fqnParts.length-1];
                     coveredUnits.add(className.toLowerCase());
                 }
+
                 Path testPath = fileNameUtils.getPathForIdentifier(unit.getKey().getFQN(),
                         generalConf.getMethodLevel());
+
                 result.add(classifyTestFile(unit.getKey().getFQN(), testPath, coveredUnits, "cov_nc"));
             }
 
@@ -99,7 +97,9 @@ public class NamingConventionTestTypeCollector extends BaseMetricCollector {
         }
     }
 
-    private Result classifyTestFile(String id, Path testFile, List<String> codeFileNamesWithoutTests, String metric) {
+    private Result classifyTestFile(String id, Path testFile, Set<String> codeFileNamesWithoutTests, String metric) {
+        logger.debug("Classifying: {}", testFile);
+        logger.debug("Has tested: {}", codeFileNamesWithoutTests);
         Result result = new Result(id, testFile);
         if(isIntegrationTest(testFile)) {
             result.addMetric(metric, TestType.INTEGRATION.name());
@@ -135,7 +135,7 @@ public class NamingConventionTestTypeCollector extends BaseMetricCollector {
         return false;
     }
 
-    private Boolean isUnitTest(Path testFilePath, List<String> codeFileNamesWithoutTests) {
+    private Boolean isUnitTest(Path testFilePath, Set<String> codeFileNamesWithoutTests) {
         // List of patterns to check
         String[] pathPatterns = new String[]{"unit", "Unit", "UnitTest", "unitTest", "unittest", "unittests"};
 

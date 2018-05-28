@@ -74,7 +74,10 @@ public class PythonMethod extends PythonModule implements IUnit {
 
     @Override
     public String getFQN() {
-        return getFQNOfUnit()+"."+nameSpace+"."+method;
+        if (nameSpace == null) {
+            return getFQNOfUnit()+":"+method;
+        }
+        return getFQNOfUnit()+":"+nameSpace+"."+method;
     }
 
     @Override

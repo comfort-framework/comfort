@@ -36,6 +36,7 @@ import de.ugoe.cs.comfort.data.models.PythonCoveragerloaderTestedMethod;
 import de.ugoe.cs.comfort.data.models.PythonMethod;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -88,15 +89,22 @@ public class TestCoverageLoader extends BaseLoader {
             // This can be the case if the tests are part of the program itself (e.g. networkx/util/tests)
             for(PythonCoveragerloaderTestedMethod testedMethod: testMethod.getTestedMethods()) {
                 // Convert
-                PythonMethod pythonTestedMethod = new PythonMethod(testedMethod,
-                        fileNameUtils.getPathForPythonModuleFQN(testedMethod.getModule()));
+                PythonMethod pythonTestedMethod = null;
+                if(testedMethod.getLocation().toString().startsWith(generalConf.getProjectDir().toString())) {
+                    String location = testedMethod.getLocation().toString()
+                            .replace(generalConf.getProjectDir().toString()+"/", "");
+                    pythonTestedMethod = new PythonMethod(testedMethod, Paths.get(location));
+                } else {
+                    pythonTestedMethod = new PythonMethod(testedMethod,
+                            fileNameUtils.getPathForPythonModuleFQN(testedMethod.getModule()));
+                }
                 pythonTestedMethod.setCoveredLines(testedMethod.getCoveredLines());
 
                 testedMethodsWithoutTestsItself.add(pythonTestedMethod);
             }
             covfefe.add(pythonMethod, testedMethodsWithoutTestsItself);
+            logger.debug("Found {} which tests {}", pythonMethod, testedMethodsWithoutTestsItself);
         }
-
         return covfefe;
     }
 
