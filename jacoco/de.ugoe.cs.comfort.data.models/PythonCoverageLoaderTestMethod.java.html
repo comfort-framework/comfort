@@ -30,55 +30,63 @@ public class PythonCoverageLoaderTestMethod {
     private String module;
     private String namespace;
     private String method;
+    private String location;
 
     @JsonCreator
     public PythonCoverageLoaderTestMethod(@JsonProperty(&quot;unique_id&quot;) String uniqueIdentifier,
                                           @JsonProperty(&quot;module&quot;) String module,
                                           @JsonProperty(&quot;namespace&quot;) String namespace,
                                           @JsonProperty(&quot;method&quot;) String method,
-<span class="fc" id="L39">                                          @JsonProperty(&quot;tests&quot;) Set&lt;PythonCoveragerloaderTestedMethod&gt; tests) {</span>
-<span class="fc" id="L40">        this.namespace = namespace;</span>
-<span class="fc" id="L41">        this.module = module;</span>
-<span class="fc" id="L42">        this.method = method;</span>
+                                          @JsonProperty(&quot;location&quot;) String location,
+<span class="fc" id="L41">                                          @JsonProperty(&quot;tests&quot;) Set&lt;PythonCoveragerloaderTestedMethod&gt; tests) {</span>
+<span class="fc" id="L42">        this.namespace = namespace;</span>
+<span class="fc" id="L43">        this.module = module;</span>
+<span class="fc" id="L44">        this.method = method;</span>
+<span class="fc" id="L45">        this.location = location;</span>
 
         // Little hack, as jackson can not creaet the correct python objects otherwise
-<span class="fc" id="L45">        Set&lt;PythonCoveragerloaderTestedMethod&gt; testsSet = new HashSet&lt;&gt;();</span>
-<span class="fc" id="L46">        testsSet.addAll(tests);</span>
-<span class="fc" id="L47">        this.tests = testsSet;</span>
-<span class="fc" id="L48">    }</span>
+<span class="fc" id="L48">        Set&lt;PythonCoveragerloaderTestedMethod&gt; testsSet = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L49">        testsSet.addAll(tests);</span>
+<span class="fc" id="L50">        this.tests = testsSet;</span>
+<span class="fc" id="L51">    }</span>
 
     @Override
     public String toString() {
-<span class="nc" id="L52">        return MoreObjects.toStringHelper(this)</span>
-<span class="nc" id="L53">                .add(&quot;module&quot;, module)</span>
-<span class="nc" id="L54">                .add(&quot;namespace&quot;, namespace)</span>
-<span class="nc" id="L55">                .add(&quot;method&quot;, method)</span>
-<span class="nc" id="L56">                .add(&quot;tests&quot;, tests)</span>
-<span class="nc" id="L57">                .toString();</span>
+<span class="nc" id="L55">        return MoreObjects.toStringHelper(this)</span>
+<span class="nc" id="L56">                .add(&quot;module&quot;, module)</span>
+<span class="nc" id="L57">                .add(&quot;namespace&quot;, namespace)</span>
+<span class="nc" id="L58">                .add(&quot;method&quot;, method)</span>
+<span class="nc" id="L59">                .add(&quot;location&quot;, location)</span>
+<span class="nc" id="L60">                .add(&quot;tests&quot;, tests)</span>
+<span class="nc" id="L61">                .toString();</span>
     }
 
     public Set&lt;PythonCoveragerloaderTestedMethod&gt; getTestedMethods() {
-<span class="fc" id="L61">        return tests;</span>
+<span class="fc" id="L65">        return tests;</span>
     }
 
     public String getFileNameRepresentation() {
-<span class="nc" id="L65">        return module;</span>
+<span class="nc" id="L69">        return module;</span>
     }
 
     public void setTestedMethods(Set&lt;PythonCoveragerloaderTestedMethod&gt; tests) {
-<span class="nc" id="L69">        this.tests = tests;</span>
-<span class="nc" id="L70">    }</span>
+<span class="nc" id="L73">        this.tests = tests;</span>
+<span class="nc" id="L74">    }</span>
 
     public String getModule() {
-<span class="fc" id="L73">        return this.module;</span>
+<span class="fc" id="L77">        return this.module;</span>
     }
 
     public String getNameSpace() {
-<span class="fc" id="L77">        return this.namespace;</span>
+<span class="fc" id="L81">        return this.namespace;</span>
     }
 
     public String getMethod() {
-<span class="fc" id="L81">        return this.method;</span>
+<span class="fc" id="L85">        return this.method;</span>
+    }
+
+    public String getLocation() {
+<span class="fc" id="L89">        return this.location;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

@@ -51,71 +51,97 @@ public class PythonMethod extends PythonModule implements IUnit {
 <span class="fc" id="L51">        super(covPythonMethod.getModule(), fileName);</span>
 <span class="fc" id="L52">        this.nameSpace = covPythonMethod.getNameSpace();</span>
 <span class="fc" id="L53">        this.method = covPythonMethod.getMethod();</span>
-<span class="fc" id="L54">    }</span>
+
+<span class="fc" id="L55">        checkFQN();</span>
+<span class="fc" id="L56">    }</span>
 
     // Constructor for converting JSON Python coverage object to this class
     public PythonMethod(PythonCoveragerloaderTestedMethod covPythonMethod, Path fileName) {
-<span class="fc" id="L58">        super(covPythonMethod.getModule(), fileName);</span>
-<span class="fc" id="L59">        this.nameSpace = covPythonMethod.getNameSpace();</span>
-<span class="fc" id="L60">        this.method = covPythonMethod.getMethod();</span>
-<span class="fc" id="L61">    }</span>
+<span class="fc" id="L60">        super(covPythonMethod.getModule(), fileName);</span>
+<span class="fc" id="L61">        this.nameSpace = covPythonMethod.getNameSpace();</span>
+<span class="fc" id="L62">        this.method = covPythonMethod.getMethod();</span>
+
+
+
+<span class="fc" id="L66">    }</span>
+
+    private void checkFQN() {
+        /*
+        Sometime when we use comfort-smother, the test runner (pytest/nosetest) does not record the package correctly.
+        Hence, we need to set the package here based on the file path. Nevertheless, this is not always correct!
+         */
+<span class="fc" id="L73">        String fullNameBasedOnFileName = fileName.toString()</span>
+<span class="fc" id="L74">                .substring(0, fileName.toString().length() - 3).replace(&quot;/&quot;, &quot;.&quot;);</span>
+<span class="pc bpc" id="L75" title="4 of 6 branches missed.">        if ((pPackage == null || pPackage.equals(&quot;&quot;)) &amp;&amp; !getFQNOfUnit().equals(fullNameBasedOnFileName)</span>
+<span class="nc bnc" id="L76" title="All 2 branches missed.">                &amp;&amp; !(getFQNOfUnit()+&quot;.__init__&quot;).equals(fullNameBasedOnFileName)) {</span>
+<span class="nc bnc" id="L77" title="All 2 branches missed.">            if (fullNameBasedOnFileName.endsWith(&quot;__init__&quot;)) {</span>
+<span class="nc" id="L78">                this.pModule = &quot;__init__&quot;;</span>
+<span class="nc" id="L79">                this.pPackage = fullNameBasedOnFileName.replace(&quot;.__init__&quot;, &quot;&quot;);</span>
+            } else {
+<span class="nc" id="L81">                this.pPackage = fullNameBasedOnFileName.replace(&quot;.&quot; + this.pModule, &quot;&quot;);</span>
+            }
+        }
+<span class="fc" id="L84">    }</span>
 
     public void setFileName(Path fileName) {
-<span class="fc" id="L64">        this.fileName = fileName;</span>
-<span class="fc" id="L65">    }</span>
+<span class="fc" id="L87">        this.fileName = fileName;</span>
+<span class="fc" id="L88">    }</span>
 
     public Boolean isTestBasedOnFQNOfMethod() {
-<span class="nc" id="L68">        return getFQN().toLowerCase().contains(&quot;test&quot;);</span>
+<span class="nc" id="L91">        return getFQN().toLowerCase().contains(&quot;test&quot;);</span>
     }
 
     public Boolean isTestBasedOnMethod() {
-<span class="nc" id="L72">        return this.method.toLowerCase().contains(&quot;test&quot;);</span>
+<span class="nc" id="L95">        return this.method.toLowerCase().contains(&quot;test&quot;);</span>
     }
 
     @Override
     public String getFQN() {
-<span class="fc" id="L77">        return getFQNOfUnit()+&quot;.&quot;+nameSpace+&quot;.&quot;+method;</span>
+<span class="pc bpc" id="L100" title="1 of 2 branches missed.">        if (nameSpace == null) {</span>
+<span class="nc" id="L101">            return getFQNOfUnit()+&quot;:&quot;+method;</span>
+        }
+<span class="fc" id="L103">        return getFQNOfUnit()+&quot;:&quot;+nameSpace+&quot;.&quot;+method;</span>
     }
 
     @Override
     public boolean equals(Object obj) {
-<span class="pc bpc" id="L82" title="1 of 2 branches missed.">        if(!(obj instanceof PythonMethod)) {</span>
-<span class="nc" id="L83">            return false;</span>
+<span class="pc bpc" id="L108" title="1 of 2 branches missed.">        if(!(obj instanceof PythonMethod)) {</span>
+<span class="nc" id="L109">            return false;</span>
         }
 
-<span class="pc bpc" id="L86" title="1 of 2 branches missed.">        if(obj == this) {</span>
-<span class="nc" id="L87">            return true;</span>
+<span class="pc bpc" id="L112" title="1 of 2 branches missed.">        if(obj == this) {</span>
+<span class="nc" id="L113">            return true;</span>
         }
 
-<span class="fc" id="L90">        PythonMethod otherNode = (PythonMethod) obj;</span>
-<span class="fc" id="L91">        return new EqualsBuilder()</span>
-<span class="fc" id="L92">                .appendSuper(super.equals(obj))</span>
-<span class="fc" id="L93">                .append(nameSpace, otherNode.nameSpace)</span>
-<span class="fc" id="L94">                .append(method, otherNode.method)</span>
-<span class="fc" id="L95">                .append(parameter, otherNode.parameter)</span>
-<span class="fc" id="L96">                .isEquals();</span>
+<span class="fc" id="L116">        PythonMethod otherNode = (PythonMethod) obj;</span>
+<span class="fc" id="L117">        return new EqualsBuilder()</span>
+<span class="fc" id="L118">                .appendSuper(super.equals(obj))</span>
+<span class="fc" id="L119">                .append(nameSpace, otherNode.nameSpace)</span>
+<span class="fc" id="L120">                .append(method, otherNode.method)</span>
+<span class="fc" id="L121">                .append(parameter, otherNode.parameter)</span>
+<span class="fc" id="L122">                .isEquals();</span>
     }
 
     @Override
     public int hashCode() {
-<span class="fc" id="L101">        return new HashCodeBuilder(17, 31)</span>
-<span class="fc" id="L102">                .appendSuper(super.hashCode())</span>
-<span class="fc" id="L103">                .append(nameSpace)</span>
-<span class="fc" id="L104">                .append(method)</span>
-<span class="fc" id="L105">                .append(parameter)</span>
-<span class="fc" id="L106">                .toHashCode();</span>
+<span class="fc" id="L127">        return new HashCodeBuilder(17, 31)</span>
+<span class="fc" id="L128">                .appendSuper(super.hashCode())</span>
+<span class="fc" id="L129">                .append(nameSpace)</span>
+<span class="fc" id="L130">                .append(method)</span>
+<span class="fc" id="L131">                .append(parameter)</span>
+<span class="fc" id="L132">                .toHashCode();</span>
     }
 
     @Override
     public String toString() {
-<span class="fc" id="L111">        return MoreObjects.toStringHelper(this)</span>
-<span class="fc" id="L112">                .add(&quot;pPackage&quot;, pPackage)</span>
-<span class="fc" id="L113">                .add(&quot;pModule&quot;, pModule)</span>
-<span class="fc" id="L114">                .add(&quot;namespace&quot;, nameSpace)</span>
-<span class="fc" id="L115">                .add(&quot;method&quot;, method)</span>
-<span class="fc" id="L116">                .add(&quot;parameter&quot;, parameter)</span>
-<span class="fc" id="L117">                .add(&quot;fileName&quot;, fileName)</span>
-<span class="fc" id="L118">                .toString();</span>
+<span class="fc" id="L137">        return MoreObjects.toStringHelper(this)</span>
+<span class="fc" id="L138">                .add(&quot;pPackage&quot;, pPackage)</span>
+<span class="fc" id="L139">                .add(&quot;pModule&quot;, pModule)</span>
+<span class="fc" id="L140">                .add(&quot;namespace&quot;, nameSpace)</span>
+<span class="fc" id="L141">                .add(&quot;method&quot;, method)</span>
+<span class="fc" id="L142">                .add(&quot;parameter&quot;, parameter)</span>
+<span class="fc" id="L143">                .add(&quot;fileName&quot;, fileName)</span>
+<span class="fc" id="L144">                .toString();</span>
 
     }
 }
