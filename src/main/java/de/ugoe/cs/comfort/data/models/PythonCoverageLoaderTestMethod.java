@@ -30,16 +30,19 @@ public class PythonCoverageLoaderTestMethod {
     private String module;
     private String namespace;
     private String method;
+    private String location;
 
     @JsonCreator
     public PythonCoverageLoaderTestMethod(@JsonProperty("unique_id") String uniqueIdentifier,
                                           @JsonProperty("module") String module,
                                           @JsonProperty("namespace") String namespace,
                                           @JsonProperty("method") String method,
+                                          @JsonProperty("location") String location,
                                           @JsonProperty("tests") Set<PythonCoveragerloaderTestedMethod> tests) {
         this.namespace = namespace;
         this.module = module;
         this.method = method;
+        this.location = location;
 
         // Little hack, as jackson can not creaet the correct python objects otherwise
         Set<PythonCoveragerloaderTestedMethod> testsSet = new HashSet<>();
@@ -53,6 +56,7 @@ public class PythonCoverageLoaderTestMethod {
                 .add("module", module)
                 .add("namespace", namespace)
                 .add("method", method)
+                .add("location", location)
                 .add("tests", tests)
                 .toString();
     }
@@ -79,5 +83,9 @@ public class PythonCoverageLoaderTestMethod {
 
     public String getMethod() {
         return this.method;
+    }
+
+    public String getLocation() {
+        return this.location;
     }
 }

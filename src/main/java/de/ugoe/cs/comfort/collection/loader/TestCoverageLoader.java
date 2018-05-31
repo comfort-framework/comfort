@@ -80,8 +80,18 @@ public class TestCoverageLoader extends BaseLoader {
             PythonCoverageLoaderTestMethod testMethod = mapper.readValue(jp, PythonCoverageLoaderTestMethod.class);
 
             // Convert
-            PythonMethod pythonMethod = new PythonMethod(testMethod,
-                    fileNameUtils.getPathForPythonModuleFQN(testMethod.getModule()));
+            PythonMethod pythonMethod = null;
+
+            // Compatibility with files that do not have the location inside
+            if(testMethod.getLocation() != null
+                    && testMethod.getLocation().startsWith(generalConf.getProjectDir().toString())) {
+                String location = testMethod.getLocation()
+                        .replace(generalConf.getProjectDir().toString()+"/", "");
+                pythonMethod = new PythonMethod(testMethod, Paths.get(location));
+            } else {
+                pythonMethod = new PythonMethod(testMethod,
+                        fileNameUtils.getPathForPythonModuleFQN(testMethod.getModule()));
+            }
 
             Set<IUnit> testedMethodsWithoutTestsItself = new HashSet<>();
 
@@ -90,8 +100,8 @@ public class TestCoverageLoader extends BaseLoader {
             for(PythonCoveragerloaderTestedMethod testedMethod: testMethod.getTestedMethods()) {
                 // Convert
                 PythonMethod pythonTestedMethod = null;
-                if(testedMethod.getLocation().toString().startsWith(generalConf.getProjectDir().toString())) {
-                    String location = testedMethod.getLocation().toString()
+                if(testedMethod.getLocation().startsWith(generalConf.getProjectDir().toString())) {
+                    String location = testedMethod.getLocation()
                             .replace(generalConf.getProjectDir().toString()+"/", "");
                     pythonTestedMethod = new PythonMethod(testedMethod, Paths.get(location));
                 } else {

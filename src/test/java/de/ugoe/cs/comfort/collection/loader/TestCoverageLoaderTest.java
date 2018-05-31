@@ -89,7 +89,7 @@ public class TestCoverageLoaderTest extends BaseTest {
 
             // Compare test
             for (Map.Entry<IUnit, Set<IUnit>> entry : covData.getCoverageData().entrySet()) {
-                if (entry.getKey().getFQN().equals("tests.unittests.test_module3.Module3Test.testBlub")) {
+                if (entry.getKey().getFQN().equals("tests.unittests.test_module3:Module3Test.testBlub")) {
                     assertEquals("size is not correct", 2, entry.getValue().size());
                     assertEquals("not the same methods", module3TestTestBlubtestedMethods, entry.getValue());
                     return;
@@ -118,7 +118,8 @@ public class TestCoverageLoaderTest extends BaseTest {
 
             // Compare test
             for (Map.Entry<IUnit, Set<IUnit>> entry : covData.getCoverageData().entrySet()) {
-                if (entry.getKey().getFQN().equals("tests.unittests.test_module3.Module3Test.testBlub")) {
+                System.out.println(entry.getKey());
+                if (entry.getKey().getFQN().equals("tests.unittests.test_module3:Module3Test.testBlub")) {
                     assertEquals("size is not correct", 1, entry.getValue().size());
                     assertEquals("not the same methods", module3TestTestBlubtestedMethods, entry.getValue());
                     return;

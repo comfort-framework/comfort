@@ -18,7 +18,6 @@ package de.ugoe.cs.comfort.collection.metriccollector;
 
 import static org.junit.Assert.assertEquals;
 
-import de.ugoe.cs.comfort.BaseTest;
 import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
 import de.ugoe.cs.comfort.data.graphs.CallEdge;
 import de.ugoe.cs.comfort.data.graphs.CallGraph;
@@ -119,8 +118,8 @@ public class DirectnessCollectorTest extends BaseMetricCollectorTest {
         directnessCollector = new DirectnessCollector(pythonConfig, filerMock);
         directnessCollector.createDirectnessMetricForJavaOnMethodLevel(pythonCallGraph);
 
-        expectedResult.add(new Result("tests.test_module1.Module1Test.test", null, "call_dire","66.6667"));
-        expectedResult.add(new Result("tests.test_module1.Module1Test.test2", null, "call_dire","33.3333"));
+        expectedResult.add(new Result("tests.test_module1:Module1Test.test", null, "call_dire","66.6667"));
+        expectedResult.add(new Result("tests.test_module1:Module1Test.test2", null, "call_dire","33.3333"));
 
         assertEquals(expectedResult, filerMock.getResults().getResults());
     }

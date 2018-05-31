@@ -18,7 +18,6 @@ package de.ugoe.cs.comfort.collection.metriccollector;
 
 import static org.junit.Assert.assertEquals;
 
-import de.ugoe.cs.comfort.BaseTest;
 import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
 import de.ugoe.cs.comfort.data.CoverageData;
 import de.ugoe.cs.comfort.data.graphs.CallEdge;
@@ -136,9 +135,9 @@ public class TestCoverageCollectorTest extends BaseMetricCollectorTest {
         testCoverageCollector = new TestCoverageCollector(pythonConfig, filerMock);
 
         testCoverageCollector.createResultsJavaPythonMethodLevel(covDataPython);
-        expectedResult.add(new Result("tests.test_module1.Module1Test.test", null, "cov_tcov_met", "66"));
-        expectedResult.add(new Result("tests.test_module2.Module2Test.test", null, "cov_tcov_met", "33"));
-        expectedResult.add(new Result("tests.test_module2.Module2Test.test2", null, "cov_tcov_met", "33"));
+        expectedResult.add(new Result("tests.test_module1:Module1Test.test", null, "cov_tcov_met", "66"));
+        expectedResult.add(new Result("tests.test_module2:Module2Test.test", null, "cov_tcov_met", "33"));
+        expectedResult.add(new Result("tests.test_module2:Module2Test.test2", null, "cov_tcov_met", "33"));
         assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 

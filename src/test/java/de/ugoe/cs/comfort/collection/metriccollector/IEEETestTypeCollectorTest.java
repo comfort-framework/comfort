@@ -18,7 +18,6 @@ package de.ugoe.cs.comfort.collection.metriccollector;
 
 import static org.junit.Assert.assertEquals;
 
-import de.ugoe.cs.comfort.BaseTest;
 import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
 import de.ugoe.cs.comfort.data.CoverageData;
 import de.ugoe.cs.comfort.data.graphs.CallEdge;
@@ -109,8 +108,8 @@ public class IEEETestTypeCollectorTest extends BaseMetricCollectorTest {
         ieeeTestTypeCollector = new IEEETestTypeCollector(pythonConfig, filerMock);
         ieeeTestTypeCollector.createResultsJavaPythonMethodLevelCallGraph(callGraph);
 
-        expectedResult.add(new Result("tests.test_module1.Module1Test.test", null, "call_ieee_met",TestType.INTEGRATION.name()));
-        expectedResult.add(new Result("tests.test_module2.Module2Test.test", null, "call_ieee_met",TestType.UNIT.name()));
+        expectedResult.add(new Result("tests.test_module1:Module1Test.test", null, "call_ieee_met",TestType.INTEGRATION.name()));
+        expectedResult.add(new Result("tests.test_module2:Module2Test.test", null, "call_ieee_met",TestType.UNIT.name()));
         assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
@@ -338,8 +337,8 @@ public class IEEETestTypeCollectorTest extends BaseMetricCollectorTest {
         ieeeTestTypeCollector = new IEEETestTypeCollector(pythonConfig, filerMock);
         ieeeTestTypeCollector.createResultsJavaPythonCoverageMethod(covData);
 
-        expectedResult.add(new Result("tests.test_module1.Module1Test.test", null, "cov_ieee_met", TestType.UNIT.name()));
-        expectedResult.add(new Result("tests.test_module2.Module2Test.test", null, "cov_ieee_met", TestType.INTEGRATION.name()));
+        expectedResult.add(new Result("tests.test_module1:Module1Test.test", null, "cov_ieee_met", TestType.UNIT.name()));
+        expectedResult.add(new Result("tests.test_module2:Module2Test.test", null, "cov_ieee_met", TestType.INTEGRATION.name()));
         assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 }

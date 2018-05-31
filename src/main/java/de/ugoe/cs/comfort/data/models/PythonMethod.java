@@ -51,6 +51,8 @@ public class PythonMethod extends PythonModule implements IUnit {
         super(covPythonMethod.getModule(), fileName);
         this.nameSpace = covPythonMethod.getNameSpace();
         this.method = covPythonMethod.getMethod();
+
+        checkFQN();
     }
 
     // Constructor for converting JSON Python coverage object to this class
@@ -58,6 +60,27 @@ public class PythonMethod extends PythonModule implements IUnit {
         super(covPythonMethod.getModule(), fileName);
         this.nameSpace = covPythonMethod.getNameSpace();
         this.method = covPythonMethod.getMethod();
+
+
+
+    }
+
+    private void checkFQN() {
+        /*
+        Sometime when we use comfort-smother, the test runner (pytest/nosetest) does not record the package correctly.
+        Hence, we need to set the package here based on the file path. Nevertheless, this is not always correct!
+         */
+        String fullNameBasedOnFileName = fileName.toString()
+                .substring(0, fileName.toString().length() - 3).replace("/", ".");
+        if ((pPackage == null || pPackage.equals("")) && !getFQNOfUnit().equals(fullNameBasedOnFileName)
+                && !(getFQNOfUnit()+".__init__").equals(fullNameBasedOnFileName)) {
+            if (fullNameBasedOnFileName.endsWith("__init__")) {
+                this.pModule = "__init__";
+                this.pPackage = fullNameBasedOnFileName.replace(".__init__", "");
+            } else {
+                this.pPackage = fullNameBasedOnFileName.replace("." + this.pModule, "");
+            }
+        }
     }
 
     public void setFileName(Path fileName) {

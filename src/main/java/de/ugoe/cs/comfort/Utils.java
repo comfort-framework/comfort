@@ -119,7 +119,7 @@ public class Utils {
             return initFile;
         }
 
-        LOGGER.error("Found more than one candidates for file! "
+        LOGGER.error("Did not find a path! "
                 + "PythonFile: {}, Paths: {}", pythonFile, candidatePaths);
         throw new FileNotFoundException("File for module"+moduleName+" was not found!");
     }

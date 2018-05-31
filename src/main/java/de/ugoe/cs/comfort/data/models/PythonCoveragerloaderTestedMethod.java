@@ -19,8 +19,6 @@ package de.ugoe.cs.comfort.data.models;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 /**
@@ -29,7 +27,7 @@ import java.util.List;
 public class PythonCoveragerloaderTestedMethod {
     private List<Integer> coveredLines;
     private List<Integer> uncoveredLines;
-    private Path location;
+    private String location;
     private String namespace;
     private String method;
     private String module;
@@ -47,7 +45,7 @@ public class PythonCoveragerloaderTestedMethod {
         this.method = method;
         this.coveredLines = coveredLines;
         this.uncoveredLines = uncoveredLines;
-        this.location = Paths.get(location);
+        this.location = location;
     }
 
     public String getModule() {
@@ -66,7 +64,7 @@ public class PythonCoveragerloaderTestedMethod {
         return coveredLines.size();
     }
 
-    public Path getLocation() {
+    public String getLocation() {
         return location;
     }
 
