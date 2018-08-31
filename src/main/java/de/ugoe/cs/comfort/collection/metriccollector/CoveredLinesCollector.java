@@ -40,11 +40,50 @@ public class CoveredLinesCollector  extends BaseMetricCollector {
     }
 
     @SupportsJava
-    @SupportsPython
     @SupportsMethod
     public void getCoveredTestAndProductionLinesMethodLevel(CoverageData coverageData) throws IOException {
 
         Set<Result> results = generateResults(coverageData.getCoverageDataForAll());
+        filer.storeResults(results);
+    }
+
+
+    @SupportsPython
+    @SupportsMethod
+    public void getCoveredTestAndProductionLinesMethodLevelPython(CoverageData coverageData) throws IOException {
+
+        Set<Result> results = new HashSet<>();
+        for(Map.Entry<IUnit, Set<IUnit>> entry: coverageData.getCoverageDataForAll().entrySet()) {
+            Integer coveredProductionLines = 0;
+            Integer coveredTestLines = 0;
+            logger.debug("Looking at test {}", entry.getKey());
+            if(entry.getValue() != null) {
+                for (IUnit coveredMethod : entry.getValue()) {
+                    // If we have a standard python projects, tests are hold in folders called "test" or "tests",
+                    // which can also be in sub folders, thats why we look for a contains
+                    if(coveredMethod.getFilePath().toString().contains("test")) {
+                        logger.debug("Covered Test (by path): {}", coveredMethod);
+                        coveredTestLines += coveredMethod.getCoveredLines();
+                    } else {
+                        if (!coveredMethod.getFQNOfUnit().equals(entry.getKey().getFQNOfUnit())
+                                && !(coveredMethod.getFQNOfUnit().contains("test") ||
+                                coveredMethod.getFQNOfUnit().contains("validate"))) {
+                            logger.debug("Covered production code: {}", coveredMethod);
+                            coveredProductionLines += coveredMethod.getCoveredLines();
+                        } else {
+                            logger.debug("Covered Test: {}", coveredMethod);
+                            coveredTestLines += coveredMethod.getCoveredLines();
+                        }
+                    }
+                }
+            }
+            logger.debug("Test {} covered {} test and {} production lines", entry.getKey(),
+                    coveredTestLines, coveredProductionLines);
+            Result result = new Result(entry.getKey().getFQN(), entry.getKey().getFilePath());
+            result.addMetric("cov_tlines", String.valueOf(coveredTestLines));
+            result.addMetric("cov_plines", String.valueOf(coveredProductionLines));
+            results.add(result);
+        }
         filer.storeResults(results);
     }
 
@@ -65,13 +104,20 @@ public class CoveredLinesCollector  extends BaseMetricCollector {
             logger.debug("Looking at test {}", entry.getKey());
             if(entry.getValue() != null) {
                 for (IUnit coveredMethod : entry.getValue()) {
-                    if (!coveredMethod.getFQNOfUnit().equals(entry.getKey().getFQNOfUnit())
-                            && !Utils.isTestBasedOnFQN(coveredMethod.getFQNOfUnit())) {
-                        logger.debug("Covered production code: {}", coveredMethod);
-                        coveredProductionLines += coveredMethod.getCoveredLines();
-                    } else {
-                        logger.debug("Covered Test: {}", coveredMethod);
+                    // If we have a standard java project, tests are always in src/test
+                    if(coveredMethod.getFilePath().startsWith("src/test")) {
+                        logger.debug("Covered Test (by path): {}", coveredMethod);
                         coveredTestLines += coveredMethod.getCoveredLines();
+                    } else {
+                        // Fallback method: If filename has "test" or "validate" in it, it is a test
+                        if (!coveredMethod.getFQNOfUnit().equals(entry.getKey().getFQNOfUnit())
+                                && !Utils.isTestBasedOnFQN(coveredMethod.getFQNOfUnit())) {
+                            logger.debug("Covered production code: {}", coveredMethod);
+                            coveredProductionLines += coveredMethod.getCoveredLines();
+                        } else {
+                            logger.debug("Covered Test: {}", coveredMethod);
+                            coveredTestLines += coveredMethod.getCoveredLines();
+                        }
                     }
                 }
             }

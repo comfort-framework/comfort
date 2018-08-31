@@ -46,6 +46,8 @@ import org.eclipse.jgit.lib.RepositoryBuilder;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 import org.mongodb.morphia.logging.MorphiaLoggerFactory;
+import org.mongodb.morphia.query.Query;
+import org.mongodb.morphia.query.UpdateOperations;
 
 /**
  * @author Fabian Trautsch
@@ -191,25 +193,50 @@ public class SmartSHARKFiler extends BaseFiler {
     }
 
     private void storeTestState(TestState testState) {
-        TestState dbTestState = datastore.createQuery(TestState.class)
+
+        Query<TestState> testStateQuery = datastore.createQuery(TestState.class)
                 .field("name").equal(testState.getName())
                 .field("commit_id").equal(testState.getCommitId())
-                .get();
+                .project("_id", true)
+                .project("metrics", true);
+
+        if(testState.getMutationResults().size() != 0) {
+            testStateQuery = testStateQuery.project("mutation_res", true);
+        }
+
+        TestState dbTestState = testStateQuery.get();
 
         if(dbTestState == null) {
             dbTestState = new TestState();
             dbTestState.setName(testState.getName());
             dbTestState.setCommitId(testState.getCommitId());
             dbTestState.setFileId(testState.getFileId());
+
+            dbTestState.getMetrics().putAll(testState.getMetrics());
+
+            if(testState.getMutationResults().size() != 0) {
+                dbTestState.getMutationResults().addAll(testState.getMutationResults());
+            }
+
+            datastore.save(dbTestState);
+        } else {
+            dbTestState.getMetrics().putAll(testState.getMetrics());
+            Query<TestState> updateQuery = datastore.createQuery(TestState.class).field("_id").equal(dbTestState.getId());
+
+
+            // Update metrics
+            UpdateOperations<TestState> ops = datastore.createUpdateOperations(TestState.class).set("metrics", dbTestState.getMetrics());
+            datastore.update(updateQuery, ops);
+
+            // Update mutation_res if available
+            if(testState.getMutationResults().size() != 0) {
+                dbTestState.getMutationResults().addAll(testState.getMutationResults());
+                ops = datastore.createUpdateOperations(TestState.class).set("mutation_res", dbTestState.getMutationResults());
+                datastore.update(updateQuery, ops);
+            }
         }
 
-        dbTestState.getMetrics().putAll(testState.getMetrics());
 
-        if(testState.getMutationResults().size() != 0) {
-            dbTestState.getMutationResults().addAll(testState.getMutationResults());
-        }
-
-        datastore.save(dbTestState);
     }
 
     private Repository getRepository() throws IOException {
