@@ -89,7 +89,8 @@ public class CoverageData extends DataSet {
             Set<IUnit> coveredMethodsWithoutTests = new HashSet<>();
             if(entry.getValue() != null) {
                 for (IUnit coveredMethod : entry.getValue()) {
-                    if (!coveredMethod.getFQNOfUnit().equals(entry.getKey().getFQNOfUnit())
+                    if (!coveredMethod.getFilePath().toString().contains("test") &&
+                            !coveredMethod.getFQNOfUnit().equals(entry.getKey().getFQNOfUnit())
                             && !Utils.isTestBasedOnFQN(coveredMethod.getFQNOfUnit())) {
                         coveredMethodsWithoutTests.add(coveredMethod);
                     }
