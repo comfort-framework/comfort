@@ -16,6 +16,8 @@
 
 package de.ugoe.cs.comfort.collection.filter;
 
+import static org.junit.Assert.assertEquals;
+
 import de.ugoe.cs.comfort.BaseTest;
 import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
 import de.ugoe.cs.comfort.data.graphs.CallEdge;
@@ -23,8 +25,6 @@ import de.ugoe.cs.comfort.data.graphs.CallGraph;
 import de.ugoe.cs.comfort.data.graphs.CallType;
 import de.ugoe.cs.comfort.data.graphs.DependencyGraph;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Fabian Trautsch
@@ -103,8 +103,8 @@ public class SameProjectFilterTest extends BaseTest{
 
         callGraph.addEdge(new CallEdge(CallType.INVOKE_SPECIAL, 0, testCallDemo, demoInit));
         callGraph.addEdge(new CallEdge(CallType.INVOKE_SPECIAL, 0, demoInit, callDemo));
-        callGraph.addEdge(new CallEdge(CallType.INVOKE_SPECIAL, 0, demoBar, pyUnittestInit));
-        callGraph.addEdge(new CallEdge(CallType.INVOKE_SPECIAL, 1, demoBar, pyUnittestInit));
+        callGraph.addEdge(new CallEdge(CallType.INVOKE_SPECIAL, 0, demoBarNotInProject, pyUnittestInitNotInProject));
+        callGraph.addEdge(new CallEdge(CallType.INVOKE_SPECIAL, 1, demoBarNotInProject, pyUnittestInitNotInProject));
 
         // Apply filter
         CallGraph filteredGraph = filterCallGraph(callGraph);

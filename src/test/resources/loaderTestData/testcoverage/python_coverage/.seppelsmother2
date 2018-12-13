@@ -8,9 +8,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.sup.module3:blub(F)",
-            "module":"testproject.sup.module3",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/sup/module3.py",
+            "unique_id":"project.sup.module3:blub(F)",
+            "module":"project.sup.module3",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/sup/module3.py",
             "namespace":null,
             "method":"blub"
          },

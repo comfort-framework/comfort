@@ -24,6 +24,7 @@ import de.ugoe.cs.comfort.data.graphs.CallGraph;
 import de.ugoe.cs.comfort.data.graphs.CallType;
 import de.ugoe.cs.comfort.filer.models.Result;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
 import org.junit.Before;
@@ -94,8 +95,8 @@ public class DirectnessCollectorTest extends BaseMetricCollectorTest {
         directnessCollector = new DirectnessCollector(javaConfig, filerMock);
         directnessCollector.createDirectnessMetricForJavaOnMethodLevel(javaCallGraph);
 
-        expectedResult.add(new Result("org.foo.t1.Test1.test1", null, "call_dire","33.3333"));
-        expectedResult.add(new Result("org.foo.t2.Test2.test1", null, "call_dire","66.6667"));
+        expectedResult.add(new Result("org.foo.t1.Test1.test1", Paths.get("src/main/java/org/foo/t1/Test1.java"), "call_dire","33.3333"));
+        expectedResult.add(new Result("org.foo.t2.Test2.test1", Paths.get("src/main/java/org/foo/t2/Test2.java"), "call_dire","66.6667"));
 
         assertEquals(expectedResult, filerMock.getResults().getResults());
 
@@ -106,8 +107,8 @@ public class DirectnessCollectorTest extends BaseMetricCollectorTest {
         directnessCollector = new DirectnessCollector(javaConfig, filerMock);
         directnessCollector.createDirectnessMetricForJavaOnClassLevel(javaCallGraph);
 
-        expectedResult.add(new Result("org.foo.t1.Test1", null, "call_dire","33.3333"));
-        expectedResult.add(new Result("org.foo.t2.Test2", null, "call_dire","66.6667"));
+        expectedResult.add(new Result("org.foo.t1.Test1", Paths.get("src/main/java/org/foo/t1/Test1.java"), "call_dire","33.3333"));
+        expectedResult.add(new Result("org.foo.t2.Test2", Paths.get("src/main/java/org/foo/t2/Test2.java"), "call_dire","66.6667"));
 
         assertEquals(expectedResult, filerMock.getResults().getResults());
     }
@@ -118,8 +119,8 @@ public class DirectnessCollectorTest extends BaseMetricCollectorTest {
         directnessCollector = new DirectnessCollector(pythonConfig, filerMock);
         directnessCollector.createDirectnessMetricForJavaOnMethodLevel(pythonCallGraph);
 
-        expectedResult.add(new Result("tests.test_module1:Module1Test.test", null, "call_dire","66.6667"));
-        expectedResult.add(new Result("tests.test_module1:Module1Test.test2", null, "call_dire","33.3333"));
+        expectedResult.add(new Result("tests.test_module1:Module1Test.test", Paths.get("tests/test_module1.py"), "call_dire","66.6667"));
+        expectedResult.add(new Result("tests.test_module1:Module1Test.test2", Paths.get("tests/test_module1.py"), "call_dire","33.3333"));
 
         assertEquals(expectedResult, filerMock.getResults().getResults());
     }
@@ -129,8 +130,8 @@ public class DirectnessCollectorTest extends BaseMetricCollectorTest {
         directnessCollector = new DirectnessCollector(pythonConfig, filerMock);
         directnessCollector.createDirectnessMetricForJavaOnClassLevel(pythonCallGraph);
 
-        expectedResult.add(new Result("tests.test_module1", null, "call_dire","66.6667"));
-        expectedResult.add(new Result("package1.package2.test_demo", null, "call_dire","33.3333"));
+        expectedResult.add(new Result("tests.test_module1", Paths.get("tests/test_module1.py"), "call_dire","66.6667"));
+        expectedResult.add(new Result("package1.package2.test_demo", Paths.get("package1/package2/test_demo.py"), "call_dire","33.3333"));
 
         assertEquals(expectedResult, filerMock.getResults().getResults());
     }

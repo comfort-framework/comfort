@@ -18,7 +18,6 @@ package de.ugoe.cs.comfort.collection.metriccollector;
 
 import static org.junit.Assert.assertEquals;
 
-import de.ugoe.cs.comfort.BaseTest;
 import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
 import de.ugoe.cs.comfort.data.CoverageData;
 import de.ugoe.cs.comfort.data.graphs.CallEdge;
@@ -133,9 +132,9 @@ public class ISTQBTestTypeCollectorTest extends BaseMetricCollectorTest {
 
         istqbTestTypeCollector = new ISTQBTestTypeCollector(javaConfig, filerMock);
         istqbTestTypeCollector.createResultsJavaClassLevelCallGraph(callGraph);
-        expectedResult.add(new Result("org.foo.t1.Test1", null, "call_istqb",TestType.UNIT.name()));
-        expectedResult.add(new Result("org.foo.t2.Test2", null, "call_istqb",TestType.INTEGRATION.name()));
-        expectedResult.add(new Result("org.foo.t3.Test3", null, "call_istqb",TestType.INTEGRATION.name()));
+        expectedResult.add(new Result("org.foo.t1.Test1", Paths.get("src/main/java/org/foo/t1/Test1.java"), "call_istqb",TestType.UNIT.name()));
+        expectedResult.add(new Result("org.foo.t2.Test2", Paths.get("src/main/java/org/foo/t2/Test2.java"), "call_istqb",TestType.INTEGRATION.name()));
+        expectedResult.add(new Result("org.foo.t3.Test3", Paths.get("src/main/java/org/foo/t3/Test3.java"), "call_istqb",TestType.INTEGRATION.name()));
 
         assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
@@ -165,10 +164,10 @@ public class ISTQBTestTypeCollectorTest extends BaseMetricCollectorTest {
         javaConfig.setMethodLevel(true);
         istqbTestTypeCollector = new ISTQBTestTypeCollector(javaConfig, filerMock);
         istqbTestTypeCollector.createResultsJavaMethodLevelCallGraph(callGraph);
-        expectedResult.add(new Result("org.foo.t1.Test1.m1", null, "call_istqb_met",TestType.UNIT.name()));
-        expectedResult.add(new Result("org.foo.t1.Test1.test1", null, "call_istqb_met",TestType.UNIT.name()));
-        expectedResult.add(new Result("org.foo.t2.Test2.m1", null, "call_istqb_met",TestType.INTEGRATION.name()));
-        expectedResult.add(new Result("org.foo.t3.Test3.test1", null, "call_istqb_met",TestType.INTEGRATION.name()));
+        expectedResult.add(new Result("org.foo.t1.Test1.m1", Paths.get("src/main/java/org/foo/t1/Test1.java"), "call_istqb_met",TestType.UNIT.name()));
+        expectedResult.add(new Result("org.foo.t1.Test1.test1", Paths.get("src/main/java/org/foo/t1/Test1.java"), "call_istqb_met",TestType.UNIT.name()));
+        expectedResult.add(new Result("org.foo.t2.Test2.m1", Paths.get("src/main/java/org/foo/t2/Test2.java"), "call_istqb_met",TestType.INTEGRATION.name()));
+        expectedResult.add(new Result("org.foo.t3.Test3.test1", Paths.get("src/main/java/org/foo/t3/Test3.java"), "call_istqb_met",TestType.INTEGRATION.name()));
 
         assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
@@ -189,8 +188,8 @@ public class ISTQBTestTypeCollectorTest extends BaseMetricCollectorTest {
 
         istqbTestTypeCollector = new ISTQBTestTypeCollector(pythonConfig, filerMock);
         istqbTestTypeCollector.createResultsJavaPythonClassCoverage(covData);
-        expectedResult.add(new Result("tests.test_module1", null, "cov_istqb", TestType.UNIT.name()));
-        expectedResult.add(new Result("tests.test_module2", null, "cov_istqb", TestType.INTEGRATION.name()));
+        expectedResult.add(new Result("tests.test_module1", Paths.get("tests/test_module1.py"), "cov_istqb", TestType.UNIT.name()));
+        expectedResult.add(new Result("tests.test_module2", Paths.get("tests/test_module2.py"), "cov_istqb", TestType.INTEGRATION.name()));
         assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
@@ -212,9 +211,9 @@ public class ISTQBTestTypeCollectorTest extends BaseMetricCollectorTest {
 
         istqbTestTypeCollector = new ISTQBTestTypeCollector(javaConfig, filerMock);
         istqbTestTypeCollector.createResultsJavaPythonMethodCoverage(covData);
-        expectedResult.add(new Result("org.foo.t1.Test1.m1", null, "cov_istqb_met", TestType.UNIT.name()));
-        expectedResult.add(new Result("org.foo.t2.Test2.m1", null, "cov_istqb_met", TestType.INTEGRATION.name()));
-        expectedResult.add(new Result("org.foo.t1.Test1.test1", null,"cov_istqb_met",  TestType.INTEGRATION.name()));
+        expectedResult.add(new Result("org.foo.t1.Test1.m1", Paths.get("src/main/java/org/foo/t1/Test1.java"), "cov_istqb_met", TestType.UNIT.name()));
+        expectedResult.add(new Result("org.foo.t2.Test2.m1", Paths.get("src/main/java/org/foo/t2/Test2.java"), "cov_istqb_met", TestType.INTEGRATION.name()));
+        expectedResult.add(new Result("org.foo.t1.Test1.test1", Paths.get("src/main/java/org/foo/t1/Test1.java"),"cov_istqb_met",  TestType.INTEGRATION.name()));
         assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
@@ -234,8 +233,8 @@ public class ISTQBTestTypeCollectorTest extends BaseMetricCollectorTest {
 
         istqbTestTypeCollector = new ISTQBTestTypeCollector(javaConfig, filerMock);
         istqbTestTypeCollector.createResultsJavaPythonClassCoverage(covData);
-        expectedResult.add(new Result("org.foo.t1.Test1", null, "cov_istqb",TestType.UNIT.name()));
-        expectedResult.add(new Result("org.foo.t2.Test2", null, "cov_istqb", TestType.INTEGRATION.name()));
+        expectedResult.add(new Result("org.foo.t1.Test1", Paths.get("src/main/java/org/foo/t1/Test1.java"), "cov_istqb",TestType.UNIT.name()));
+        expectedResult.add(new Result("org.foo.t2.Test2", Paths.get("src/main/java/org/foo/t2/Test2.java"), "cov_istqb", TestType.INTEGRATION.name()));
         assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
@@ -255,7 +254,7 @@ public class ISTQBTestTypeCollectorTest extends BaseMetricCollectorTest {
 
         istqbTestTypeCollector = new ISTQBTestTypeCollector(javaConfig, filerMock);
         istqbTestTypeCollector.createResultsJavaPythonClassCoverage(covData);
-        expectedResult.add(new Result("org.foo.t1.Test1", null, "cov_istqb",TestType.INTEGRATION.name()));
+        expectedResult.add(new Result("org.foo.t1.Test1", Paths.get("src/main/java/org/foo/t1/Test1.java"), "cov_istqb",TestType.INTEGRATION.name()));
         assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 

@@ -130,27 +130,27 @@ public class BaseTest {
         add("java.lang.Object");
     }}, null);
 
-    protected   JavaMethod T1M1 = new JavaMethod("org.foo.t1.Test1", "m1", new ArrayList<>(), null);
-    protected   JavaMethod T1Test1 = new JavaMethod("org.foo.t1.Test1", "test1", new ArrayList<>(), null);
-    protected   JavaMethod T1M2 = new JavaMethod("org.foo.t1.Test1", "m2", new ArrayList<>(), null);
-    protected   JavaMethod T2M1 = new JavaMethod("org.foo.t2.Test2", "m1", new ArrayList<>(), null);
-    protected   JavaMethod T2Test1 = new JavaMethod("org.foo.t2.Test2", "test1", new ArrayList<>(), null);
-    protected   JavaMethod T2Test2 = new JavaMethod("org.foo.t2.Test2", "test2", new ArrayList<>(), null);
-    protected   JavaMethod T2M2 = new JavaMethod("org.foo.t2.Test2", "m2", new ArrayList<>(), null);
-    protected   JavaMethod T3Test1 = new JavaMethod("org.foo.t3.Test3", "test1", new ArrayList<>(), null);
-    protected   JavaMethod C1M1_p1 = new JavaMethod("org.foo.bar.C1", "m1", new ArrayList<>(), null);
-    protected   JavaMethod C1M1_p2 = new JavaMethod("org.foo.C1", "m1", new ArrayList<>(), null);
-    protected   JavaMethod C2M1_p1 = new JavaMethod("org.foo.bar.C2", "m1", new ArrayList<>(), null);
-    protected   JavaMethod C2Foo_p1 = new JavaMethod("org.foo.bar.C2", "foo", new ArrayList<>(), null);
-    protected   JavaMethod C2M1_p2 = new JavaMethod("org.foo.bar.blub.C2", "m1", new ArrayList<>(), null);
-    protected   JavaMethod C3M1 = new JavaMethod("org.foo.bar.C3", "m1", new ArrayList<>(), null);
-    protected   JavaMethod C3M2 = new JavaMethod("org.foo.bar.C3", "m2", new ArrayList<>(), null);
-    protected   JavaMethod C4M1 = new JavaMethod("org.foo.bar.C4", "m1", new ArrayList<>(), null);
-    protected   JavaMethod C5Test1 = new JavaMethod("org.foo.bar.C5", "test1", new ArrayList<>(), null);
-    protected   JavaMethod covP1C1M1 = new JavaMethod("org.foo.bar.C1", "m1", new ArrayList<>(), null);
-    protected   JavaMethod covP1C1M2 = new JavaMethod("org.foo.bar.C1", "m2", new ArrayList<>(), null);
-    protected   JavaMethod covP1C2M1 = new JavaMethod("org.foo.bar.C2", "m1", new ArrayList<>(), null);
-    protected   JavaMethod covP2C1M1 = new JavaMethod("org.foo.C1", "m1", new ArrayList<>(), null
+    protected   JavaMethod T1M1 = new JavaMethod("org.foo.t1.Test1", "m1", new ArrayList<>(), Paths.get("src/main/java/org/foo/t1/Test1.java"));
+    protected   JavaMethod T1Test1 = new JavaMethod("org.foo.t1.Test1", "test1", new ArrayList<>(), Paths.get("src/main/java/org/foo/t1/Test1.java"));
+    protected   JavaMethod T1M2 = new JavaMethod("org.foo.t1.Test1", "m2", new ArrayList<>(), Paths.get("src/main/java/org/foo/t1/Test1.java"));
+    protected   JavaMethod T2M1 = new JavaMethod("org.foo.t2.Test2", "m1", new ArrayList<>(), Paths.get("src/main/java/org/foo/t2/Test2.java"));
+    protected   JavaMethod T2Test1 = new JavaMethod("org.foo.t2.Test2", "test1", new ArrayList<>(), Paths.get("src/main/java/org/foo/t2/Test2.java"));
+    protected   JavaMethod T2Test2 = new JavaMethod("org.foo.t2.Test2", "test2", new ArrayList<>(), Paths.get("src/main/java/org/foo/t2/Test2.java"));
+    protected   JavaMethod T2M2 = new JavaMethod("org.foo.t2.Test2", "m2", new ArrayList<>(), Paths.get("src/main/java/org/foo/t2/Test2.java"));
+    protected   JavaMethod T3Test1 = new JavaMethod("org.foo.t3.Test3", "test1", new ArrayList<>(), Paths.get("src/main/java/org/foo/t3/Test3.java"));
+    protected   JavaMethod C1M1_p1 = new JavaMethod("org.foo.bar.C1", "m1", new ArrayList<>(), Paths.get("src/main/java/org/foo/bar/C1.java"));
+    protected   JavaMethod C1M1_p2 = new JavaMethod("org.foo.C1", "m1", new ArrayList<>(), Paths.get("src/main/java/org/foo/C1.java"));
+    protected   JavaMethod C2M1_p1 = new JavaMethod("org.foo.bar.C2", "m1", new ArrayList<>(), Paths.get("src/main/java/org/foo/bar/C2.java"));
+    protected   JavaMethod C2Foo_p1 = new JavaMethod("org.foo.bar.C2", "foo", new ArrayList<>(), Paths.get("src/main/java/org/foo/bar/C2.java"));
+    protected   JavaMethod C2M1_p2 = new JavaMethod("org.foo.bar.blub.C2", "m1", new ArrayList<>(), Paths.get("src/main/java/org/foo/bar/blub/C2.java"));
+    protected   JavaMethod C3M1 = new JavaMethod("org.foo.bar.C3", "m1", new ArrayList<>(), Paths.get("src/main/java/org/foo/bar/C3.java"));
+    protected   JavaMethod C3M2 = new JavaMethod("org.foo.bar.C3", "m2", new ArrayList<>(), Paths.get("src/main/java/org/foo/bar/C3.java"));
+    protected   JavaMethod C4M1 = new JavaMethod("org.foo.bar.C4", "m1", new ArrayList<>(), Paths.get("src/main/java/org/foo/bar/C4.java"));
+    protected   JavaMethod C5Test1 = new JavaMethod("org.foo.bar.C5", "test1", new ArrayList<>(), Paths.get("src/main/java/org/foo/bar/C5.java"));
+    protected   JavaMethod covP1C1M1 = new JavaMethod("org.foo.bar.C1", "m1", new ArrayList<>(), Paths.get("src/main/java/org/foo/bar/C1.java"));
+    protected   JavaMethod covP1C1M2 = new JavaMethod("org.foo.bar.C1", "m2", new ArrayList<>(), Paths.get("src/main/java/org/foo/bar/C1.java"));
+    protected   JavaMethod covP1C2M1 = new JavaMethod("org.foo.bar.C2", "m1", new ArrayList<>(), Paths.get("src/main/java/org/foo/bar/C1.java"));
+    protected   JavaMethod covP2C1M1 = new JavaMethod("org.foo.C1", "m1", new ArrayList<>(), Paths.get("src/main/java/org/foo/C1.java")
     );
 
     // Python CallGraph Test Data
@@ -158,19 +158,21 @@ public class BaseTest {
     protected PythonMethod callDemo = new PythonMethod("tests.data", "demo", null, "callDemo", Paths.get("tests/data/demo.py"));
     protected PythonMethod demoInit = new PythonMethod("tests.data", "demo", "Demo", "__init__", Paths.get("tests/data/demo.py"));
     protected PythonMethod demoBar = new PythonMethod("tests.data", "demo", "Demo", "bar", Paths.get("tests/data/demo.py"));
+    protected PythonMethod demoBarNotInProject = new PythonMethod("tests.data", "demo", "Demo", "bar", null);
     protected PythonMethod demoFoo = new PythonMethod("tests.data", "demo", "Demo", "foo", Paths.get("tests/data/demo.py"));
-    protected PythonMethod pyTestDemoInit = new PythonMethod("package1.package2", "test_demo", "TestDemo", "__init__", null);
-    protected PythonMethod pyModule1Init = new PythonMethod("package1.package2", "module1", "Module1", "__init__", null);
-    protected PythonMethod pyModule2Init = new PythonMethod("package1.package2", "module2", "Module2", "__init__", null);
-    protected PythonMethod pyModule2Foo = new PythonMethod("package1.package2", "module2", "Module2", "foo", null);
-    protected PythonMethod pyModule3Init = new PythonMethod("package1.package2", "module3", "Module3", "__init__", null);
-    protected PythonMethod pyModule4Init = new PythonMethod("package1.package2", "module4", "Module4", "__init__", null);
-    protected PythonMethod pyModule5Init = new PythonMethod("package1.package2.package3", "module5", "Module5", "__init__", null);
-    protected PythonMethod pyUnittestInit = new PythonMethod("unittest", "unittest", null, "__init__", null);
-    protected PythonMethod pyTest1Test = new PythonMethod("tests", "test_module1", "Module1Test", "test", null);
-    protected PythonMethod pyTest1Test2 = new PythonMethod("tests", "test_module1", "Module1Test", "test2", null);
-    protected PythonMethod pyTest2Test = new PythonMethod("tests", "test_module2", "Module2Test", "test", null);
-    protected PythonMethod pyTest2Test2 = new PythonMethod("tests", "test_module2", "Module2Test", "test2", null);
+    protected PythonMethod pyTestDemoInit = new PythonMethod("package1.package2", "test_demo", "TestDemo", "__init__", Paths.get("package1/package2/test_demo.py"));
+    protected PythonMethod pyModule1Init = new PythonMethod("package1.package2", "module1", "Module1", "__init__", Paths.get("package1/package2/module1.py"));
+    protected PythonMethod pyModule2Init = new PythonMethod("package1.package2", "module2", "Module2", "__init__", Paths.get("package1/package2/module2.py"));
+    protected PythonMethod pyModule2Foo = new PythonMethod("package1.package2", "module2", "Module2", "foo", Paths.get("package1/package2/module2.py"));
+    protected PythonMethod pyModule3Init = new PythonMethod("package1.package2", "module3", "Module3", "__init__", Paths.get("package1/package2/module3.py"));
+    protected PythonMethod pyModule4Init = new PythonMethod("package1.package2", "module4", "Module4", "__init__", Paths.get("package1/package2/module4.py"));
+    protected PythonMethod pyModule5Init = new PythonMethod("package1.package2.package3", "module5", "Module5", "__init__", Paths.get("package1/package2/package3/module5.py"));
+    protected PythonMethod pyUnittestInit = new PythonMethod("unittest", "unittest", null, "__init__", Paths.get("unittest/unittest.py"));
+    protected PythonMethod pyUnittestInitNotInProject = new PythonMethod("unittest", "unittest", null, "__init__", null);
+    protected PythonMethod pyTest1Test = new PythonMethod("tests", "test_module1", "Module1Test", "test", Paths.get("tests/test_module1.py"));
+    protected PythonMethod pyTest1Test2 = new PythonMethod("tests", "test_module1", "Module1Test", "test2", Paths.get("tests/test_module1.py"));
+    protected PythonMethod pyTest2Test = new PythonMethod("tests", "test_module2", "Module2Test", "test", Paths.get("tests/test_module2.py"));
+    protected PythonMethod pyTest2Test2 = new PythonMethod("tests", "test_module2", "Module2Test", "test2", Paths.get("tests/test_module2.py"));
 
     
     // Java Coverage Data

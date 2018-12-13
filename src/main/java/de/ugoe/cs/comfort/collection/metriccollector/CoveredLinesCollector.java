@@ -105,7 +105,7 @@ public class CoveredLinesCollector  extends BaseMetricCollector {
             if(entry.getValue() != null) {
                 for (IUnit coveredMethod : entry.getValue()) {
                     // If we have a standard java project, tests are always in src/test
-                    if(coveredMethod.getFilePath().startsWith("src/test")) {
+                    if(coveredMethod.getFilePath() != null && coveredMethod.getFilePath().startsWith("src/test")) {
                         logger.debug("Covered Test (by path): {}", coveredMethod);
                         coveredTestLines += coveredMethod.getCoveredLines();
                     } else {

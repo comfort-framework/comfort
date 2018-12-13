@@ -79,8 +79,8 @@ public class TestCoverageLoaderTest extends BaseTest {
     public void testPythonCoverageLoaderOneExampleResult() {
         // Expected data (tests.unittests.test_module3:Module3Test.testBlub)
         Set<IUnit> module3TestTestBlubtestedMethods = new HashSet<>();
-        module3TestTestBlubtestedMethods.add(new PythonMethod("testproject.sup", "module3", null, "blub", new ArrayList<>(), Paths.get("testproject/sup/module3.py")));
-        module3TestTestBlubtestedMethods.add(new PythonMethod("testproject", "module1", null, "sum", new ArrayList<>(), Paths.get("testproject/module1.py")));
+        module3TestTestBlubtestedMethods.add(new PythonMethod("project.sup", "module3", null, "blub", new ArrayList<>(), Paths.get("project/sup/module3.py")));
+        module3TestTestBlubtestedMethods.add(new PythonMethod("project", "module1", null, "sum", new ArrayList<>(), Paths.get("project/module1.py")));
         // Call method
         try {
             TestCoverageLoader covLoader = new TestCoverageLoader(pythonConfiguration, loaderPythonConfiguration);
@@ -107,7 +107,7 @@ public class TestCoverageLoaderTest extends BaseTest {
     public void testPythonCoverageLoaderExcludeTestsTest() {
         // Expected data (tests.unittests.test_module3:Module3Test.testBlub)
         Set<IUnit> module3TestTestBlubtestedMethods = new HashSet<>();
-        module3TestTestBlubtestedMethods.add(new PythonMethod("testproject.sup", "module3", null, "blub", new ArrayList<>(), Paths.get("testproject/sup/module3.py")));
+        module3TestTestBlubtestedMethods.add(new PythonMethod("project.sup", "module3", null, "blub", new ArrayList<>(), Paths.get("project/sup/module3.py")));
 
         // Call method
         loaderPythonConfiguration.setCoverageLocation(getPathToResource("loaderTestData/testcoverage/python_coverage/.seppelsmother2"));
@@ -118,7 +118,7 @@ public class TestCoverageLoaderTest extends BaseTest {
 
             // Compare test
             for (Map.Entry<IUnit, Set<IUnit>> entry : covData.getCoverageData().entrySet()) {
-                System.out.println(entry.getKey());
+                System.out.println(entry.getValue());
                 if (entry.getKey().getFQN().equals("tests.unittests.test_module3:Module3Test.testBlub")) {
                     assertEquals("size is not correct", 1, entry.getValue().size());
                     assertEquals("not the same methods", module3TestTestBlubtestedMethods, entry.getValue());

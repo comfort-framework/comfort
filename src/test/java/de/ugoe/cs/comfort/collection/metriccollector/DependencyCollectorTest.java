@@ -18,7 +18,6 @@ package de.ugoe.cs.comfort.collection.metriccollector;
 
 import static org.junit.Assert.assertEquals;
 
-import de.ugoe.cs.comfort.BaseTest;
 import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
 import de.ugoe.cs.comfort.data.CoverageData;
 import de.ugoe.cs.comfort.data.graphs.CallEdge;
@@ -28,6 +27,7 @@ import de.ugoe.cs.comfort.data.graphs.DependencyGraph;
 import de.ugoe.cs.comfort.data.models.IUnit;
 import de.ugoe.cs.comfort.filer.models.Result;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
 import org.junit.Before;
@@ -121,9 +121,9 @@ public class DependencyCollectorTest extends BaseMetricCollectorTest {
 
         result = filerMock.getResults().getResults();
 
-        expectedResult.add(new Result("org.foo.t1.Test1.test1", null, "call_dep","3"));
-        expectedResult.add(new Result("org.foo.t2.Test2.test1", null, "call_dep","2"));
-        expectedResult.add(new Result("org.foo.t2.Test2.test2", null, "call_dep","3"));
+        expectedResult.add(new Result("org.foo.t1.Test1.test1", Paths.get("src/main/java/org/foo/t1/Test1.java"), "call_dep","3"));
+        expectedResult.add(new Result("org.foo.t2.Test2.test1", Paths.get("src/main/java/org/foo/t2/Test2.java"), "call_dep","2"));
+        expectedResult.add(new Result("org.foo.t2.Test2.test2", Paths.get("src/main/java/org/foo/t2/Test2.java"), "call_dep","3"));
 
         assertEquals(expectedResult, result);
     }
@@ -162,9 +162,9 @@ public class DependencyCollectorTest extends BaseMetricCollectorTest {
 
         result = filerMock.getResults().getResults();
 
-        expectedResult.add(new Result("org.foo.t1.Test1.m1", null, "cov_dep", "1"));
-        expectedResult.add(new Result("org.foo.t2.Test2.m1", null, "cov_dep", "2"));
-        expectedResult.add(new Result("org.foo.t1.Test1.test1", null, "cov_dep", "0"));
+        expectedResult.add(new Result("org.foo.t1.Test1.m1", Paths.get("src/main/java/org/foo/t1/Test1.java"), "cov_dep", "1"));
+        expectedResult.add(new Result("org.foo.t2.Test2.m1", Paths.get("src/main/java/org/foo/t2/Test2.java"), "cov_dep", "2"));
+        expectedResult.add(new Result("org.foo.t1.Test1.test1", Paths.get("src/main/java/org/foo/t1/Test1.java"), "cov_dep", "0"));
 
         assertEquals(expectedResult, result);
     }

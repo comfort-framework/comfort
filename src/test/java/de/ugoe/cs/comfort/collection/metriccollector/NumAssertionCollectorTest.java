@@ -19,7 +19,6 @@ package de.ugoe.cs.comfort.collection.metriccollector;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import de.ugoe.cs.comfort.BaseTest;
 import de.ugoe.cs.comfort.configuration.GeneralConfiguration;
 import de.ugoe.cs.comfort.data.ClassFiles;
 import de.ugoe.cs.comfort.data.graphs.CallEdge;
@@ -119,8 +118,8 @@ public class NumAssertionCollectorTest extends BaseMetricCollectorTest {
         numAssertionCollector = new NumAssertionCollector(javaConfig, filerMock);
         numAssertionCollector.getNumberOfAssertionsForCallGraphOnClassLevel(javaCallGraph);
 
-        expectedResult.add(new Result("org.foo.t1.Test1", null, "num_asserts", "3"));
-        expectedResult.add(new Result("org.foo.t2.Test2", null, "num_asserts", "3"));
+        expectedResult.add(new Result("org.foo.t1.Test1", Paths.get("src/main/java/org/foo/t1/Test1.java"), "num_asserts", "3"));
+        expectedResult.add(new Result("org.foo.t2.Test2", Paths.get("src/main/java/org/foo/t2/Test2.java"), "num_asserts", "3"));
         assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
@@ -130,9 +129,9 @@ public class NumAssertionCollectorTest extends BaseMetricCollectorTest {
         numAssertionCollector = new NumAssertionCollector(javaConfig, filerMock);
         numAssertionCollector.getNumberOfAssertionsForCallGraph(javaCallGraph);
 
-        expectedResult.add(new Result("org.foo.t1.Test1.test1", null, "num_asserts", "3"));
-        expectedResult.add(new Result("org.foo.t2.Test2.test1", null, "num_asserts", "2"));
-        expectedResult.add(new Result("org.foo.t2.Test2.test2", null, "num_asserts", "1"));
+        expectedResult.add(new Result("org.foo.t1.Test1.test1", Paths.get("src/main/java/org/foo/t1/Test1.java"), "num_asserts", "3"));
+        expectedResult.add(new Result("org.foo.t2.Test2.test1", Paths.get("src/main/java/org/foo/t2/Test2.java"), "num_asserts", "2"));
+        expectedResult.add(new Result("org.foo.t2.Test2.test2", Paths.get("src/main/java/org/foo/t2/Test2.java"), "num_asserts", "1"));
         assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 }

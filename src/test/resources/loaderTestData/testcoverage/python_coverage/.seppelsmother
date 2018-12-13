@@ -8,9 +8,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.sup.module3:blub(F)",
-            "module":"testproject.sup.module3",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/sup/module3.py",
+            "unique_id":"project.sup.module3:blub(F)",
+            "module":"project.sup.module3",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/sup/module3.py",
             "namespace":null,
             "method":"blub"
          },
@@ -21,9 +21,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module1:sum(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:sum(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":null,
             "method":"sum"
          }
@@ -42,9 +42,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.sup.module3:blub(F)",
-            "module":"testproject.sup.module3",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/sup/module3.py",
+            "unique_id":"project.sup.module3:blub(F)",
+            "module":"project.sup.module3",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/sup/module3.py",
             "namespace":null,
             "method":"blub"
          },
@@ -55,9 +55,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module1:sum(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:sum(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":null,
             "method":"sum"
          }
@@ -76,9 +76,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module1:NewClassTest(C).InnerClass(C).__init__(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:NewClassTest(C).InnerClass(C).__init__(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":"NewClassTest.InnerClass",
             "method":"__init__"
          },
@@ -89,9 +89,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module1:sum(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:sum(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":null,
             "method":"sum"
          },
@@ -103,9 +103,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module1:NewClassTest(C).__init__(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:NewClassTest(C).__init__(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":"NewClassTest",
             "method":"__init__"
          },
@@ -116,9 +116,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module1:NewClassTest(C).InnerClass(C).innerClassCall(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:NewClassTest(C).InnerClass(C).innerClassCall(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":"NewClassTest.InnerClass",
             "method":"innerClassCall"
          },
@@ -133,9 +133,9 @@
                10,
                11
             ],
-            "unique_id":"testproject.module1:NewClassTest(C).greaterThan(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:NewClassTest(C).greaterThan(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":"NewClassTest",
             "method":"greaterThan"
          }
@@ -154,9 +154,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module1:NewClassTest(C).InnerClass(C).__init__(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:NewClassTest(C).InnerClass(C).__init__(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":"NewClassTest.InnerClass",
             "method":"__init__"
          },
@@ -167,9 +167,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module1:sum(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:sum(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":null,
             "method":"sum"
          },
@@ -181,9 +181,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module1:NewClassTest(C).__init__(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:NewClassTest(C).__init__(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":"NewClassTest",
             "method":"__init__"
          },
@@ -194,9 +194,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module1:NewClassTest(C).InnerClass(C).innerClassCall(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:NewClassTest(C).InnerClass(C).innerClassCall(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":"NewClassTest.InnerClass",
             "method":"innerClassCall"
          },
@@ -211,9 +211,9 @@
                12,
                13
             ],
-            "unique_id":"testproject.module1:NewClassTest(C).greaterThan(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:NewClassTest(C).greaterThan(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":"NewClassTest",
             "method":"greaterThan"
          }
@@ -232,9 +232,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module2:inModule2(F)",
-            "module":"testproject.module2",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module2.py",
+            "unique_id":"project.module2:inModule2(F)",
+            "module":"project.module2",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module2.py",
             "namespace":null,
             "method":"inModule2"
          }
@@ -253,9 +253,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module1:sum(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:sum(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":null,
             "method":"sum"
          },
@@ -267,9 +267,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module1:NewClassTest(C).__init__(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:NewClassTest(C).__init__(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":"NewClassTest",
             "method":"__init__"
          },
@@ -280,9 +280,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module1:NewClassTest(C).InnerClass(C).innerClassCall(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:NewClassTest(C).InnerClass(C).innerClassCall(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":"NewClassTest.InnerClass",
             "method":"innerClassCall"
          },
@@ -293,9 +293,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module1:NewClassTest(C).InnerClass(C).__init__(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:NewClassTest(C).InnerClass(C).__init__(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":"NewClassTest.InnerClass",
             "method":"__init__"
          }
@@ -314,9 +314,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module1:sum(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:sum(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":null,
             "method":"sum"
          }
@@ -335,9 +335,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module1:testme(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:testme(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":null,
             "method":"testme"
          },
@@ -348,9 +348,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module1:NewClassTest(C).InnerClass(C).innerClassCall(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:NewClassTest(C).InnerClass(C).innerClassCall(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":"NewClassTest.InnerClass",
             "method":"innerClassCall"
          },
@@ -361,9 +361,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module1:NewClassTest(C).InnerClass(C).__init__(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:NewClassTest(C).InnerClass(C).__init__(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":"NewClassTest.InnerClass",
             "method":"__init__"
          },
@@ -374,9 +374,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module1:sum(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:sum(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":null,
             "method":"sum"
          },
@@ -387,9 +387,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module1:NewClassTest(C).callSum(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:NewClassTest(C).callSum(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":"NewClassTest",
             "method":"callSum"
          },
@@ -401,9 +401,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module1:NewClassTest(C).__init__(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:NewClassTest(C).__init__(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":"NewClassTest",
             "method":"__init__"
          }
@@ -422,9 +422,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module1:sum(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:sum(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":null,
             "method":"sum"
          },
@@ -436,9 +436,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module1:NewClassTest(C).__init__(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:NewClassTest(C).__init__(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":"NewClassTest",
             "method":"__init__"
          },
@@ -449,9 +449,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module1:NewClassTest(C).InnerClass(C).innerClassCall(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:NewClassTest(C).InnerClass(C).innerClassCall(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":"NewClassTest.InnerClass",
             "method":"innerClassCall"
          },
@@ -462,9 +462,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module1:NewClassTest(C).InnerClass(C).__init__(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:NewClassTest(C).InnerClass(C).__init__(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":"NewClassTest.InnerClass",
             "method":"__init__"
          },
@@ -475,9 +475,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module2:new(F)",
-            "module":"testproject.module2",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module2.py",
+            "unique_id":"project.module2:new(F)",
+            "module":"project.module2",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module2.py",
             "namespace":null,
             "method":"new"
          }
@@ -496,9 +496,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module1:sum(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:sum(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":null,
             "method":"sum"
          },
@@ -510,9 +510,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module1:NewClassTest(C).__init__(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:NewClassTest(C).__init__(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":"NewClassTest",
             "method":"__init__"
          },
@@ -523,9 +523,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module1:NewClassTest(C).InnerClass(C).innerClassCall(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:NewClassTest(C).InnerClass(C).innerClassCall(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":"NewClassTest.InnerClass",
             "method":"innerClassCall"
          },
@@ -536,9 +536,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module1:NewClassTest(C).InnerClass(C).__init__(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:NewClassTest(C).InnerClass(C).__init__(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":"NewClassTest.InnerClass",
             "method":"__init__"
          },
@@ -549,9 +549,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module2:new(F)",
-            "module":"testproject.module2",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module2.py",
+            "unique_id":"project.module2:new(F)",
+            "module":"project.module2",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module2.py",
             "namespace":null,
             "method":"new"
          }
@@ -570,9 +570,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module1:sum(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:sum(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":null,
             "method":"sum"
          },
@@ -584,9 +584,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module1:NewClassTest(C).__init__(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:NewClassTest(C).__init__(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":"NewClassTest",
             "method":"__init__"
          },
@@ -597,9 +597,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module1:NewClassTest(C).InnerClass(C).innerClassCall(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:NewClassTest(C).InnerClass(C).innerClassCall(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":"NewClassTest.InnerClass",
             "method":"innerClassCall"
          },
@@ -610,9 +610,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module1:NewClassTest(C).InnerClass(C).__init__(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:NewClassTest(C).InnerClass(C).__init__(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":"NewClassTest.InnerClass",
             "method":"__init__"
          },
@@ -627,9 +627,9 @@
                17,
                18
             ],
-            "unique_id":"testproject.module2:outerMethod(F)",
-            "module":"testproject.module2",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module2.py",
+            "unique_id":"project.module2:outerMethod(F)",
+            "module":"project.module2",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module2.py",
             "namespace":null,
             "method":"outerMethod"
          },
@@ -643,9 +643,9 @@
                17,
                18
             ],
-            "unique_id":"testproject.module2:outerMethod(F).innerMethod(F)",
-            "module":"testproject.module2",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module2.py",
+            "unique_id":"project.module2:outerMethod(F).innerMethod(F)",
+            "module":"project.module2",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module2.py",
             "namespace":"outerMethod",
             "method":"innerMethod"
          }
@@ -664,9 +664,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module1:sum(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:sum(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":null,
             "method":"sum"
          },
@@ -678,9 +678,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module1:NewClassTest(C).__init__(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:NewClassTest(C).__init__(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":"NewClassTest",
             "method":"__init__"
          },
@@ -691,9 +691,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module1:NewClassTest(C).InnerClass(C).innerClassCall(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:NewClassTest(C).InnerClass(C).innerClassCall(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":"NewClassTest.InnerClass",
             "method":"innerClassCall"
          },
@@ -704,9 +704,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module1:NewClassTest(C).InnerClass(C).__init__(F)",
-            "module":"testproject.module1",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module1.py",
+            "unique_id":"project.module1:NewClassTest(C).InnerClass(C).__init__(F)",
+            "module":"project.module1",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module1.py",
             "namespace":"NewClassTest.InnerClass",
             "method":"__init__"
          },
@@ -717,9 +717,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module2:x(F)",
-            "module":"testproject.module2",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module2.py",
+            "unique_id":"project.module2:x(F)",
+            "module":"project.module2",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module2.py",
             "namespace":null,
             "method":"x"
          },
@@ -730,9 +730,9 @@
             "uncovered_lines":[
 
             ],
-            "unique_id":"testproject.module2:y(F)",
-            "module":"testproject.module2",
-            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/testproject/module2.py",
+            "unique_id":"project.module2:y(F)",
+            "module":"project.module2",
+            "location":"/home/ftrauts/Arbeit/phd_experiments/seppelSHARK/seppelshark-framework/src/test/resources/loaderTestData/testcoverage/python_coverage/project/module2.py",
             "namespace":null,
             "method":"y"
          }

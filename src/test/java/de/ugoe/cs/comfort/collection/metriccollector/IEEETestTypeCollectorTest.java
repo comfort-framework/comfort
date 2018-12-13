@@ -79,7 +79,7 @@ public class IEEETestTypeCollectorTest extends BaseMetricCollectorTest {
         ieeeTestTypeCollector = new IEEETestTypeCollector(javaConfig, filerMock);
         ieeeTestTypeCollector.createResultsJavaPythonClassLevelCallGraph(callGraph);
 
-        expectedResult.add(new Result("org.foo.t1.Test1", null, "call_ieee",TestType.INTEGRATION.name()));
+        expectedResult.add(new Result("org.foo.t1.Test1", Paths.get("src/main/java/org/foo/t1/Test1.java"), "call_ieee",TestType.INTEGRATION.name()));
         assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
@@ -92,7 +92,7 @@ public class IEEETestTypeCollectorTest extends BaseMetricCollectorTest {
         ieeeTestTypeCollector = new IEEETestTypeCollector(javaConfig, filerMock);
         ieeeTestTypeCollector.createResultsJavaPythonClassLevelCallGraph(callGraph);
 
-        expectedResult.add(new Result("tests.test_module1", null, "call_ieee",TestType.INTEGRATION.name()));
+        expectedResult.add(new Result("tests.test_module1", Paths.get("tests/test_module1.py"), "call_ieee",TestType.INTEGRATION.name()));
         assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
@@ -108,8 +108,8 @@ public class IEEETestTypeCollectorTest extends BaseMetricCollectorTest {
         ieeeTestTypeCollector = new IEEETestTypeCollector(pythonConfig, filerMock);
         ieeeTestTypeCollector.createResultsJavaPythonMethodLevelCallGraph(callGraph);
 
-        expectedResult.add(new Result("tests.test_module1:Module1Test.test", null, "call_ieee_met",TestType.INTEGRATION.name()));
-        expectedResult.add(new Result("tests.test_module2:Module2Test.test", null, "call_ieee_met",TestType.UNIT.name()));
+        expectedResult.add(new Result("tests.test_module1:Module1Test.test", Paths.get("tests/test_module1.py"), "call_ieee_met",TestType.INTEGRATION.name()));
+        expectedResult.add(new Result("tests.test_module2:Module2Test.test", Paths.get("tests/test_module2.py"), "call_ieee_met",TestType.UNIT.name()));
         assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
@@ -133,8 +133,8 @@ public class IEEETestTypeCollectorTest extends BaseMetricCollectorTest {
         ieeeTestTypeCollector = new IEEETestTypeCollector(javaConfig, filerMock);
         ieeeTestTypeCollector.createResultsJavaPythonClassLevelCallGraph(callGraph);
 
-        expectedResult.add(new Result("org.foo.t1.Test1", null, "call_ieee",TestType.UNIT.name()));
-        expectedResult.add(new Result("org.foo.t2.Test2", null, "call_ieee",TestType.INTEGRATION.name()));
+        expectedResult.add(new Result("org.foo.t1.Test1", Paths.get("src/main/java/org/foo/t1/Test1.java"), "call_ieee",TestType.UNIT.name()));
+        expectedResult.add(new Result("org.foo.t2.Test2", Paths.get("src/main/java/org/foo/t2/Test2.java"), "call_ieee",TestType.INTEGRATION.name()));
         assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
@@ -163,8 +163,8 @@ public class IEEETestTypeCollectorTest extends BaseMetricCollectorTest {
         ieeeTestTypeCollector = new IEEETestTypeCollector(javaConfig, filerMock);
         ieeeTestTypeCollector.createResultsJavaPythonMethodLevelCallGraph(callGraph);
 
-        expectedResult.add(new Result("org.foo.t1.Test1.test1", null, "call_ieee_met",TestType.UNIT.name()));
-        expectedResult.add(new Result("org.foo.t2.Test2.test1", null, "call_ieee_met",TestType.INTEGRATION.name()));
+        expectedResult.add(new Result("org.foo.t1.Test1.test1", Paths.get("src/main/java/org/foo/t1/Test1.java"), "call_ieee_met",TestType.UNIT.name()));
+        expectedResult.add(new Result("org.foo.t2.Test2.test1", Paths.get("src/main/java/org/foo/t2/Test2.java"), "call_ieee_met",TestType.INTEGRATION.name()));
         assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
@@ -245,8 +245,8 @@ public class IEEETestTypeCollectorTest extends BaseMetricCollectorTest {
         ieeeTestTypeCollector = new IEEETestTypeCollector(javaConfig, filerMock);
         ieeeTestTypeCollector.createResultsJavaPythonCoverageClass(covData);
 
-        expectedResult.add(new Result("org.foo.t1.Test1", null, "cov_ieee",TestType.UNIT.name()));
-        expectedResult.add(new Result("org.foo.t2.Test2", null , "cov_ieee",TestType.INTEGRATION.name()));
+        expectedResult.add(new Result("org.foo.t1.Test1", Paths.get("src/main/java/org/foo/t1/Test1.java"), "cov_ieee",TestType.UNIT.name()));
+        expectedResult.add(new Result("org.foo.t2.Test2", Paths.get("src/main/java/org/foo/t2/Test2.java") , "cov_ieee",TestType.INTEGRATION.name()));
         assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
@@ -267,7 +267,7 @@ public class IEEETestTypeCollectorTest extends BaseMetricCollectorTest {
         ieeeTestTypeCollector = new IEEETestTypeCollector(javaConfig, filerMock);
         ieeeTestTypeCollector.createResultsJavaPythonCoverageClass(covData);
 
-        expectedResult.add(new Result("org.foo.t1.Test1", null, "cov_ieee",TestType.INTEGRATION.name()));
+        expectedResult.add(new Result("org.foo.t1.Test1", Paths.get("src/main/java/org/foo/t1/Test1.java"), "cov_ieee",TestType.INTEGRATION.name()));
         assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
@@ -289,8 +289,8 @@ public class IEEETestTypeCollectorTest extends BaseMetricCollectorTest {
         ieeeTestTypeCollector = new IEEETestTypeCollector(javaConfig, filerMock);
         ieeeTestTypeCollector.createResultsJavaPythonCoverageMethod(covData);
 
-        expectedResult.add(new Result("org.foo.t1.Test1.test1", null, "cov_ieee_met",TestType.UNIT.name()));
-        expectedResult.add(new Result("org.foo.t1.Test1.m1", null, "cov_ieee_met",TestType.INTEGRATION.name()));
+        expectedResult.add(new Result("org.foo.t1.Test1.test1", Paths.get("src/main/java/org/foo/t1/Test1.java"), "cov_ieee_met",TestType.UNIT.name()));
+        expectedResult.add(new Result("org.foo.t1.Test1.m1", Paths.get("src/main/java/org/foo/t1/Test1.java"), "cov_ieee_met",TestType.INTEGRATION.name()));
         assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
@@ -313,8 +313,8 @@ public class IEEETestTypeCollectorTest extends BaseMetricCollectorTest {
         ieeeTestTypeCollector = new IEEETestTypeCollector(pythonConfig, filerMock);
         ieeeTestTypeCollector.createResultsJavaPythonCoverageClass(covData);
 
-        expectedResult.add(new Result("tests.test_module1", null, "cov_ieee", TestType.UNIT.name()));
-        expectedResult.add(new Result("tests.test_module2", null, "cov_ieee", TestType.INTEGRATION.name()));
+        expectedResult.add(new Result("tests.test_module1", Paths.get("tests/test_module1.py"), "cov_ieee", TestType.UNIT.name()));
+        expectedResult.add(new Result("tests.test_module2", Paths.get("tests/test_module2.py"), "cov_ieee", TestType.INTEGRATION.name()));
         assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
@@ -337,8 +337,8 @@ public class IEEETestTypeCollectorTest extends BaseMetricCollectorTest {
         ieeeTestTypeCollector = new IEEETestTypeCollector(pythonConfig, filerMock);
         ieeeTestTypeCollector.createResultsJavaPythonCoverageMethod(covData);
 
-        expectedResult.add(new Result("tests.test_module1:Module1Test.test", null, "cov_ieee_met", TestType.UNIT.name()));
-        expectedResult.add(new Result("tests.test_module2:Module2Test.test", null, "cov_ieee_met", TestType.INTEGRATION.name()));
+        expectedResult.add(new Result("tests.test_module1:Module1Test.test", Paths.get("tests/test_module1.py"), "cov_ieee_met", TestType.UNIT.name()));
+        expectedResult.add(new Result("tests.test_module2:Module2Test.test", Paths.get("tests/test_module2.py"), "cov_ieee_met", TestType.INTEGRATION.name()));
         assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 }

@@ -87,11 +87,11 @@ public class TestCoverageCollectorTest extends BaseMetricCollectorTest {
 
         // Python Data
         Set<IUnit> testedMethodsOfTest1py = new HashSet<>();
-        testedMethodsOfTest1py.add(demoInit);
+        testedMethodsOfTest1py.add(pyModule1Init);
         testedMethodsOfTest1py.add(pyModule2Init);
 
         Set<IUnit> testedMethodsOfTest2py = new HashSet<>();
-        testedMethodsOfTest2py.add(demoInit);
+        testedMethodsOfTest2py.add(pyModule1Init);
 
         Set<IUnit> testedMethodsOfTest3py = new HashSet<>();
         testedMethodsOfTest3py.add(pyModule3Init);
@@ -123,9 +123,9 @@ public class TestCoverageCollectorTest extends BaseMetricCollectorTest {
     public void createCodeCoverageMetricJavaMethodLevelTest() throws IOException {
         testCoverageCollector = new TestCoverageCollector(javaConfig, filerMock);
         testCoverageCollector.createResultsJavaPythonMethodLevel(covDataJava);
-        expectedResult.add(new Result("org.foo.t1.Test1.test1", null, "cov_tcov_met", "66"));
-        expectedResult.add(new Result("org.foo.t2.Test2.test1", null, "cov_tcov_met","33"));
-        expectedResult.add(new Result("org.foo.t2.Test2.test2", null, "cov_tcov_met","33"));
+        expectedResult.add(new Result("org.foo.t1.Test1.test1", Paths.get("src/main/java/org/foo/t1/Test1.java"), "cov_tcov_met", "66"));
+        expectedResult.add(new Result("org.foo.t2.Test2.test1", Paths.get("src/main/java/org/foo/t2/Test2.java"), "cov_tcov_met","33"));
+        expectedResult.add(new Result("org.foo.t2.Test2.test2", Paths.get("src/main/java/org/foo/t2/Test2.java"), "cov_tcov_met","33"));
         assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
 
     }
@@ -135,9 +135,9 @@ public class TestCoverageCollectorTest extends BaseMetricCollectorTest {
         testCoverageCollector = new TestCoverageCollector(pythonConfig, filerMock);
 
         testCoverageCollector.createResultsJavaPythonMethodLevel(covDataPython);
-        expectedResult.add(new Result("tests.test_module1:Module1Test.test", null, "cov_tcov_met", "66"));
-        expectedResult.add(new Result("tests.test_module2:Module2Test.test", null, "cov_tcov_met", "33"));
-        expectedResult.add(new Result("tests.test_module2:Module2Test.test2", null, "cov_tcov_met", "33"));
+        expectedResult.add(new Result("tests.test_module1:Module1Test.test", Paths.get("tests/test_module1.py"), "cov_tcov_met", "66"));
+        expectedResult.add(new Result("tests.test_module2:Module2Test.test",  Paths.get("tests/test_module2.py"), "cov_tcov_met", "33"));
+        expectedResult.add(new Result("tests.test_module2:Module2Test.test2",  Paths.get("tests/test_module2.py"), "cov_tcov_met", "33"));
         assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
@@ -145,8 +145,8 @@ public class TestCoverageCollectorTest extends BaseMetricCollectorTest {
     public void createCodeCoverageMetricJavaClassLevelTest() throws IOException {
         testCoverageCollector = new TestCoverageCollector(javaConfig, filerMock);
         testCoverageCollector.createResultsJavaPythonClassLevel(covDataJava);
-        expectedResult.add(new Result("org.foo.t1.Test1", null, "cov_tcov", "66"));
-        expectedResult.add(new Result("org.foo.t2.Test2", null, "cov_tcov", "66"));
+        expectedResult.add(new Result("org.foo.t1.Test1", Paths.get("src/main/java/org/foo/t1/Test1.java"), "cov_tcov", "66"));
+        expectedResult.add(new Result("org.foo.t2.Test2", Paths.get("src/main/java/org/foo/t2/Test2.java"), "cov_tcov", "66"));
         assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
@@ -155,8 +155,8 @@ public class TestCoverageCollectorTest extends BaseMetricCollectorTest {
         testCoverageCollector = new TestCoverageCollector(pythonConfig, filerMock);
 
         testCoverageCollector.createResultsJavaPythonClassLevel(covDataPython);
-        expectedResult.add(new Result("tests.test_module1", null, "cov_tcov", "66"));
-        expectedResult.add(new Result("tests.test_module2", null, "cov_tcov", "66"));
+        expectedResult.add(new Result("tests.test_module1", Paths.get("tests/test_module1.py"), "cov_tcov", "66"));
+        expectedResult.add(new Result("tests.test_module2", Paths.get("tests/test_module2.py"), "cov_tcov", "66"));
         assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
@@ -165,9 +165,9 @@ public class TestCoverageCollectorTest extends BaseMetricCollectorTest {
         testCoverageCollector = new TestCoverageCollector(javaConfig, filerMock);
 
         testCoverageCollector.createResultsForCallGraphMethodLevel(javaCallGraph);
-        expectedResult.add(new Result("org.foo.t1.Test1.test1", null, "call_tcov_met", "66"));
-        expectedResult.add(new Result("org.foo.t2.Test2.test1", null, "call_tcov_met", "100"));
-        expectedResult.add(new Result("org.foo.t2.Test2.test2", null, "call_tcov_met", "33"));
+        expectedResult.add(new Result("org.foo.t1.Test1.test1", Paths.get("src/main/java/org/foo/t1/Test1.java"), "call_tcov_met", "66"));
+        expectedResult.add(new Result("org.foo.t2.Test2.test1", Paths.get("src/main/java/org/foo/t2/Test2.java"), "call_tcov_met", "100"));
+        expectedResult.add(new Result("org.foo.t2.Test2.test2", Paths.get("src/main/java/org/foo/t2/Test2.java"), "call_tcov_met", "33"));
         assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 
@@ -176,8 +176,8 @@ public class TestCoverageCollectorTest extends BaseMetricCollectorTest {
         testCoverageCollector = new TestCoverageCollector(javaConfig, filerMock);
 
         testCoverageCollector.createResultsForCallGraphClassLevel(javaCallGraph);
-        expectedResult.add(new Result("org.foo.t1.Test1", null, "call_tcov", "66"));
-        expectedResult.add(new Result("org.foo.t2.Test2", null, "call_tcov", "100"));
+        expectedResult.add(new Result("org.foo.t1.Test1", Paths.get("src/main/java/org/foo/t1/Test1.java"), "call_tcov", "66"));
+        expectedResult.add(new Result("org.foo.t2.Test2", Paths.get("src/main/java/org/foo/t2/Test2.java"), "call_tcov", "100"));
         assertEquals("Result set is not correct!", expectedResult, filerMock.getResults().getResults());
     }
 

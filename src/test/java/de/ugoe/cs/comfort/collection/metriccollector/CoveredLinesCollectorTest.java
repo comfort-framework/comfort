@@ -23,6 +23,7 @@ import de.ugoe.cs.comfort.data.CoverageData;
 import de.ugoe.cs.comfort.data.models.IUnit;
 import de.ugoe.cs.comfort.filer.models.Result;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
 import org.junit.Test;
@@ -48,7 +49,7 @@ public class CoveredLinesCollectorTest extends BaseMetricCollectorTest {
         CoveredLinesCollector coveredLinesCollectorTest = new CoveredLinesCollector(javaConfig, filerMock);
         coveredLinesCollectorTest.getCoveredTestAndProductionLinesMethodLevel(covData);
 
-        Result expectedResult = new Result("org.foo.t1.Test1.test1", null);
+        Result expectedResult = new Result("org.foo.t1.Test1.test1", Paths.get("src/main/java/org/foo/t1/Test1.java"));
         expectedResult.addMetric("cov_tlines", "6");
         expectedResult.addMetric("cov_plines", "0");
 
@@ -70,7 +71,7 @@ public class CoveredLinesCollectorTest extends BaseMetricCollectorTest {
         CoveredLinesCollector coveredLinesCollectorTest = new CoveredLinesCollector(javaConfig, filerMock);
         coveredLinesCollectorTest.getCoveredTestAndProductionLinesMethodLevel(covData);
 
-        Result expectedResult = new Result("org.foo.bar.C1.m1", null);
+        Result expectedResult = new Result("org.foo.bar.C1.m1", Paths.get("src/main/java/org/foo/bar/C1.java"));
         expectedResult.addMetric("cov_tlines", "6");
         expectedResult.addMetric("cov_plines", "0");
 
@@ -96,7 +97,7 @@ public class CoveredLinesCollectorTest extends BaseMetricCollectorTest {
         CoveredLinesCollector coveredLinesCollectorTest = new CoveredLinesCollector(javaConfig, filerMock);
         coveredLinesCollectorTest.getCoveredTestAndProductionLinesMethodLevel(covData);
 
-        Result expectedResult = new Result("org.foo.t1.Test1.m2", null);
+        Result expectedResult = new Result("org.foo.t1.Test1.m2", Paths.get("src/main/java/org/foo/t1/Test1.java"));
         expectedResult.addMetric("cov_tlines", "6");
         expectedResult.addMetric("cov_plines", "14");
 
@@ -125,11 +126,11 @@ public class CoveredLinesCollectorTest extends BaseMetricCollectorTest {
         CoveredLinesCollector coveredLinesCollectorTest = new CoveredLinesCollector(javaConfig, filerMock);
         coveredLinesCollectorTest.getCoveredTestAndProductionLinesMethodLevel(covData);
 
-        Result expectedResult1 = new Result("org.foo.t1.Test1.m1", null);
+        Result expectedResult1 = new Result("org.foo.t1.Test1.m1", Paths.get("src/main/java/org/foo/t1/Test1.java"));
         expectedResult1.addMetric("cov_tlines", "6");
         expectedResult1.addMetric("cov_plines", "0");
 
-        Result expectedResult2 = new Result("org.foo.t1.Test1.m2", null);
+        Result expectedResult2 = new Result("org.foo.t1.Test1.m2", Paths.get("src/main/java/org/foo/t1/Test1.java"));
         expectedResult2.addMetric("cov_tlines", "0");
         expectedResult2.addMetric("cov_plines", "14");
 
@@ -159,7 +160,7 @@ public class CoveredLinesCollectorTest extends BaseMetricCollectorTest {
         CoveredLinesCollector coveredLinesCollectorTest = new CoveredLinesCollector(javaConfig, filerMock);
         coveredLinesCollectorTest.getCoveredTestAndProductionLinesClassLevel(covData);
 
-        Result expectedResult1 = new Result("org.foo.t1.Test1", null);
+        Result expectedResult1 = new Result("org.foo.t1.Test1", Paths.get("src/main/java/org/foo/t1/Test1.java"));
         expectedResult1.addMetric("cov_tlines", "6");
         expectedResult1.addMetric("cov_plines", "14");
 
