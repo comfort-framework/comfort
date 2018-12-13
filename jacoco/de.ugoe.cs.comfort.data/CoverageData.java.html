@@ -89,17 +89,18 @@ public class CoverageData extends DataSet {
 <span class="fc" id="L89">            Set&lt;IUnit&gt; coveredMethodsWithoutTests = new HashSet&lt;&gt;();</span>
 <span class="fc bfc" id="L90" title="All 2 branches covered.">            if(entry.getValue() != null) {</span>
 <span class="fc bfc" id="L91" title="All 2 branches covered.">                for (IUnit coveredMethod : entry.getValue()) {</span>
-<span class="fc bfc" id="L92" title="All 2 branches covered.">                    if (!coveredMethod.getFQNOfUnit().equals(entry.getKey().getFQNOfUnit())</span>
-<span class="fc bfc" id="L93" title="All 2 branches covered.">                            &amp;&amp; !Utils.isTestBasedOnFQN(coveredMethod.getFQNOfUnit())) {</span>
-<span class="fc" id="L94">                        coveredMethodsWithoutTests.add(coveredMethod);</span>
+<span class="fc bfc" id="L92" title="All 2 branches covered.">                    if (!coveredMethod.getFilePath().toString().contains(&quot;test&quot;)</span>
+<span class="pc bpc" id="L93" title="1 of 2 branches missed.">                            &amp;&amp; !coveredMethod.getFQNOfUnit().equals(entry.getKey().getFQNOfUnit())</span>
+<span class="pc bpc" id="L94" title="1 of 2 branches missed.">                            &amp;&amp; !Utils.isTestBasedOnFQN(coveredMethod.getFQNOfUnit())) {</span>
+<span class="fc" id="L95">                        coveredMethodsWithoutTests.add(coveredMethod);</span>
                     }
-<span class="fc" id="L96">                }</span>
-<span class="fc" id="L97">                coverageWithoutTests.put(entry.getKey(), coveredMethodsWithoutTests);</span>
+<span class="fc" id="L97">                }</span>
+<span class="fc" id="L98">                coverageWithoutTests.put(entry.getKey(), coveredMethodsWithoutTests);</span>
             } else {
-<span class="fc" id="L99">                coverageWithoutTests.put(entry.getKey(), null);</span>
+<span class="fc" id="L100">                coverageWithoutTests.put(entry.getKey(), null);</span>
             }
-<span class="fc" id="L101">        }</span>
-<span class="fc" id="L102">        return coverageWithoutTests;</span>
+<span class="fc" id="L102">        }</span>
+<span class="fc" id="L103">        return coverageWithoutTests;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

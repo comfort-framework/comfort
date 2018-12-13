@@ -57,7 +57,7 @@ public class BaseMetricCollector extends BaseModel {
             try {
                 // We need to find the method where the annotations are fitting to the configuration and
                 // where the parameter types are fitting
-<span class="fc bfc" id="L60" title="All 4 branches covered.">                if (shouldMethodBeExecuted(method) &amp;&amp; checkIfParameterTypesAreFitting(method, classNamesOfArguments)) {</span>
+<span class="pc bpc" id="L60" title="1 of 4 branches missed.">                if (shouldMethodBeExecuted(method) &amp;&amp; checkIfParameterTypesAreFitting(method, classNamesOfArguments)) {</span>
 <span class="fc" id="L61">                    method.invoke(this, data);</span>
 <span class="fc" id="L62">                    return;</span>
                 }
