@@ -221,17 +221,20 @@ public class SmartSHARKFiler extends BaseFiler {
             datastore.save(dbTestState);
         } else {
             dbTestState.getMetrics().putAll(testState.getMetrics());
-            Query<TestState> updateQuery = datastore.createQuery(TestState.class).field("_id").equal(dbTestState.getId());
+            Query<TestState> updateQuery = datastore.createQuery(TestState.class).field("_id")
+                    .equal(dbTestState.getId());
 
 
             // Update metrics
-            UpdateOperations<TestState> ops = datastore.createUpdateOperations(TestState.class).set("metrics", dbTestState.getMetrics());
+            UpdateOperations<TestState> ops = datastore.createUpdateOperations(TestState.class)
+                    .set("metrics", dbTestState.getMetrics());
             datastore.update(updateQuery, ops);
 
             // Update mutation_res if available
             if(testState.getMutationResults().size() != 0) {
                 dbTestState.getMutationResults().addAll(testState.getMutationResults());
-                ops = datastore.createUpdateOperations(TestState.class).set("mutation_res", dbTestState.getMutationResults());
+                ops = datastore.createUpdateOperations(TestState.class)
+                        .set("mutation_res", dbTestState.getMutationResults());
                 datastore.update(updateQuery, ops);
             }
         }

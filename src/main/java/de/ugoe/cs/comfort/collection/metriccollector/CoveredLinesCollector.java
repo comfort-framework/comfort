@@ -66,8 +66,8 @@ public class CoveredLinesCollector  extends BaseMetricCollector {
                         coveredTestLines += coveredMethod.getCoveredLines();
                     } else {
                         if (!coveredMethod.getFQNOfUnit().equals(entry.getKey().getFQNOfUnit())
-                                && !(coveredMethod.getFQNOfUnit().contains("test") ||
-                                coveredMethod.getFQNOfUnit().contains("validate"))) {
+                                && !(coveredMethod.getFQNOfUnit().contains("test")
+                                || coveredMethod.getFQNOfUnit().contains("validate"))) {
                             logger.debug("Covered production code: {}", coveredMethod);
                             coveredProductionLines += coveredMethod.getCoveredLines();
                         } else {
