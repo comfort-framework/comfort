@@ -52,7 +52,7 @@ dependencies {
     compile group: 'org.jacoco', name: 'org.jacoco.report', version: jacocoVersion
     compile group: 'com.github.javaparser', name:'javaparser-core', version: '3.5.7'
     compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '4.10.0.201712302008-r'
-    compile group: 'de.ugoe.cs', name: 'jSHARK', version: '2.+'
+    compile group: 'io.github.smartshark', name: 'jSHARK', version: '2.+'
     compile group: 'de.ugoe.cs', name: 'changeSHARK', version: '2.+'
     compile group: 'org.apache.maven.shared', name: 'maven-invoker', version: '3.0.0'
 }
